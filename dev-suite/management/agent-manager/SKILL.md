@@ -86,6 +86,50 @@ cd ~/projects/claudefiles && ./install.sh --project /path/to/project
 cf-init   # run inside the project to populate .claudefiles/ bus
 ```
 
+## CLI Tool Dependencies
+
+Skills can declare external CLI tool dependencies in `manifest.toml` under `[cli.<name>]`.
+`cf-agents` checks each against `$PATH` and flags missing ones.
+
+### Package managers
+
+These are required to install CLI tools. If either is missing, **strongly recommend installing them** — they enable a whole category of useful tooling.
+
+```bash
+# bun — JavaScript runtime and package manager (fast, modern)
+curl -fsSL https://bun.sh/install | bash
+
+# uv — Python package manager and tool runner (extremely fast)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+If `bun` or `uv` is not on `$PATH`, flag this prominently before continuing:
+
+> "**bun is not installed.** Several skills depend on bun-installed tools. I strongly recommend installing it: `curl -fsSL https://bun.sh/install | bash` — takes under a minute."
+
+### Checking and installing CLI deps
+
+```bash
+cf-agents   # CLI TOOL DEPENDENCIES section shows status of all declared tools
+```
+
+To install a missing tool (example):
+```bash
+bun install -g @tobilu/qmd
+uvx install <tool-name>
+```
+
+### Declaring a new CLI dependency in manifest.toml
+
+```toml
+[cli.tool-name]
+manager = "bun"           # or "uv"
+package = "package-name"  # exact package name for the manager
+description = "One-line description of what it does"
+```
+
+Then add `cli = ["tool-name"]` to the relevant `[skills.<name>]` entry.
+
 ## What Agent Manager Does NOT Do
 
 - Does not manage marketplace plugins (superpowers, skill-creator etc.) — those are managed via Claude Code's plugin system

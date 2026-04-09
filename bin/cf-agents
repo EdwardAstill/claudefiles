@@ -358,4 +358,76 @@ if "$SHOW_AVAILABLE"; then
     echo "  Install all: cd $CLAUDEFILES_ROOT && ./install.sh --user"
 fi
 
+# ── CLI Tool Dependencies ─────────────────────────────────────────────────────
+
+echo ""
+echo "CLI TOOL DEPENDENCIES"
+echo "$DIVIDER"
+
+MANIFEST="$CLAUDEFILES_ROOT/manifest.toml"
+
+python3 - "$MANIFEST" <<'PYEOF'
+import sys, subprocess, shutil
+
+manifest_file = sys.argv[1]
+
+# Parse manifest.toml for [cli.*] entries
+cli_tools = {}
+current_tool = None
+try:
+    with open(manifest_file) as f:
+        for line in f:
+            line = line.rstrip()
+            if line.startswith("[cli."):
+                current_tool = line[5:].rstrip("]").strip()
+                cli_tools[current_tool] = {}
+            elif current_tool and "=" in line and not line.startswith("["):
+                key, _, val = line.partition("=")
+                cli_tools[current_tool][key.strip()] = val.strip().strip('"')
+except Exception as e:
+    print(f"  (error reading manifest: {e})")
+    sys.exit(0)
+
+if not cli_tools:
+    print("  (no CLI tool dependencies declared in manifest.toml)")
+    sys.exit(0)
+
+# Check package managers first
+managers = {"bun": None, "uv": None}
+for mgr in managers:
+    path = shutil.which(mgr)
+    managers[mgr] = path
+
+missing_managers = [m for m, p in managers.items() if p is None]
+if missing_managers:
+    print()
+    for mgr in missing_managers:
+        if mgr == "bun":
+            print(f"  ⚠  bun not found — required for some CLI tools")
+            print(f"     Install: curl -fsSL https://bun.sh/install | bash")
+        elif mgr == "uv":
+            print(f"  ⚠  uv not found — required for some CLI tools")
+            print(f"     Install: curl -LsSf https://astral.sh/uv/install.sh | sh")
+    print()
+
+# Check each CLI tool
+for name, info in cli_tools.items():
+    mgr = info.get("manager", "?")
+    pkg = info.get("package", name)
+    desc = info.get("description", "")
+    on_path = shutil.which(name) is not None
+    mgr_available = managers.get(mgr) is not None
+
+    status = "ok" if on_path else "missing"
+    marker = "✓" if on_path else "✗"
+    print(f"  {marker} {name}  [{mgr}]  [{status}]")
+    if desc:
+        print(f"    {desc}")
+    if not on_path:
+        if mgr_available:
+            print(f"    Install: {mgr} install -g {pkg}")
+        else:
+            print(f"    Install: (install {mgr} first, then: {mgr} install -g {pkg})")
+PYEOF
+
 echo ""

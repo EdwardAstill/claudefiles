@@ -23,6 +23,17 @@ tools = ["Bash", "Read", "Grep", "Glob"]
 [skills.docs-agent]
 tools = ["WebSearch", "WebFetch"]
 mcp = ["context7"]
+cli = ["qmd"]
 
 [skills.research-agent]
 tools = ["WebSearch", "WebFetch", "Read"]
+cli = ["qmd"]
+
+# ── CLI tool registry ─────────────────────────────────────────────────────────
+# Tools installed via bun or uv. Referenced by skills above.
+# cf-agents checks PATH for each and flags missing ones.
+
+[cli.qmd]
+manager = "bun"
+package = "@tobilu/qmd"
+description = "Local markdown search — BM25 + vector + LLM reranking, fully local"
