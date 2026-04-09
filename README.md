@@ -63,55 +63,11 @@ claudefiles/
 
 ## Install
 
-### Quick start — full install from the local repo
-
-```bash
-./install.sh --global           # skills → ~/.claude/skills/, bin → ~/.local/bin/
-./install.sh --local            # skills → ./.claude/skills/ (current project)
-./install.sh --global --dry-run # preview without changes
-./install.sh --global --remove  # remove installed symlinks
-```
-
-### Install from GitHub (no local clone required)
-
-```bash
-./install.sh --global --from github:EdwardAstill/claudefiles
-./install.sh --local  --from github:EdwardAstill/claudefiles
-```
-
-Clones the repo to `~/.local/share/claudefiles-src/` on first run, then `git pull` on subsequent runs to stay current.
-
-### Granular installs
-
-```bash
-# One category
-./install.sh --global --category research
-./install.sh --global --category coding
-./install.sh --global --category management
-
-# One skill by name
-./install.sh --global --skill agent-manager
-./install.sh --local  --skill git-expert
-```
-
-### Bootstrap — new machine, minimal first install
-
-`bootstrap.sh` is a dedicated script that installs just `agent-manager` and the bin tools,
-then tells you what to say to install the rest:
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
 ```
 
-What it does:
-1. Clones the repo to `~/.local/share/claudefiles-src/`
-2. Installs the `agent-manager` skill globally
-3. Installs all bin tools (`cf-agents`, `cf-status`, etc.) to `~/.local/bin/`
-
-Then start a new Claude Code session and say: **"Install the full claudefiles suite from GitHub."**
-The agent-manager will run `install.sh --global --from github:EdwardAstill/claudefiles` to pull and install everything else.
-
-After any install, start a new Claude Code session. Skills appear automatically.
+Installs the `agent-manager` skill and CLI tools globally. Start a new Claude Code session — the agent-manager can take it from there.
 
 ## CLI Tools
 
