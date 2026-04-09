@@ -5,3 +5,7 @@ curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/boots
 ```
 
 Installs the agent-manager. Talk to him.
+
+---
+
+Site coming soon.
