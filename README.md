@@ -67,7 +67,7 @@ claudefiles/
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
 ```
 
-Installs the `agent-manager` skill and CLI tools globally. Start a new Claude Code session — the agent-manager can take it from there.
+Installs the agent-manager. Talk to him.
 
 ## CLI Tools
 
