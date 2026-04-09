@@ -96,14 +96,20 @@ Clones the repo to `~/.local/share/claudefiles-src/` on first run, then `git pul
 
 ### Bootstrap — new machine, minimal first install
 
-Install just `agent-manager` globally without cloning the whole repo:
+`bootstrap.sh` is a dedicated script that installs just `agent-manager` and the bin tools,
+then tells you what to say to install the rest:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/install.sh \
-  | bash -s -- --global --from github:EdwardAstill/claudefiles --skill agent-manager
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
 ```
 
-Then start a new Claude Code session. The agent-manager skill has everything it needs to install the rest from GitHub.
+What it does:
+1. Clones the repo to `~/.local/share/claudefiles-src/`
+2. Installs the `agent-manager` skill globally
+3. Installs all bin tools (`cf-agents`, `cf-status`, etc.) to `~/.local/bin/`
+
+Then start a new Claude Code session and say: **"Install the full claudefiles suite from GitHub."**
+The agent-manager will run `install.sh --global --from github:EdwardAstill/claudefiles` to pull and install everything else.
 
 After any install, start a new Claude Code session. Skills appear automatically.
 
