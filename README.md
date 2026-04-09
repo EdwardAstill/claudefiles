@@ -4,18 +4,30 @@ Personal Claude Code skill suite and tooling. Contains a coordinated set of skil
 
 ## Skills
 
-Skills live in `dev-suite/` and are installed as a group.
+Skills live in `dev-suite/` and are organized into three categories. Run `cf-agents --tree` to see the full live hierarchy.
+
+### management/ — orchestration and tooling
 
 | Skill | Purpose |
 |-------|---------|
 | `simple-orchestrator` | Always-on triage — routes simple tasks directly, escalates complex ones |
 | `complex-orchestrator` | Full planner — reads the registry, coordinates multi-skill workflows |
+| `agent-manager` | Skill visibility and management — what's installed globally vs per-project |
+
+### coding/ — writing, reviewing, and shipping code
+
+| Skill | Purpose |
+|-------|---------|
 | `git-expert` | Version control manager — worktrees, branches, merge, cleanup |
+| `github-expert` | GitHub and gh CLI specialist — PRs, issues, Actions, browsing external repos |
 | `api-architect` | API design (from feature → contract) and review (existing code) |
+
+### research/ — information before action
+
+| Skill | Purpose |
+|-------|---------|
 | `docs-agent` | Technical reference lookup — exact APIs, examples, versioned docs |
 | `research-agent` | General research and critical analysis — consensus, trade-offs, pitfalls |
-| `github-expert` | GitHub and gh CLI specialist — PRs, issues, Actions, browsing external repos |
-| `agent-manager` | Skill visibility and management — what's installed globally vs per-project |
 
 The two orchestrators form a tiered system: `simple-orchestrator` activates on every task and either routes to a specialist or hands off to `complex-orchestrator` for full multi-skill coordination.
 
@@ -25,17 +37,25 @@ The two orchestrators form a tiered system: `simple-orchestrator` activates on e
 claudefiles/
 ├── dev-suite/
 │   ├── registry.md              ← skill contracts for complex-orchestrator
-│   ├── simple-orchestrator/
-│   ├── complex-orchestrator/
-│   ├── git-expert/
-│   │   └── scripts/             ← skill-specific helpers
-│   ├── api-architect/
-│   │   └── scripts/
-│   ├── docs-agent/
-│   └── research-agent/
+│   ├── management/              ← orchestration, planning, agent tooling
+│   │   ├── SKILL.md             ← category dispatcher
+│   │   ├── orchestration/
+│   │   │   ├── simple-orchestrator/
+│   │   │   └── complex-orchestrator/
+│   │   └── agent-manager/
+│   ├── coding/                  ← writing, reviewing, and shipping code
+│   │   ├── SKILL.md             ← category dispatcher
+│   │   ├── quality/             ← TDD, debugging, review (coming soon)
+│   │   ├── version-control/
+│   │   │   ├── git-expert/
+│   │   │   └── github-expert/
+│   │   └── api/
+│   │       └── api-architect/
+│   └── research/                ← information before action
+│       ├── SKILL.md             ← category dispatcher
+│       ├── docs-agent/
+│       └── research-agent/
 ├── bin/                         ← personal CLI tools → ~/.local/bin/
-│   ├── cf-worktree
-│   └── cf-status
 ├── lib/                         ← shared scripts used by multiple skills
 ├── manifest.toml                ← per-skill tool requirements + bin entries
 └── install.sh                   ← install/remove skills and bin tools
@@ -190,11 +210,12 @@ If a script is useful as a CLI tool on its own, put it directly in `bin/`. If it
 
 ## Adding a New Skill
 
-1. Create `dev-suite/<skill-name>/SKILL.md` with the standard frontmatter (`name`, `description`)
-2. Add a `scripts/` folder inside the skill directory if it needs helper scripts
-3. Add an entry to `manifest.toml` under `[skills.<skill-name>]` declaring required tools
-4. Add an entry to `dev-suite/registry.md` with the skill's inputs, outputs, and chain targets
-5. Re-run `./install.sh --user` (the symlink points to the live directory, so skills are picked up on next session)
+1. Decide which category it belongs to: `management/`, `coding/`, or `research/`
+2. Create `dev-suite/<category>/[sub-category/]<skill-name>/SKILL.md` with the standard frontmatter (`name`, `description`)
+3. Add a `scripts/` folder inside the skill directory if it needs helper scripts
+4. Add an entry to `manifest.toml` under `[skills.<skill-name>]` declaring required tools
+5. Add an entry to `dev-suite/registry.md` with the skill's inputs, outputs, and chain targets
+6. Re-run `./install.sh --user` (the symlink points to the live directory, so skills are picked up on next session)
 
 ## Adding a Bin Tool
 

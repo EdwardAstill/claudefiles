@@ -5,6 +5,32 @@ Keep this in sync when adding or changing skills.
 
 ---
 
+## Taxonomy
+
+Skills are organized into three top-level categories. Each category has a dispatcher skill
+that routes to the right leaf skill. Run `cf-agents --tree` to see the live hierarchy.
+
+```
+dev-suite/
+├── management/           ← orchestration, planning, agent tooling
+│   ├── orchestration/
+│   │   ├── simple-orchestrator
+│   │   └── complex-orchestrator
+│   └── agent-manager
+├── coding/               ← code writing, review, version control, API design
+│   ├── quality/          (tdd, debugging, verification, review — coming soon)
+│   ├── version-control/
+│   │   ├── git-expert
+│   │   └── github-expert
+│   └── api/
+│       └── api-architect
+└── research/             ← technical reference, analysis, trade-offs
+    ├── docs-agent
+    └── research-agent
+```
+
+---
+
 ## simple-orchestrator
 
 - **Purpose:** Lightweight triage — assess complexity, route or escalate

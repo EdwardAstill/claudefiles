@@ -25,7 +25,7 @@ cf-status --write
 
 This produces the full repo map: trunk state, all branches, all worktrees, commit history
 since each branch point, ahead/behind counts, dirty status, and divergence warnings.
-It also saves a copy to `.git/repo-map.md` for reference.
+It also saves a copy to `.claudefiles/repo-map.md` for reference.
 
 Use the map output as the **Situation Summary**. Do not re-run individual git commands to
 gather what the map already provides.

@@ -2,15 +2,15 @@
 # install.sh — install claudefiles dev-suite skills and bin tools
 #
 # Usage:
-#   ./install.sh --user              # install to ~/.claude/skills/ and ~/.local/bin/
-#   ./install.sh --project ./        # install to ./.claude/skills/ and ~/.local/bin/
-#   ./install.sh --project /path     # install to /path/.claude/skills/ and ~/.local/bin/
-#   ./install.sh --dry-run           # show what would happen without making changes
-#   ./install.sh --remove            # remove installed symlinks
+#   ./install.sh --user                        # install all skills + bin
+#   ./install.sh --user --category coding      # install only coding/ category
+#   ./install.sh --project ./                  # install to project scope
+#   ./install.sh --project ./ --category research
+#   ./install.sh --dry-run                     # preview without changes
+#   ./install.sh --remove                      # remove installed symlinks
+#   ./install.sh --list-categories             # show available categories
 #
-# Combine flags:
-#   ./install.sh --user --dry-run
-#   ./install.sh --project ./ --remove
+# Valid categories: all (default), management, coding, research
 
 set -euo pipefail
 
@@ -21,32 +21,53 @@ BIN_DIR="$SCRIPT_DIR/bin"
 
 MODE=""           # user | project
 PROJECT_PATH=""
+CATEGORY="all"
 DRY_RUN=false
 REMOVE=false
+LIST_CATS=false
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
 
-for arg in "$@"; do
+i=0
+args=("$@")
+while [[ $i -lt ${#args[@]} ]]; do
+    arg="${args[$i]}"
     case "$arg" in
-        --user)      MODE="user" ;;
-        --project)   MODE="project" ;;
-        --dry-run)   DRY_RUN=true ;;
-        --remove)    REMOVE=true ;;
-        /*)          PROJECT_PATH="$arg" ;;
-        ./*)         PROJECT_PATH="$(realpath "$arg")" ;;
-        .)           PROJECT_PATH="$(realpath "$arg")" ;;
+        --user)             MODE="user" ;;
+        --project)          MODE="project" ;;
+        --dry-run)          DRY_RUN=true ;;
+        --remove)           REMOVE=true ;;
+        --list-categories)  LIST_CATS=true ;;
+        --category)
+            i=$((i+1))
+            CATEGORY="${args[$i]}"
+            ;;
+        /*)   PROJECT_PATH="$arg" ;;
+        ./*)  PROJECT_PATH="$(realpath "$arg")" ;;
+        .)    PROJECT_PATH="$(realpath "$arg")" ;;
         *)
-            # Allow --project path as next token (handled by positional)
             if [[ "$MODE" == "project" && -z "$PROJECT_PATH" ]]; then
                 PROJECT_PATH="$(realpath "$arg")"
             fi
             ;;
     esac
+    i=$((i+1))
 done
+
+# ── List categories ───────────────────────────────────────────────────────────
+
+if "$LIST_CATS"; then
+    echo "Available categories:"
+    echo "  all         — install the full dev-suite (default)"
+    for d in "$DEV_SUITE"/*/; do
+        [[ -f "$d/SKILL.md" ]] && echo "  $(basename "$d")"
+    done
+    exit 0
+fi
 
 if [[ -z "$MODE" ]]; then
     echo "Error: specify --user or --project <path>" >&2
-    echo "Usage: $0 [--user|--project <path>] [--dry-run] [--remove]" >&2
+    echo "Usage: $0 [--user|--project <path>] [--category <name>] [--dry-run] [--remove]" >&2
     exit 1
 fi
 
@@ -54,7 +75,20 @@ if [[ "$MODE" == "project" && -z "$PROJECT_PATH" ]]; then
     PROJECT_PATH="$(pwd)"
 fi
 
-# ── Resolve targets ───────────────────────────────────────────────────────────
+# ── Resolve skill source and install target ───────────────────────────────────
+
+if [[ "$CATEGORY" == "all" ]]; then
+    SKILL_SRC="$DEV_SUITE"
+    SKILL_LINK_NAME="dev-suite"
+else
+    SKILL_SRC="$DEV_SUITE/$CATEGORY"
+    SKILL_LINK_NAME="cf-$CATEGORY"
+    if [[ ! -d "$SKILL_SRC" ]]; then
+        echo "Error: category '$CATEGORY' not found in dev-suite/" >&2
+        echo "Run $0 --list-categories to see available categories." >&2
+        exit 1
+    fi
+fi
 
 if [[ "$MODE" == "user" ]]; then
     SKILLS_TARGET="$HOME/.claude/skills"
@@ -125,7 +159,7 @@ install_all() {
     echo ""
 
     echo "Skills:"
-    do_symlink "$DEV_SUITE" "$SKILLS_TARGET/dev-suite"
+    do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
 
     echo ""
     echo "Bin tools:"
@@ -169,7 +203,7 @@ remove_all() {
     echo ""
 
     echo "Skills:"
-    do_remove "$SKILLS_TARGET/dev-suite"
+    do_remove "$SKILLS_TARGET/$SKILL_LINK_NAME"
 
     echo ""
     echo "Bin tools:"

@@ -14,7 +14,9 @@ and invoked directly by the user when they know what they want.
 
 ## Key Facts
 
-- **Skills live in** `dev-suite/<skill-name>/SKILL.md`
+- **Skills live in** `dev-suite/<category>/.../<skill-name>/SKILL.md` — three top-level categories: `management/`, `coding/`, `research/`
+- **Each category has a dispatcher** at `dev-suite/<category>/SKILL.md` that routes to the right leaf skill
+- **Run `cf-agents --tree`** to see the full live hierarchy
 - **Registry lives at** `dev-suite/registry.md` — the complex-orchestrator reads this
 - **Install script:** `install.sh` (bash) — handles symlinks and `manifest.toml` parsing
 - **Bin tools:** `bin/` → symlinked to `~/.local/bin/` on install
@@ -59,7 +61,8 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 
 ## Adding a New Skill — Checklist
 
-- [ ] Create `dev-suite/<skill-name>/SKILL.md` with valid frontmatter
+- [ ] Decide which category it belongs to: `management/`, `coding/`, or `research/`
+- [ ] Create `dev-suite/<category>/[sub-category/]<skill-name>/SKILL.md` with valid frontmatter
 - [ ] Add `scripts/` folder if the skill needs helper scripts
 - [ ] Add entry to `manifest.toml` under `[skills.<skill-name>]`
 - [ ] Add entry to `dev-suite/registry.md` (inputs, outputs, chains)

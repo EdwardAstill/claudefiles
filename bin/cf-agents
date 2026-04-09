@@ -19,6 +19,7 @@ SHOW_GLOBAL=true
 SHOW_PROJECT=true
 SHOW_MCP=true
 SHOW_AVAILABLE=true
+TREE_ONLY=false
 
 for arg in "$@"; do
     case "$arg" in
@@ -26,6 +27,7 @@ for arg in "$@"; do
         --project)   SHOW_GLOBAL=false;  SHOW_AVAILABLE=false; SHOW_MCP=true ;;
         --mcp)       SHOW_GLOBAL=false;  SHOW_PROJECT=false; SHOW_AVAILABLE=false; SHOW_MCP=true ;;
         --available) SHOW_GLOBAL=false;  SHOW_PROJECT=false; SHOW_MCP=false ;;
+        --tree)      TREE_ONLY=true ;;
     esac
 done
 
@@ -39,6 +41,92 @@ skill_name() {
 
 skill_desc() {
     awk '/^description:/{found=1; next} found && /^  /{gsub(/^  /, ""); print; exit} found && /^[^ ]/{exit}' "$1" 2>/dev/null | head -1
+}
+
+# Render a skills directory as a tree, respecting category hierarchy
+render_tree() {
+    local dir="$1"
+    local prefix="${2:-}"
+    local entries=()
+
+    # Collect immediate children (dirs only)
+    while IFS= read -r entry; do
+        entries+=("$entry")
+    done < <(find "$dir" -mindepth 1 -maxdepth 1 -type d | sort)
+
+    local count="${#entries[@]}"
+    local i=0
+
+    for entry in "${entries[@]}"; do
+        i=$((i + 1))
+        local name
+        name="$(basename "$entry")"
+        local is_last=false
+        [[ $i -eq $count ]] && is_last=true
+
+        local connector="├──"
+        local child_prefix="│   "
+        "$is_last" && connector="└──" && child_prefix="    "
+
+        if [[ -f "$entry/SKILL.md" ]]; then
+            local skill
+            skill="$(skill_name "$entry/SKILL.md")"
+            # Check if this is a category (has subdirs with SKILL.md) or leaf
+            local subdirs
+            subdirs="$(find "$entry" -mindepth 2 -name "SKILL.md" 2>/dev/null | wc -l)"
+            if [[ "$subdirs" -gt 0 ]]; then
+                echo "${prefix}${connector} ${name}/  [category: ${skill}]"
+                render_tree "$entry" "${prefix}${child_prefix}"
+            else
+                echo "${prefix}${connector} ${skill}"
+            fi
+        else
+            # Directory without SKILL.md — show as group
+            echo "${prefix}${connector} ${name}/"
+            render_tree "$entry" "${prefix}${child_prefix}"
+        fi
+    done
+}
+
+# Show tree for a given skills root dir
+print_tree() {
+    local root="$1"
+    local label="$2"
+    echo "$label"
+    # Each top-level entry in the skills dir
+    local entries=()
+    while IFS= read -r entry; do
+        entries+=("$entry")
+    done < <(find "$root" -mindepth 1 -maxdepth 1 -type d | sort)
+
+    local count="${#entries[@]}"
+    local i=0
+    for entry in "${entries[@]}"; do
+        i=$((i + 1))
+        local name
+        name="$(basename "$entry")"
+        local is_last=false
+        [[ $i -eq $count ]] && is_last=true
+        local connector="├──"
+        local child_prefix="│   "
+        "$is_last" && connector="└──" && child_prefix="    "
+
+        if [[ -f "$entry/SKILL.md" ]]; then
+            local subdirs
+            subdirs="$(find "$entry" -mindepth 2 -name "SKILL.md" 2>/dev/null | wc -l)"
+            if [[ "$subdirs" -gt 0 ]]; then
+                local skill
+                skill="$(skill_name "$entry/SKILL.md")"
+                echo "${connector} ${name}/  [${skill}]"
+                render_tree "$entry" "${child_prefix}"
+            else
+                echo "${connector} $(skill_name "$entry/SKILL.md")"
+            fi
+        else
+            echo "${connector} ${name}/"
+            render_tree "$entry" "${child_prefix}"
+        fi
+    done
 }
 
 # Print MCP servers from a .mcp.json file
@@ -162,18 +250,21 @@ PYEOF
 
     USER_SKILLS="$HOME/.claude/skills"
     if [[ -d "$USER_SKILLS" ]]; then
-        found_any=false
-        while IFS= read -r skill_md; do
-            name="$(skill_name "$skill_md")"
-            desc="$(skill_desc "$skill_md")"
-            echo "  • $name"
-            [[ -n "$desc" ]] && echo "    $desc"
-            found_any=true
-        done < <(find "$USER_SKILLS" -name "SKILL.md" | sort)
-        "$found_any" || echo "  (none)"
+        print_tree "$USER_SKILLS" ""
     else
         echo "  (directory does not exist)"
     fi
+fi
+
+# ── Tree-only mode ────────────────────────────────────────────────────────────
+
+if "$TREE_ONLY"; then
+    echo ""
+    echo "SKILL TREE"
+    echo "$DIVIDER"
+    print_tree "$CLAUDEFILES_ROOT/dev-suite" "dev-suite/"
+    echo ""
+    exit 0
 fi
 
 # ── MCP Servers ───────────────────────────────────────────────────────────────
@@ -226,15 +317,7 @@ if "$SHOW_PROJECT"; then
         echo "PROJECT — SKILLS  $(basename "$GIT_ROOT")/.claude/skills/"
         echo "$DIVIDER"
         if [[ -d "$PROJECT_SKILLS" ]]; then
-            found_any=false
-            while IFS= read -r skill_md; do
-                name="$(skill_name "$skill_md")"
-                desc="$(skill_desc "$skill_md")"
-                echo "  • $name"
-                [[ -n "$desc" ]] && echo "    $desc"
-                found_any=true
-            done < <(find "$PROJECT_SKILLS" -name "SKILL.md" | sort)
-            "$found_any" || echo "  (none)"
+            print_tree "$PROJECT_SKILLS" ""
         else
             echo "  (no project-level skills installed)"
             echo "  Install with: cd $CLAUDEFILES_ROOT && ./install.sh --project $GIT_ROOT"

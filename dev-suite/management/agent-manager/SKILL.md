@@ -21,6 +21,22 @@ manage what is installed where. Understands the difference between global scope
 | Global | `~/.claude/skills/` | All sessions, manually installed |
 | Project | `.claude/skills/` | This project only |
 
+## Skill Hierarchy
+
+Skills are organized in a three-level taxonomy. To see the live tree:
+
+```bash
+cf-agents --tree
+```
+
+Top-level categories:
+- `management/` — orchestration (simple + complex), agent tooling
+- `coding/` — quality (TDD, debugging, review), version control, API design
+- `research/` — docs lookup, general research and analysis
+
+Each category has a dispatcher `SKILL.md` that routes to the right leaf skill.
+Leaf skills work standalone too — use `/skill-name` to invoke directly.
+
 ## On Invocation
 
 Always run `cf-agents` first to get the current state:
