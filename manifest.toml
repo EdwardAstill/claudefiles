@@ -3,7 +3,7 @@
 
 [bin]
 # Scripts in bin/ to symlink to ~/.local/bin/
-install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents"]
+install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents", "cf-setup"]
 
 [skills.simple-orchestrator]
 # Reads only in-context frontmatter — no additional tools needed

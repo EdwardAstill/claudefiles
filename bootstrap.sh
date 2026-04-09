@@ -12,7 +12,7 @@
 #   ./bootstrap.sh
 #
 # What this does:
-#   1. Clones (or updates) the claudefiles repo to ~/.local/share/claudefiles-src/
+#   1. Clones (or updates) the claudefiles repo to ~/.claudefiles/
 #   2. Installs the agent-manager skill to ~/.claude/skills/
 #   3. Installs all bin tools (cf-agents, cf-status, etc.) to ~/.local/bin/
 #
@@ -24,7 +24,7 @@
 set -euo pipefail
 
 GITHUB_REPO="EdwardAstill/claudefiles"
-CACHE_DIR="$HOME/.local/share/claudefiles-src/EdwardAstill-claudefiles"
+CACHE_DIR="$HOME/.claudefiles"
 SKILLS_TARGET="$HOME/.claude/skills"
 BIN_TARGET="$HOME/.local/bin"
 
@@ -63,7 +63,6 @@ if [[ -d "$CACHE_DIR/.git" ]]; then
     ok "Up to date"
 else
     info "Cloning from GitHub..."
-    mkdir -p "$(dirname "$CACHE_DIR")"
     git clone --quiet "https://github.com/$GITHUB_REPO" "$CACHE_DIR"
     ok "Cloned to $CACHE_DIR"
 fi
@@ -159,10 +158,7 @@ echo ""
 echo "  agent-manager is installed globally."
 echo ""
 echo "  Next steps:"
-echo "    1. Start a new Claude Code session"
-echo "    2. Say: \"Install the full claudefiles suite from GitHub\""
-echo "       The agent-manager will run install.sh to pull and install everything."
-echo ""
-echo "  Or install everything right now:"
-echo "    $CACHE_DIR/install.sh --global --from github:$GITHUB_REPO"
+echo "    1. Start a new Claude Code session in your project"
+echo "    2. Say: \"Set up this project\" — the agent-manager will ask you to"
+echo "       describe your project and install the right skills for it."
 echo ""

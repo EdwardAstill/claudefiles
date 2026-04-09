@@ -1,0 +1,190 @@
+#!/usr/bin/env bash
+# cf-setup — check tool dependencies for the skills installed in this project
+#
+# Reads .claude/skills/ to discover which skills are active, then looks up
+# their declared tool and CLI requirements in manifest.toml. Reports what is
+# installed, what is missing, and writes a summary to .claudefiles/deps.md.
+#
+# Usage:
+#   cf-setup           # check deps for all locally installed skills
+#   cf-setup --write   # also write .claudefiles/deps.md
+#   cf-setup --skills "git-expert,docs-agent"  # check specific skills by name
+
+set -euo pipefail
+
+CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
+source "$CF_LIB/common.sh"
+
+WRITE=false
+EXPLICIT_SKILLS=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --write)   WRITE=true ;;
+        --skills)  shift; EXPLICIT_SKILLS="$1" ;;
+    esac
+done
+
+# ── Locate manifest.toml ──────────────────────────────────────────────────────
+# Prefer the home claudefiles install, fall back to the repo this script is in.
+
+MANIFEST=""
+for candidate in \
+    "$HOME/.claudefiles/manifest.toml" \
+    "$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../manifest.toml"
+do
+    [[ -f "$candidate" ]] && MANIFEST="$candidate" && break
+done
+
+if [[ -z "$MANIFEST" ]]; then
+    echo "Error: manifest.toml not found. Is claudefiles installed to ~/.claudefiles/?" >&2
+    exit 1
+fi
+
+# ── Discover installed skills ─────────────────────────────────────────────────
+
+GIT_ROOT="$(cf_git_root 2>/dev/null || echo "")"
+PROJECT_SKILLS_DIR="${GIT_ROOT:+$GIT_ROOT/.claude/skills}"
+
+if [[ -n "$EXPLICIT_SKILLS" ]]; then
+    INSTALLED_SKILLS="$(echo "$EXPLICIT_SKILLS" | tr ',' '\n' | tr -d ' ')"
+elif [[ -n "$PROJECT_SKILLS_DIR" && -d "$PROJECT_SKILLS_DIR" ]]; then
+    # Read skill names from SKILL.md files under .claude/skills/
+    INSTALLED_SKILLS=""
+    while IFS= read -r skill_md; do
+        name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
+        [[ -n "$name" ]] && INSTALLED_SKILLS+="$name"$'\n'
+    done < <(find "$PROJECT_SKILLS_DIR" -name "SKILL.md" 2>/dev/null)
+else
+    echo "No project skills found. Run this inside a project with skills installed."
+    echo "Install skills with: cf-setup --skills \"git-expert,docs-agent\""
+    exit 0
+fi
+
+if [[ -z "$INSTALLED_SKILLS" ]]; then
+    echo "No skills found in $PROJECT_SKILLS_DIR"
+    exit 0
+fi
+
+# ── Run the dependency check ──────────────────────────────────────────────────
+
+OUTPUT="$(python3 - "$MANIFEST" "$INSTALLED_SKILLS" <<'PYEOF'
+import sys, shutil, json
+
+manifest_file = sys.argv[1]
+skill_names = set(s.strip() for s in sys.argv[2].strip().splitlines() if s.strip())
+
+# Parse manifest.toml
+skills = {}       # name -> {tools, mcp, cli}
+cli_registry = {} # name -> {manager, package, description}
+current_section = None
+current_key = None
+
+def parse_list(val):
+    return [x.strip().strip('"') for x in val.strip().strip('[]').split(',') if x.strip().strip('"')]
+
+with open(manifest_file) as f:
+    for line in f:
+        line = line.rstrip()
+        if not line or line.startswith('#'):
+            continue
+        if line.startswith('[cli.'):
+            current_key = line[5:].rstrip(']').strip()
+            current_section = 'cli'
+            cli_registry[current_key] = {}
+        elif line.startswith('[skills.'):
+            current_key = line[8:].rstrip(']').strip()
+            current_section = 'skills'
+            skills[current_key] = {'tools': [], 'mcp': [], 'cli': []}
+        elif line.startswith('['):
+            current_section = None
+            current_key = None
+        elif current_section == 'skills' and current_key and '=' in line:
+            k, _, v = line.partition('=')
+            k = k.strip()
+            if k in ('tools', 'mcp', 'cli'):
+                skills[current_key][k] = parse_list(v)
+        elif current_section == 'cli' and current_key and '=' in line:
+            k, _, v = line.partition('=')
+            cli_registry[current_key][k.strip()] = v.strip().strip('"')
+
+# Check package managers
+bun_path = shutil.which('bun')
+uv_path  = shutil.which('uv')
+
+lines = []
+lines.append("# Project Skill Dependencies\n")
+
+any_missing = False
+
+for skill_name in sorted(skill_names):
+    skill = skills.get(skill_name)
+    if not skill:
+        continue
+
+    lines.append(f"## {skill_name}\n")
+
+    # Claude Code tools (informational — always available in Claude Code)
+    if skill['tools']:
+        lines.append(f"  Claude tools : {', '.join(skill['tools'])}")
+
+    # MCP servers
+    if skill['mcp']:
+        lines.append(f"  MCP servers  : {', '.join(skill['mcp'])}")
+
+    # CLI tools
+    for cli_name in skill['cli']:
+        info = cli_registry.get(cli_name, {})
+        mgr  = info.get('manager', '?')
+        pkg  = info.get('package', cli_name)
+        desc = info.get('description', '')
+        on_path = shutil.which(cli_name) is not None
+
+        if on_path:
+            lines.append(f"  ✓  {cli_name}  [{mgr}]  installed")
+        else:
+            any_missing = True
+            mgr_ok = (mgr == 'bun' and bun_path) or (mgr == 'uv' and uv_path)
+            lines.append(f"  ✗  {cli_name}  [{mgr}]  MISSING")
+            if desc:
+                lines.append(f"       {desc}")
+            if mgr_ok:
+                lines.append(f"       Install: {mgr} install -g {pkg}")
+            else:
+                lines.append(f"       Install {mgr} first, then: {mgr} install -g {pkg}")
+
+    lines.append("")
+
+# Package manager summary
+pm_lines = []
+if not bun_path:
+    any_missing = True
+    pm_lines.append("  ✗  bun   not installed")
+    pm_lines.append("       curl -fsSL https://bun.sh/install | bash")
+else:
+    pm_lines.append(f"  ✓  bun   {bun_path}")
+
+if not uv_path:
+    any_missing = True
+    pm_lines.append("  ✗  uv    not installed")
+    pm_lines.append("       curl -LsSf https://astral.sh/uv/install.sh | sh")
+else:
+    pm_lines.append(f"  ✓  uv    {uv_path}")
+
+lines.insert(1, "## Package managers\n" + "\n".join(pm_lines) + "\n")
+
+if not any_missing:
+    lines.append("All dependencies satisfied.")
+
+print("\n".join(lines))
+PYEOF
+)"
+
+echo "$OUTPUT"
+
+if "$WRITE"; then
+    BUS="$(cf_ensure_bus)"
+    echo "$OUTPUT" > "$BUS/deps.md"
+    echo ""
+    echo "  Written to $BUS/deps.md"
+fi

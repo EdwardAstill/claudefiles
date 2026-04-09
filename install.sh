@@ -95,9 +95,7 @@ done
 # then point all paths at that cache. The rest of the script is source-agnostic.
 
 if [[ "$SOURCE" == "github" ]]; then
-    CACHE_BASE="$HOME/.local/share/claudefiles-src"
-    REPO_SLUG="$(echo "$GITHUB_REPO" | tr '/' '-')"
-    REPO_DIR="$CACHE_BASE/$REPO_SLUG"
+    REPO_DIR="$HOME/.claudefiles"
 
     if [[ -d "$REPO_DIR/.git" ]]; then
         echo "  Updating cached repo from github.com/$GITHUB_REPO ..."
