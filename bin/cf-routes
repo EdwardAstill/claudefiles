@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# cf-routes — scan the codebase for API route definitions
+#
+# Usage:
+#   cf-routes           # print to stdout
+#   cf-routes --write   # also write to .claudefiles/routes.md
+
+set -euo pipefail
+
+CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
+source "$CF_LIB/common.sh"
+
+WRITE=false
+for arg in "$@"; do [[ "$arg" == "--write" ]] && WRITE=true; done
+
+GIT_ROOT="$(cf_git_root)"
+OUT=""
+line() { OUT+="$*"$'\n'; }
+blank() { OUT+=$'\n'; }
+header() { line "$1"; line "$(printf '%0.s─' $(seq 1 ${#1}))"; }
+
+NOW="$(date '+%Y-%m-%d %H:%M:%S')"
+line "# API ROUTES"
+line "# Generated: $NOW"
+line "# Root: $GIT_ROOT"
+blank
+
+FOUND=false
+
+scan() {
+    local label="$1"; shift
+    local results
+    results="$(grep -rn "$@" "$GIT_ROOT" \
+        --include="*.ts" --include="*.tsx" \
+        --include="*.js" --include="*.jsx" \
+        --include="*.rs" --include="*.py" \
+        --include="*.go" \
+        --exclude-dir=node_modules \
+        --exclude-dir=target \
+        --exclude-dir=.git \
+        --exclude-dir=dist \
+        --exclude-dir=build \
+        --exclude-dir=__pycache__ \
+        2>/dev/null || true)"
+
+    if [[ -n "$results" ]]; then
+        FOUND=true
+        header "$label"
+        blank
+        while IFS= read -r match; do
+            file="${match%%:*}"
+            rest="${match#*:}"
+            linenum="${rest%%:*}"
+            content="${rest#*:}"
+            content="$(echo "$content" | sed 's/^ *//')"
+            rel="${file#$GIT_ROOT/}"
+            line "  $rel:$linenum"
+            line "    $content"
+        done <<< "$results"
+        blank
+    fi
+}
+
+scan "Express / Fastify / Hono" \
+    -E "\.(get|post|put|patch|delete|options|head)\(['\"]/"
+
+scan "Next.js App Router" \
+    -E "^export (async )?function (GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)\("
+
+scan "Axum" \
+    -E "\.(get|post|put|patch|delete|options|head)\(\"/"
+
+scan "Actix-web" \
+    -E "#\[((web\.)?(get|post|put|patch|delete|options|head))\(\"/"
+
+scan "FastAPI" \
+    -E "@(app|router)\.(get|post|put|patch|delete|options|head)\(['\"]/"
+
+scan "Go net/http" \
+    -E "HandleFunc\(['\"]/"
+
+scan "Go chi" \
+    -E "\.(Get|Post|Put|Patch|Delete|Options|Head)\(['\"]/"
+
+scan "Go Gin" \
+    -E "\.(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)\(['\"]/"
+
+if ! "$FOUND"; then
+    line "No route definitions found."
+    line "Supported: Express, Fastify, Hono, Next.js, Axum, Actix-web, FastAPI, Go (net/http, chi, gin)"
+    blank
+fi
+
+printf '%s' "$OUT"
+
+if "$WRITE"; then
+    BUS="$(cf_ensure_bus)"
+    printf '%s' "$OUT" > "$BUS/routes.md"
+    echo "# Written to $BUS/routes.md" >&2
+fi

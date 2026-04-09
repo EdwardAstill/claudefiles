@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# cf-worktree — create a git worktree and open a new terminal with Claude Code inside it
+#
+# Usage:
+#   cf-worktree <branch-name> [base-branch]
+
+set -euo pipefail
+
+CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
+source "$CF_LIB/common.sh"
+
+BRANCH="${1:-}"
+BASE="${2:-HEAD}"
+
+if [[ -z "$BRANCH" ]]; then
+    echo "Usage: cf-worktree <branch-name> [base-branch]" >&2
+    exit 1
+fi
+
+cf_require_git
+REPO_ROOT="$(cf_git_root)"
+WORKTREE_NAME="worktree-$(echo "$BRANCH" | tr '/' '-')"
+WORKTREE_PATH="$(dirname "$REPO_ROOT")/$WORKTREE_NAME"
+
+if git worktree list | grep -q "$WORKTREE_PATH"; then
+    echo "Worktree already exists at $WORKTREE_PATH"
+else
+    # Find next free port using shared lib
+    PORT="$(bash "$CF_LIB/port-finder.sh")"
+    echo "Creating worktree: $WORKTREE_PATH (branch: $BRANCH, port: $PORT)"
+    git worktree add "$WORKTREE_PATH" -b "$BRANCH" "$BASE"
+    echo "Worktree created."
+fi
+
+echo ""
+echo "WORKTREE CONTEXT"
+echo "  Path:   $WORKTREE_PATH"
+echo "  Branch: $BRANCH"
+[[ -n "${PORT:-}" ]] && echo "  Port:   $PORT"
+echo ""
+
+launch_claude() {
+    local path="$1"
+    case "${TERM_PROGRAM:-}" in
+        ghostty) ghostty --working-directory="$path" -e claude & ;;
+        WezTerm) wezterm start --cwd "$path" -- claude & ;;
+        kitty)   kitty --directory "$path" claude & ;;
+        *)
+            if [[ -n "${KITTY_WINDOW_ID:-}" ]]; then
+                kitty --directory "$path" claude &
+            else
+                echo "Could not detect terminal from \$TERM_PROGRAM (value: '${TERM_PROGRAM:-unset}')."
+                echo "Open a terminal at $path and run: claude"
+                return 1
+            fi
+            ;;
+    esac
+    echo "Opened Claude Code in new terminal at $path"
+}
+
+launch_claude "$WORKTREE_PATH"

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# cf-note — append a note to .claudefiles/notes.md for cross-agent communication
+#
+# Usage:
+#   cf-note "message"                    # append a plain note
+#   cf-note --agent research "message"   # tag note with agent name
+#   cf-note --read                       # print current notes
+#   cf-note --clear                      # clear all notes (prompts for confirmation)
+
+set -euo pipefail
+
+CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
+source "$CF_LIB/common.sh"
+
+AGENT="agent"
+MODE="write"
+MESSAGE=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --agent) shift; AGENT="$1" ;;
+        --read)  MODE="read" ;;
+        --clear) MODE="clear" ;;
+        *)       MESSAGE="$1" ;;
+    esac
+    shift
+done
+
+NOTES="$(cf_bus)/notes.md"
+
+if [[ "$MODE" == "read" ]]; then
+    if [[ -f "$NOTES" ]]; then cat "$NOTES"
+    else echo "(no notes yet)"
+    fi
+    exit 0
+fi
+
+if [[ "$MODE" == "clear" ]]; then
+    [[ ! -f "$NOTES" ]] && echo "Nothing to clear." && exit 0
+    read -r -p "Clear all notes in $NOTES? [y/N] " confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] && rm "$NOTES" && echo "Cleared." || echo "Cancelled."
+    exit 0
+fi
+
+if [[ -z "$MESSAGE" ]]; then
+    echo "Usage: cf-note [--agent <name>] \"message\"" >&2
+    echo "       cf-note --read" >&2
+    echo "       cf-note --clear" >&2
+    exit 1
+fi
+
+cf_ensure_bus > /dev/null
+
+if [[ ! -f "$NOTES" ]]; then
+    { echo "# SESSION NOTES"
+      echo "# .claudefiles/notes.md — shared agent communication"
+      echo ""
+    } > "$NOTES"
+fi
+
+TIMESTAMP="$(date '+%H:%M:%S')"
+{ echo "[$TIMESTAMP] [$AGENT]"
+  echo "$MESSAGE"
+  echo ""
+} >> "$NOTES"
+
+echo "Note appended to $NOTES"

@@ -1,0 +1,28 @@
+# claudefiles manifest
+# Declares per-skill tool requirements and bin entries for install.sh
+
+[bin]
+# Scripts in bin/ to symlink to ~/.local/bin/
+install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents"]
+
+[skills.simple-orchestrator]
+# Reads only in-context frontmatter — no additional tools needed
+tools = []
+
+[skills.complex-orchestrator]
+# Reads registry.md
+tools = ["Read"]
+
+[skills.git-expert]
+tools = ["Bash", "Read", "Glob"]
+
+[skills.api-architect]
+tools = ["Bash", "Read", "Grep", "Glob"]
+# LSP tools (typescript-lsp, rust-analyzer-lsp) assumed installed via plugins
+
+[skills.docs-agent]
+tools = ["WebSearch", "WebFetch"]
+mcp = ["context7"]
+
+[skills.research-agent]
+tools = ["WebSearch", "WebFetch", "Read"]

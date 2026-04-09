@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# cf-init — bootstrap .claudefiles/ in the current project
+#
+# Creates the .claudefiles/ bus, adds it to .gitignore, then populates
+# all bus files in one shot. Run this at the start of a session.
+#
+# Usage:
+#   cf-init         # full init
+#   cf-init --dry-run
+
+set -euo pipefail
+
+CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
+CF_BIN="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+source "$CF_LIB/common.sh"
+
+DRY_RUN=false
+for arg in "$@"; do [[ "$arg" == "--dry-run" ]] && DRY_RUN=true; done
+
+cf_require_git
+GIT_ROOT="$(cf_git_root)"
+BUS="$(cf_bus)"
+
+echo "Initialising .claudefiles/ for $(basename "$GIT_ROOT")"
+echo ""
+
+if "$DRY_RUN"; then
+    echo "  [dry-run] create $BUS/"
+    echo "  [dry-run] add .claudefiles/ to .gitignore"
+    echo "  [dry-run] run cf-context --write"
+    echo "  [dry-run] run cf-versions --write"
+    echo "  [dry-run] run cf-routes --write"
+    echo "  [dry-run] run cf-status --write"
+    echo ""
+    echo "Done (dry-run)."
+    exit 0
+fi
+
+# Create bus and gitignore entry
+cf_ensure_bus > /dev/null
+echo "  [created] $BUS/"
+
+cf_gitignore_bus
+
+# Populate all bus files
+echo ""
+echo "Populating bus:"
+
+bash "$CF_BIN/cf-context"  --write 2>&1 | grep -v '^#' | sed 's/^/  /' || true
+bash "$CF_BIN/cf-versions" --write 2>&1 | grep -v '^#' | sed 's/^/  /' || true
+bash "$CF_BIN/cf-routes"   --write 2>&1 | grep -v '^#' | sed 's/^/  /' || true
+bash "$CF_BIN/cf-status"   --write 2>&1 | grep -v '^#' | sed 's/^/  /' || true
+
+echo ""
+echo "Bus ready at $BUS/"
+echo "Files: $(ls "$BUS" | tr '\n' ' ')"
+echo ""
+echo "Agents can now read from .claudefiles/ for full project context."

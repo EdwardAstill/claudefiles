@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# cf-read — dump the full .claudefiles/ bus state in one shot
+#
+# Useful for agents to catch up on all shared context without reading
+# each file individually.
+#
+# Usage:
+#   cf-read              # dump all bus files
+#   cf-read context      # dump only context.md
+#   cf-read versions     # dump only versions.md
+#   cf-read routes       # dump only routes.md
+#   cf-read repo-map     # dump only repo-map.md
+#   cf-read notes        # dump only notes.md
+
+set -euo pipefail
+
+CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
+source "$CF_LIB/common.sh"
+
+cf_require_git
+BUS="$(cf_bus)"
+
+if [[ ! -d "$BUS" ]]; then
+    echo "No .claudefiles/ bus found in this project."
+    echo "Run cf-init to create it."
+    exit 1
+fi
+
+# Map friendly names to filenames
+declare -A FILE_MAP=(
+    [context]="context.md"
+    [versions]="versions.md"
+    [routes]="routes.md"
+    [repo-map]="repo-map.md"
+    [notes]="notes.md"
+)
+
+DIVIDER="$(printf '%0.s─' {1..60})"
+
+print_file() {
+    local name="$1"
+    local path="$BUS/$name"
+    if [[ -f "$path" ]]; then
+        echo "$DIVIDER"
+        cat "$path"
+    fi
+}
+
+TARGET="${1:-}"
+
+if [[ -n "$TARGET" ]]; then
+    filename="${FILE_MAP[$TARGET]:-}"
+    if [[ -z "$filename" ]]; then
+        echo "Unknown file: $TARGET" >&2
+        echo "Valid options: ${!FILE_MAP[*]}" >&2
+        exit 1
+    fi
+    print_file "$filename"
+else
+    # Dump all in a consistent order
+    for name in context.md versions.md routes.md repo-map.md notes.md; do
+        print_file "$name"
+    done
+fi
