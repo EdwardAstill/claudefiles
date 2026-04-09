@@ -393,21 +393,23 @@ if not cli_tools:
     sys.exit(0)
 
 # Check package managers first
-managers = {"bun": None, "uv": None}
-for mgr in managers:
-    path = shutil.which(mgr)
-    managers[mgr] = path
+manager_installs = {
+    "bun":    "curl -fsSL https://bun.sh/install | bash",
+    "uv":     "curl -LsSf https://astral.sh/uv/install.sh | sh",
+    "cargo":  "curl https://sh.rustup.rs -sSf | sh",
+    "rustup": "curl https://sh.rustup.rs -sSf | sh",
+}
+managers = {m: shutil.which(m) for m in manager_installs}
 
 missing_managers = [m for m, p in managers.items() if p is None]
-if missing_managers:
+# Only warn about managers actually used by a declared tool
+used_managers = {info.get("manager") for info in cli_tools.values()}
+missing_used = [m for m in missing_managers if m in used_managers]
+if missing_used:
     print()
-    for mgr in missing_managers:
-        if mgr == "bun":
-            print(f"  ⚠  bun not found — required for some CLI tools")
-            print(f"     Install: curl -fsSL https://bun.sh/install | bash")
-        elif mgr == "uv":
-            print(f"  ⚠  uv not found — required for some CLI tools")
-            print(f"     Install: curl -LsSf https://astral.sh/uv/install.sh | sh")
+    for mgr in missing_used:
+        print(f"  ⚠  {mgr} not found — required for some CLI tools")
+        print(f"     Install: {manager_installs[mgr]}")
     print()
 
 # Check each CLI tool
@@ -415,6 +417,8 @@ for name, info in cli_tools.items():
     mgr = info.get("manager", "?")
     pkg = info.get("package", name)
     desc = info.get("description", "")
+    # Use explicit 'install' field if present, else build default command
+    install_cmd = info.get("install") or f"{mgr} install -g {pkg}"
     on_path = shutil.which(name) is not None
     mgr_available = managers.get(mgr) is not None
 
@@ -425,9 +429,9 @@ for name, info in cli_tools.items():
         print(f"    {desc}")
     if not on_path:
         if mgr_available:
-            print(f"    Install: {mgr} install -g {pkg}")
+            print(f"    Install: {install_cmd}")
         else:
-            print(f"    Install: (install {mgr} first, then: {mgr} install -g {pkg})")
+            print(f"    Install: (install {mgr} first, then: {install_cmd})")
 PYEOF
 
 echo ""

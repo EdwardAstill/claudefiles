@@ -109,8 +109,13 @@ with open(manifest_file) as f:
             cli_registry[current_key][k.strip()] = v.strip().strip('"')
 
 # Check package managers
-bun_path = shutil.which('bun')
-uv_path  = shutil.which('uv')
+manager_installs = {
+    "bun":    "curl -fsSL https://bun.sh/install | bash",
+    "uv":     "curl -LsSf https://astral.sh/uv/install.sh | sh",
+    "cargo":  "curl https://sh.rustup.rs -sSf | sh",
+    "rustup": "curl https://sh.rustup.rs -sSf | sh",
+}
+managers = {m: shutil.which(m) for m in manager_installs}
 
 lines = []
 lines.append("# Project Skill Dependencies\n")
@@ -124,54 +129,54 @@ for skill_name in sorted(skill_names):
 
     lines.append(f"## {skill_name}\n")
 
-    # Claude Code tools (informational — always available in Claude Code)
     if skill['tools']:
         lines.append(f"  Claude tools : {', '.join(skill['tools'])}")
-
-    # MCP servers
     if skill['mcp']:
         lines.append(f"  MCP servers  : {', '.join(skill['mcp'])}")
 
-    # CLI tools
     for cli_name in skill['cli']:
         info = cli_registry.get(cli_name, {})
         mgr  = info.get('manager', '?')
         pkg  = info.get('package', cli_name)
         desc = info.get('description', '')
+        install_cmd = info.get('install') or f"{mgr} install -g {pkg}"
         on_path = shutil.which(cli_name) is not None
+        mgr_ok  = bool(managers.get(mgr))
 
         if on_path:
             lines.append(f"  ✓  {cli_name}  [{mgr}]  installed")
         else:
             any_missing = True
-            mgr_ok = (mgr == 'bun' and bun_path) or (mgr == 'uv' and uv_path)
             lines.append(f"  ✗  {cli_name}  [{mgr}]  MISSING")
             if desc:
                 lines.append(f"       {desc}")
             if mgr_ok:
-                lines.append(f"       Install: {mgr} install -g {pkg}")
+                lines.append(f"       Install: {install_cmd}")
             else:
-                lines.append(f"       Install {mgr} first, then: {mgr} install -g {pkg}")
+                lines.append(f"       Install {mgr} first ({manager_installs.get(mgr, '?')}), then: {install_cmd}")
 
     lines.append("")
 
-# Package manager summary
+# Package manager summary — only show managers actually needed
+used_managers = set()
+for skill_name in skill_names:
+    for cli_name in skills.get(skill_name, {}).get('cli', []):
+        used_managers.add(cli_registry.get(cli_name, {}).get('manager'))
+
 pm_lines = []
-if not bun_path:
-    any_missing = True
-    pm_lines.append("  ✗  bun   not installed")
-    pm_lines.append("       curl -fsSL https://bun.sh/install | bash")
-else:
-    pm_lines.append(f"  ✓  bun   {bun_path}")
+for mgr, install_cmd in manager_installs.items():
+    if mgr not in used_managers:
+        continue
+    path = managers[mgr]
+    if path:
+        pm_lines.append(f"  ✓  {mgr}   {path}")
+    else:
+        any_missing = True
+        pm_lines.append(f"  ✗  {mgr}   not installed")
+        pm_lines.append(f"       {install_cmd}")
 
-if not uv_path:
-    any_missing = True
-    pm_lines.append("  ✗  uv    not installed")
-    pm_lines.append("       curl -LsSf https://astral.sh/uv/install.sh | sh")
-else:
-    pm_lines.append(f"  ✓  uv    {uv_path}")
-
-lines.insert(1, "## Package managers\n" + "\n".join(pm_lines) + "\n")
+if pm_lines:
+    lines.insert(1, "## Package managers\n" + "\n".join(pm_lines) + "\n")
 
 if not any_missing:
     lines.append("All dependencies satisfied.")

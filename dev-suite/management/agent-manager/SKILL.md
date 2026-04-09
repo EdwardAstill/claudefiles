@@ -65,6 +65,10 @@ Three categories:
 | API design, endpoints, REST, GraphQL, contracts | `api-architect` |
 | Unfamiliar libraries, SDKs, framework docs | `docs-agent` |
 | Evaluating approaches, research, trade-offs, comparing options | `research-agent` |
+| Python, FastAPI, Django, data science, ML | `python-expert` |
+| TypeScript, JavaScript, React, Node, Next.js, Bun | `typescript-expert` |
+| Rust, systems programming, WebAssembly, embedded | `rust-expert` |
+| Typst, documents, papers, PDFs | `typst-expert` |
 
 When in doubt, install it — skills are cheap to add and easy to remove.
 
@@ -134,6 +138,9 @@ curl -fsSL https://bun.sh/install | bash
 
 # uv — Python package manager and tool runner
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# cargo / rustup — Rust toolchain and package manager
+curl https://sh.rustup.rs -sSf | sh
 ```
 
 ### Declaring a new CLI dependency

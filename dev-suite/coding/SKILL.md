@@ -19,3 +19,4 @@ Routes to the right coding skill based on the task.
 | `git-expert` | Local git operations, worktrees, branching, merge |
 | `github-expert` | GitHub — PRs, issues, Actions, browsing external repos |
 | `api-architect` | Designing or reviewing API contracts |
+| `languages` | Language-specific expertise — routes to python-expert, typescript-expert, rust-expert, typst-expert |

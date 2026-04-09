@@ -29,11 +29,51 @@ cli = ["qmd"]
 tools = ["WebSearch", "WebFetch", "Read"]
 cli = ["qmd"]
 
+[skills.python-expert]
+tools = ["LSP", "Bash", "Read"]
+cli = ["pyright"]
+
+[skills.typescript-expert]
+tools = ["LSP", "Bash", "Read"]
+cli = ["typescript-language-server"]
+
+[skills.rust-expert]
+tools = ["LSP", "Bash", "Read"]
+cli = ["rust-analyzer"]
+
+[skills.typst-expert]
+tools = ["LSP", "Bash", "Read"]
+cli = ["tinymist"]
+
 # ── CLI tool registry ─────────────────────────────────────────────────────────
-# Tools installed via bun or uv. Referenced by skills above.
+# Tools installed via bun, uv, cargo, or rustup.
 # cf-agents checks PATH for each and flags missing ones.
+# Use 'install' to override the default install command.
 
 [cli.qmd]
 manager = "bun"
 package = "@tobilu/qmd"
 description = "Local markdown search — BM25 + vector + LLM reranking, fully local"
+
+[cli.pyright]
+manager = "bun"
+package = "pyright"
+description = "Python type checker and language server"
+
+[cli.typescript-language-server]
+manager = "bun"
+package = "typescript-language-server"
+install = "bun install -g typescript typescript-language-server"
+description = "TypeScript/JavaScript language server"
+
+[cli.rust-analyzer]
+manager = "rustup"
+package = "rust-analyzer"
+install = "rustup component add rust-analyzer"
+description = "Rust language server"
+
+[cli.tinymist]
+manager = "cargo"
+package = "tinymist"
+install = "cargo install tinymist"
+description = "Typst language server"
