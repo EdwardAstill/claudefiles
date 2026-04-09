@@ -1,16 +1,34 @@
 #!/usr/bin/env bash
-# install.sh — install claudefiles dev-suite skills and bin tools
+# install.sh — install claudefiles skills and bin tools
 #
 # Usage:
-#   ./install.sh --user                        # install all skills + bin
-#   ./install.sh --user --category coding      # install only coding/ category
-#   ./install.sh --project ./                  # install to project scope
-#   ./install.sh --project ./ --category research
-#   ./install.sh --dry-run                     # preview without changes
-#   ./install.sh --remove                      # remove installed symlinks
-#   ./install.sh --list-categories             # show available categories
+#   ./install.sh --global                              # install full dev-suite + bin globally
+#   ./install.sh --global --category coding           # install one category globally
+#   ./install.sh --global --skill agent-manager       # install one skill globally (bootstrap)
+#   ./install.sh --local                              # install to current project
+#   ./install.sh --local /path/to/project             # install to specific project
+#   ./install.sh --local --category research          # install one category to current project
+#   ./install.sh --from github:owner/repo --global    # clone from GitHub then install
+#   ./install.sh --dry-run                            # preview without changes
+#   ./install.sh --remove                             # remove installed symlinks
+#   ./install.sh --list-categories                    # show available categories
 #
-# Valid categories: all (default), management, coding, research
+# Source options:
+#   (default)                    use this repo (where install.sh lives)
+#   --from github:owner/repo     clone/update from GitHub, install from that copy
+#
+# Scope options:
+#   --global  (or --user)        install to ~/.claude/skills/ + ~/.local/bin/
+#   --local   (or --project)     install to <project>/.claude/skills/
+#
+# Granularity options (pick one):
+#   (none)                       install full dev-suite as one symlink
+#   --category <name>            install one top-level category (management, coding, research)
+#   --skill <name>               install one named skill by its SKILL.md name field
+#
+# Bootstrap (install just the manager, then use it to install the rest):
+#   curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/install.sh \
+#     | bash -s -- --global --from github:EdwardAstill/claudefiles --skill agent-manager
 
 set -euo pipefail
 
@@ -20,8 +38,11 @@ DEV_SUITE="$SCRIPT_DIR/dev-suite"
 BIN_DIR="$SCRIPT_DIR/bin"
 
 MODE=""           # user | project
+SOURCE="local"    # local | github
+GITHUB_REPO=""
 PROJECT_PATH=""
-CATEGORY="all"
+CATEGORY="all"    # all | <category-name>
+SKILL_NAME=""     # empty = category/all mode; set = single-skill mode
 DRY_RUN=false
 REMOVE=false
 LIST_CATS=false
@@ -33,14 +54,29 @@ args=("$@")
 while [[ $i -lt ${#args[@]} ]]; do
     arg="${args[$i]}"
     case "$arg" in
-        --user)             MODE="user" ;;
-        --project)          MODE="project" ;;
+        --global|--user)    MODE="user" ;;
+        --local|--project)  MODE="project" ;;
         --dry-run)          DRY_RUN=true ;;
         --remove)           REMOVE=true ;;
         --list-categories)  LIST_CATS=true ;;
+        --from)
+            i=$((i+1))
+            FROM_VAL="${args[$i]}"
+            if [[ "$FROM_VAL" == github:* ]]; then
+                SOURCE="github"
+                GITHUB_REPO="${FROM_VAL#github:}"
+            else
+                echo "Error: unknown --from value '$FROM_VAL'. Expected: github:<owner>/<repo>" >&2
+                exit 1
+            fi
+            ;;
         --category)
             i=$((i+1))
             CATEGORY="${args[$i]}"
+            ;;
+        --skill)
+            i=$((i+1))
+            SKILL_NAME="${args[$i]}"
             ;;
         /*)   PROJECT_PATH="$arg" ;;
         ./*)  PROJECT_PATH="$(realpath "$arg")" ;;
@@ -54,6 +90,32 @@ while [[ $i -lt ${#args[@]} ]]; do
     i=$((i+1))
 done
 
+# ── Resolve GitHub source ─────────────────────────────────────────────────────
+# If --from github:owner/repo, clone or update into a local cache directory,
+# then point all paths at that cache. The rest of the script is source-agnostic.
+
+if [[ "$SOURCE" == "github" ]]; then
+    CACHE_BASE="$HOME/.local/share/claudefiles-src"
+    REPO_SLUG="$(echo "$GITHUB_REPO" | tr '/' '-')"
+    REPO_DIR="$CACHE_BASE/$REPO_SLUG"
+
+    if [[ -d "$REPO_DIR/.git" ]]; then
+        echo "  Updating cached repo from github.com/$GITHUB_REPO ..."
+        git -C "$REPO_DIR" pull --ff-only --quiet
+        echo "  Up to date: $REPO_DIR"
+    else
+        echo "  Cloning github.com/$GITHUB_REPO → $REPO_DIR ..."
+        mkdir -p "$CACHE_BASE"
+        git clone --quiet "https://github.com/$GITHUB_REPO" "$REPO_DIR"
+        echo "  Cloned."
+    fi
+
+    # Override all source paths to use the cached copy
+    DEV_SUITE="$REPO_DIR/dev-suite"
+    BIN_DIR="$REPO_DIR/bin"
+    MANIFEST="$REPO_DIR/manifest.toml"
+fi
+
 # ── List categories ───────────────────────────────────────────────────────────
 
 if "$LIST_CATS"; then
@@ -66,8 +128,8 @@ if "$LIST_CATS"; then
 fi
 
 if [[ -z "$MODE" ]]; then
-    echo "Error: specify --user or --project <path>" >&2
-    echo "Usage: $0 [--user|--project <path>] [--category <name>] [--dry-run] [--remove]" >&2
+    echo "Error: specify --global (or --local <path>)" >&2
+    echo "Usage: $0 [--global|--local [<path>]] [--from github:<owner>/<repo>] [--category <name>|--skill <name>] [--dry-run] [--remove]" >&2
     exit 1
 fi
 
@@ -75,11 +137,43 @@ if [[ "$MODE" == "project" && -z "$PROJECT_PATH" ]]; then
     PROJECT_PATH="$(pwd)"
 fi
 
-# ── Resolve skill source and install target ───────────────────────────────────
+# ── Resolve install target ────────────────────────────────────────────────────
 
-if [[ "$CATEGORY" == "all" ]]; then
+if [[ "$MODE" == "user" ]]; then
+    SKILLS_TARGET="$HOME/.claude/skills"
+else
+    SKILLS_TARGET="$PROJECT_PATH/.claude/skills"
+fi
+
+BIN_TARGET="$HOME/.local/bin"
+
+# ── Resolve skill source and link name ───────────────────────────────────────
+# Three modes: full dev-suite, one category, or one named skill.
+
+SKILL_SRC=""
+SKILL_LINK_NAME=""
+
+if [[ -n "$SKILL_NAME" ]]; then
+    # Single-skill mode: find the skill directory by SKILL.md name field
+    while IFS= read -r skill_md; do
+        found_name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
+        if [[ "$found_name" == "$SKILL_NAME" ]]; then
+            SKILL_SRC="$(dirname "$skill_md")"
+            SKILL_LINK_NAME="$SKILL_NAME"
+            break
+        fi
+    done < <(find "$DEV_SUITE" -name "SKILL.md" 2>/dev/null)
+
+    if [[ -z "$SKILL_SRC" ]]; then
+        echo "Error: skill '$SKILL_NAME' not found in dev-suite" >&2
+        echo "Run $0 --list-categories to see available categories, or check dev-suite/ for skill names." >&2
+        exit 1
+    fi
+
+elif [[ "$CATEGORY" == "all" ]]; then
     SKILL_SRC="$DEV_SUITE"
     SKILL_LINK_NAME="dev-suite"
+
 else
     SKILL_SRC="$DEV_SUITE/$CATEGORY"
     SKILL_LINK_NAME="cf-$CATEGORY"
@@ -89,14 +183,6 @@ else
         exit 1
     fi
 fi
-
-if [[ "$MODE" == "user" ]]; then
-    SKILLS_TARGET="$HOME/.claude/skills"
-else
-    SKILLS_TARGET="$PROJECT_PATH/.claude/skills"
-fi
-
-BIN_TARGET="$HOME/.local/bin"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -152,22 +238,33 @@ parse_bin_entries() {
 
 install_all() {
     echo ""
-    echo "Installing claudefiles dev-suite"
+    if [[ -n "$SKILL_NAME" ]]; then
+        echo "Installing claudefiles skill: $SKILL_NAME"
+    elif [[ "$CATEGORY" != "all" ]]; then
+        echo "Installing claudefiles category: $CATEGORY"
+    else
+        echo "Installing claudefiles dev-suite"
+    fi
+
+    echo "  Source        : $SKILL_SRC"
     echo "  Skills target : $SKILLS_TARGET"
-    echo "  Bin target    : $BIN_TARGET"
+    [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]] && echo "  Bin target    : $BIN_TARGET"
     "$DRY_RUN" && echo "  [dry-run mode — no changes will be made]"
     echo ""
 
     echo "Skills:"
     do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
 
-    echo ""
-    echo "Bin tools:"
-    while IFS= read -r entry; do
-        [[ -z "$entry" ]] && continue
-        do_symlink "$BIN_DIR/$entry" "$BIN_TARGET/$entry"
-        chmod +x "$BIN_DIR/$entry" 2>/dev/null || true
-    done < <(parse_bin_entries)
+    # Only install bin tools on global installs, and only for full dev-suite or all-category installs
+    if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
+        echo ""
+        echo "Bin tools:"
+        while IFS= read -r entry; do
+            [[ -z "$entry" ]] && continue
+            do_symlink "$BIN_DIR/$entry" "$BIN_TARGET/$entry"
+            chmod +x "$BIN_DIR/$entry" 2>/dev/null || true
+        done < <(parse_bin_entries)
+    fi
 
     # Add .claudefiles/ to project .gitignore on project installs
     if [[ "$MODE" == "project" ]]; then
@@ -198,19 +295,21 @@ install_all() {
 
 remove_all() {
     echo ""
-    echo "Removing claudefiles dev-suite"
+    echo "Removing claudefiles skills"
     "$DRY_RUN" && echo "  [dry-run mode — no changes will be made]"
     echo ""
 
     echo "Skills:"
     do_remove "$SKILLS_TARGET/$SKILL_LINK_NAME"
 
-    echo ""
-    echo "Bin tools:"
-    while IFS= read -r entry; do
-        [[ -z "$entry" ]] && continue
-        do_remove "$BIN_TARGET/$entry"
-    done < <(parse_bin_entries)
+    if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
+        echo ""
+        echo "Bin tools:"
+        while IFS= read -r entry; do
+            [[ -z "$entry" ]] && continue
+            do_remove "$BIN_TARGET/$entry"
+        done < <(parse_bin_entries)
+    fi
 
     echo ""
     echo "Done."

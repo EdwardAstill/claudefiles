@@ -83,6 +83,20 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 `install.sh` uses symlinks, not copies. Changes to skill files in this repo are immediately
 reflected on the next Claude Code session — no re-install needed.
 
+**Scopes:** `--global` installs to `~/.claude/skills/` + `~/.local/bin/`. `--local [path]`
+installs to `<project>/.claude/skills/`. (`--user` and `--project` are accepted as aliases.)
+
+**Granularity:** `--skill <name>` finds a skill by its SKILL.md `name` field (recursive
+search through dev-suite). `--category <name>` installs a top-level category directory.
+No flag installs the full dev-suite as a single symlink.
+
+**GitHub source:** `--from github:owner/repo` clones to `~/.local/share/claudefiles-src/`
+(or pulls if already cached) and installs from there. The rest of the script is
+source-agnostic — all path logic runs the same way after the clone step.
+
+**Bin tools** are only symlinked on `--global` full dev-suite installs (no `--skill` or
+`--category` flags). They live in `bin/` and are declared in `manifest.toml` under `[bin]`.
+
 `--remove` only removes symlinks created by `install.sh`. It does not touch anything else.
 
 The manifest TOML parser is a simple awk/grep pipeline — keep manifest.toml clean and

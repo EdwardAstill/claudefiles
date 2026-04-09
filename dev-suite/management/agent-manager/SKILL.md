@@ -50,41 +50,100 @@ cf-agents --available  # what's in claudefiles but not installed
 
 Present the output to the user before taking any action.
 
-## Common Tasks
+## Install Commands
 
-### "What skills do I have?"
+`install.sh` has three granularity levels and two scopes. You can combine them freely.
+
+### Scopes
+
+| Flag | Installs to | Use when |
+|------|-------------|----------|
+| `--global` | `~/.claude/skills/` + `~/.local/bin/` | All sessions |
+| `--local [path]` | `<project>/.claude/skills/` | This project only |
+
+### Granularity
+
+| Flag | What gets installed |
+|------|---------------------|
+| (none) | Full dev-suite as one symlink |
+| `--category <name>` | One top-level category (`management`, `coding`, `research`) |
+| `--skill <name>` | One named skill by its SKILL.md `name` field |
+
+### Source
+
+| Flag | Where skills come from |
+|------|------------------------|
+| (none) | Local claudefiles repo |
+| `--from github:owner/repo` | Clones/updates to `~/.local/share/claudefiles-src/` then installs from there |
+
+### Common Tasks
+
+**"What skills do I have?"**
 ```bash
 cf-agents
 ```
 Show the full output. Explain what each scope means if the user seems unfamiliar.
 
-### "Install X skill for this project"
+**"Install everything globally from the local repo"**
 ```bash
-cd ~/projects/claudefiles && ./install.sh --project /path/to/project
-```
-This symlinks the full dev-suite into the project's `.claude/skills/` and adds
-`.claudefiles/` to the project's `.gitignore`.
-
-### "Install everything globally"
-```bash
-cd ~/projects/claudefiles && ./install.sh --user
+cd ~/projects/claudefiles && ./install.sh --global
 ```
 
-### "Remove skills from this project"
+**"Install everything globally from GitHub"**
 ```bash
-cd ~/projects/claudefiles && ./install.sh --project /path/to/project --remove
+./install.sh --global --from github:EdwardAstill/claudefiles
 ```
 
-### "What's available in claudefiles that I haven't installed?"
+**"Install just the research category globally"**
 ```bash
-cf-agents --available
+./install.sh --global --category research
 ```
 
-### "Set up this project from scratch"
+**"Install one skill into a project"**
 ```bash
-cd ~/projects/claudefiles && ./install.sh --project /path/to/project
+./install.sh --local /path/to/project --skill git-expert
+```
+
+**"Install everything into the current project from GitHub"**
+```bash
+./install.sh --local --from github:EdwardAstill/claudefiles
+```
+
+**"Remove skills from a project"**
+```bash
+./install.sh --local /path/to/project --remove
+```
+
+**"Set up a project from scratch"**
+```bash
+./install.sh --local /path/to/project
 cf-init   # run inside the project to populate .claudefiles/ bus
 ```
+
+**"Preview what will happen"**
+```bash
+./install.sh --global --dry-run
+```
+
+## Bootstrap — Installing the Manager First
+
+If you're on a new machine and only want the minimum to get started:
+
+```bash
+# Option A: from a local clone
+cd ~/projects/claudefiles && ./install.sh --global --skill agent-manager
+
+# Option B: without cloning first (pipe install.sh directly)
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/install.sh \
+  | bash -s -- --global --from github:EdwardAstill/claudefiles --skill agent-manager
+```
+
+Once `agent-manager` is globally installed, start a new Claude Code session and ask:
+
+> "What skills do I have? Install everything from GitHub."
+
+The manager will run `cf-agents`, identify what's missing, and call `install.sh` with
+`--from github:EdwardAstill/claudefiles --global` to pull and install the full suite.
 
 ## CLI Tool Dependencies
 
