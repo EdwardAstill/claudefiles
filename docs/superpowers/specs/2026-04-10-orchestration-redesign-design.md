@@ -44,7 +44,9 @@ task-analyser  →  cheapskill   (simple — haiku, direct execution)
 ### task-analyser
 
 Always-on entry point. Replaces both `simple-orchestrator` and `complex-orchestrator` as the
-first thing that runs on every task.
+first thing that runs on every task. Like `simple-orchestrator` today, task-analyser achieves
+this by having a description field that triggers at session start / task receipt — it is the
+first skill Claude sees in context and fires before any other skill acts.
 
 **Responsibilities:**
 - Decompose the task into subtasks
@@ -233,7 +235,10 @@ dev-suite/registry.md
 
 ## Updates Required
 
-- `manifest.toml` — add entries for 4 new skills + 3 consultants; remove simple/complex-orchestrator
+- `manifest.toml` — add entries for 7 new SKILL.md files (task-analyser, cheapskill, superskill,
+  manager, orchestration-consultant, version-control-consultant, planning-consultant); remove
+  simple-orchestrator and complex-orchestrator entries. Consultants are registered the same way
+  as any other skill — no special handling needed.
 - `dev-suite/management/SKILL.md` dispatcher — update orchestration section to reference new skills
 - `CLAUDE.md` — update registry reference (registry.md → regional docs), update orchestration notes
 - `cf-check` — update to walk SKILL.md files and verify each leaf skill has an entry in its
