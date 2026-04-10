@@ -8,8 +8,8 @@ into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level) via `
 Any skill can be invoked directly with `/skill-name`. For example, `/git-expert` triggers
 the git-expert skill immediately without waiting for simple-orchestrator to route it.
 
-Slash commands are the manual override. The orchestrators are the automatic layer.
-Skills should be designed to work both ways — invoked automatically by the orchestrator,
+Slash commands are the manual override. The task-analyser is the automatic layer.
+Skills should be designed to work both ways — invoked automatically by the task-analyser,
 and invoked directly by the user when they know what they want.
 
 ## Key Facts
@@ -17,7 +17,7 @@ and invoked directly by the user when they know what they want.
 - **Skills live in** `dev-suite/<category>/.../<skill-name>/SKILL.md` — four top-level categories: `management/`, `planning/`, `coding/`, `research/`
 - **Each category has a dispatcher** at `dev-suite/<category>/SKILL.md` that routes to the right leaf skill
 - **Run `cf-agents --tree`** to see the full live hierarchy
-- **Registry lives at** `dev-suite/registry.md` — the complex-orchestrator reads this
+- **Regional docs live at** `dev-suite/<category>/REGION.md` — the manager reads these during planning
 - **Install script:** `install.sh` (bash) — handles symlinks and `manifest.toml` parsing
 - **Bin tools:** `bin/` → symlinked to `~/.local/bin/` on install
 - **Shared scripts:** `lib/` — available to any skill, no install step needed
@@ -33,18 +33,19 @@ description: >
 ---
 ```
 
-The description field is the only thing visible to other skills and to simple-orchestrator
+The description field is the only thing visible to other skills and to task-analyser
 without invoking this skill. Write it to be unambiguous about when to trigger.
 
-## Registry Sync Rule
+## Regional Docs Sync Rule
 
-**Any time a skill's inputs, outputs, or chain targets change, update `dev-suite/registry.md`.**
+**Any time a new leaf skill is added or removed, update the REGION.md for its category.**
 
-The registry is the contract between skills. If it drifts from reality, complex-orchestrator
-will misplan. Keep it accurate.
+Regional docs (`dev-suite/<category>/REGION.md`) are the skill catalogs the manager reads
+during planning. Each entry uses `### skill-name` heading format. If they drift from
+reality, the manager will mis-plan.
 
 Run `cf-check` before committing any changes to `dev-suite/` to verify all leaf skills have
-registry entries.
+entries in their category's REGION.md.
 
 ## manifest.toml
 
@@ -68,14 +69,16 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 - [ ] Create `dev-suite/<category>/[sub-category/]<skill-name>/SKILL.md` with valid frontmatter
 - [ ] Add `scripts/` folder if the skill needs helper scripts
 - [ ] Add entry to `manifest.toml` under `[skills.<skill-name>]`
-- [ ] Add entry to `dev-suite/registry.md` (inputs, outputs, chains)
+- [ ] Add entry to the category's `dev-suite/<category>/REGION.md` under `### skill-name`
 - [ ] Re-run `./install.sh --user` if already installed (symlink picks it up on next session)
 
 ## Architecture Notes
 
-**Two-tier orchestration:**
-- `simple-orchestrator` — reads frontmatter only (already in context). Assesses complexity, routes or escalates. No file I/O.
-- `complex-orchestrator` — reads `registry.md`. Plans multi-skill workflows. Only invoked by simple-orchestrator.
+**Three-path orchestration:**
+- `task-analyser` — always-on entry point. Decomposes task, scores complexity across 3 signals, routes to one of three paths.
+- `cheapskill` — haiku model, direct execution for simple tasks (1–2 subtasks, single domain, no coordination).
+- `superskill` — Sonnet, capable general agent for medium tasks. Full tool access, tests own solution, absorbs specialist skills inline.
+- `manager` — Opus, for difficult tasks. Planning phase: reads relevant REGION.md files + consults planning-consultant → version-control-consultant → orchestration-consultant. Execution phase: dispatches specialists as subagents.
 
 **Git expert outputs a WORKTREE CONTEXT block** — other skills should look for this when they need to know where to make changes.
 
