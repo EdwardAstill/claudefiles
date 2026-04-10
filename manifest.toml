@@ -3,7 +3,49 @@
 
 [bin]
 # Scripts in bin/ to symlink to ~/.local/bin/
-install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents", "cf-setup"]
+install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents", "cf-setup", "cf-check"]
+
+[skills.brainstorming]
+tools = ["Read", "Write", "Glob", "Agent"]
+
+[skills.writing-plans]
+tools = ["Read", "Write"]
+
+[skills.executing-plans]
+tools = ["Read", "Agent"]
+
+[skills.dispatching-parallel-agents]
+tools = ["Agent"]
+
+[skills.subagent-driven-development]
+tools = ["Read", "Agent"]
+
+[skills.skill-manager]
+tools = ["Bash", "Read"]
+
+[skills.writing-skills]
+tools = ["Read", "Write", "Agent"]
+
+[skills.tdd]
+tools = ["Bash", "Read", "Write"]
+
+[skills.systematic-debugging]
+tools = ["Bash", "Read", "Grep"]
+
+[skills.verification-before-completion]
+tools = ["Bash", "Read"]
+
+[skills.requesting-code-review]
+tools = ["Bash", "Read", "Agent"]
+
+[skills.receiving-code-review]
+tools = ["Read", "Write", "Bash"]
+
+[skills.simplify]
+tools = ["Read", "Write", "Bash"]
+
+[skills.git-worktree-workflow]
+tools = ["Bash"]
 
 [skills.simple-orchestrator]
 # Reads only in-context frontmatter — no additional tools needed
