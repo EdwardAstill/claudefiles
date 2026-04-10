@@ -1,12 +1,12 @@
 ---
-name: agent-manager
+name: skill-manager
 description: >
   Use when the user wants to set up skills for a project, see what is installed,
   install or remove skills, or understand their Claude Code skill setup. Also
   the entry point for new projects — invoke with "set up this project" or /setup.
 ---
 
-# Agent Manager
+# Skill Manager
 
 The only skill installed globally. Everything else is installed per-project based
 on what the project actually needs. Use `cf-agents` to inspect current state,
@@ -17,7 +17,7 @@ on what the project actually needs. Use `cf-agents` to inspect current state,
 | Scope | Location | When active |
 |-------|----------|-------------|
 | Plugin | `~/.claude/plugins/` | All sessions, managed by plugin marketplace |
-| Global | `~/.claude/skills/` | All sessions — only agent-manager lives here |
+| Global | `~/.claude/skills/` | All sessions — only skill-manager lives here |
 | Project | `.claude/skills/` | This project only — skills installed per-project |
 
 ## Skill Hierarchy
@@ -30,7 +30,7 @@ cf-agents --tree
 ```
 
 Three categories:
-- `management/` — orchestration (simple + complex), this skill
+- `management/` — orchestration (simple + complex), meta tooling (this skill + writing-skills)
 - `coding/` — quality, version control, API design
 - `research/` — technical docs lookup, general research
 
@@ -154,7 +154,7 @@ description = "One-line description"
 
 Then add `cli = ["tool-name"]` to the relevant `[skills.<name>]` entry.
 
-## What Agent Manager Does NOT Do
+## What Skill Manager Does NOT Do
 
 - Does not manage marketplace plugins — those are managed via Claude Code's plugin system
 - Does not create or edit skills — edit SKILL.md files directly in `~/.claudefiles/dev-suite/`
