@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cf-check — verify all leaf skills in dev-suite have a registry entry
+# cf-check — verify all leaf skills in dev-suite have an entry in their category's REGION.md
 #
 # Usage:
 #   cf-check           # check from current directory or installed location
@@ -15,15 +15,9 @@ done
 # Locate dev-suite
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 SUITE="$SCRIPT_DIR/../dev-suite"
-REGISTRY="$SUITE/registry.md"
 
 if [[ ! -d "$SUITE" ]]; then
     echo "Error: dev-suite not found at $SUITE" >&2
-    exit 1
-fi
-
-if [[ ! -f "$REGISTRY" ]]; then
-    echo "Error: registry.md not found at $REGISTRY" >&2
     exit 1
 fi
 
@@ -44,7 +38,17 @@ while IFS= read -r skill_md; do
     name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
     [[ -z "$name" ]] && continue
 
-    if grep -q "^## $name" "$REGISTRY" 2>/dev/null; then
+    # Derive category from skill path: dev-suite/<category>/...
+    rel="${skill_md#"$SUITE/"}"         # strip leading dev-suite/
+    category="${rel%%/*}"               # first path component = category
+    region="$SUITE/$category/REGION.md"
+
+    if [[ ! -f "$region" ]]; then
+        missing+=("$name (no REGION.md for category '$category')")
+        continue
+    fi
+
+    if grep -q "^### $name" "$region" 2>/dev/null; then
         found+=("$name")
         $VERBOSE && echo -e "  ${green}✓${reset}  $name"
     else
@@ -54,16 +58,16 @@ done < <(find "$SUITE" -name "SKILL.md" | sort)
 
 echo ""
 if [[ ${#missing[@]} -eq 0 ]]; then
-    echo -e "  ${green}✓${reset}  Registry in sync — ${#found[@]} skills, all have entries"
+    echo -e "  ${green}✓${reset}  Regional docs in sync — ${#found[@]} skills, all have entries"
     echo ""
     exit 0
 else
-    echo -e "  ${red}✗${reset}  ${#missing[@]} skill(s) missing from registry:"
+    echo -e "  ${red}✗${reset}  ${#missing[@]} skill(s) missing from their category's REGION.md:"
     for name in "${missing[@]}"; do
         echo "       - $name"
     done
     echo ""
-    echo "  Add entries to dev-suite/registry.md for the above skills."
+    echo "  Add ### <skill-name> entries to the relevant dev-suite/<category>/REGION.md."
     echo ""
     exit 1
 fi
