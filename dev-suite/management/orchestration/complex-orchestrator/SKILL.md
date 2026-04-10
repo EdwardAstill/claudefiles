@@ -81,8 +81,8 @@ Read it to understand:
 
 ## Execution
 
-- Use the `superpowers:dispatching-parallel-agents` skill when launching multiple independent agents
-- Use the `superpowers:subagent-driven-development` skill when executing a sequential plan in the current session
+- Use the `dispatching-parallel-agents` skill when launching multiple independent agents
+- Use the `subagent-driven-development` skill when executing a sequential plan in the current session
 - Capture outputs explicitly and pass them as inputs to downstream skills
 
 ## Output
