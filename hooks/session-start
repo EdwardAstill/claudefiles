@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# SessionStart hook — injects task-analyser into every Claude Code session
+
+set -euo pipefail
+
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+SKILL_FILE="$PLUGIN_ROOT/skills/management/orchestration/task-analyser/SKILL.md"
+[[ ! -f "$SKILL_FILE" ]] && SKILL_FILE="$PLUGIN_ROOT/dev-suite/management/orchestration/task-analyser/SKILL.md"
+
+if [[ ! -f "$SKILL_FILE" ]]; then
+    exit 0
+fi
+
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+content=$(cat "$SKILL_FILE")
+content_escaped=$(escape_for_json "$content")
+context="<EXTREMELY_IMPORTANT>\nYou must invoke task-analyser before starting any task.\n\n**Below is the full content of your 'task-analyser' skill:**\n\n${content_escaped}\n</EXTREMELY_IMPORTANT>"
+
+printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$context"
+
+exit 0

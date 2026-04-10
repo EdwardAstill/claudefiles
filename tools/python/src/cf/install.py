@@ -15,7 +15,7 @@ def get_source_repo(source: Optional[str]) -> Path:
         return Path(env_root)
     # Fall back to the package's own location
     import cf
-    return Path(cf.__file__).parent.parent.parent.parent  # src/cf -> src -> python -> tools -> repo root
+    return Path(cf.__file__).parent.parent.parent.parent.parent  # src/cf -> src -> python -> tools -> repo root
 
 
 def find_skill_by_name(skills_root: Path, name: str) -> Optional[Path]:
