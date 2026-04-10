@@ -274,6 +274,50 @@ dev-suite/
 
 ---
 
+## python-expert
+
+- **Purpose:** Python development with type safety — implementation, debugging, type checking via pyright
+- **Triggers when:** Writing or debugging Python code; need type-safe Python with linting and testing
+- **Inputs:** Python files, task description, error messages
+- **Outputs:** Type-annotated Python code, passing tests, lint-clean implementation
+- **Tools required:** LSP, Bash, Read
+- **Chains into:** tdd (test-driven cycles), systematic-debugging (Python-specific errors)
+
+---
+
+## typescript-expert
+
+- **Purpose:** TypeScript/JavaScript development with language-server type checking
+- **Triggers when:** Writing or debugging TypeScript or JavaScript code
+- **Inputs:** TS/JS files, task description, type errors
+- **Outputs:** Type-safe TypeScript, passing tests, TSC-clean implementation
+- **Tools required:** LSP, Bash, Read
+- **Chains into:** tdd (test-driven cycles), api-architect (typed API design)
+
+---
+
+## rust-expert
+
+- **Purpose:** Rust development with borrow checker and clippy guidance
+- **Triggers when:** Writing or debugging Rust code; ownership/lifetime issues; cargo builds
+- **Inputs:** Rust source, Cargo.toml, compiler errors
+- **Outputs:** Idiomatic Rust, passing tests, clippy-clean implementation
+- **Tools required:** LSP, Bash, Read
+- **Chains into:** tdd (test-driven cycles), systematic-debugging (borrow checker errors)
+
+---
+
+## typst-expert
+
+- **Purpose:** Typst document authoring — markup, scripting, layout, bibliography
+- **Triggers when:** Writing or debugging Typst documents; layout issues; custom functions
+- **Inputs:** .typ files, task description, compiler errors
+- **Outputs:** Compiling Typst document with correct output
+- **Tools required:** LSP, Bash, Read
+- **Chains into:** docs-agent (reference lookup for Typst packages)
+
+---
+
 ## Chaining Patterns
 
 ### Full Feature Flow (with planning)
