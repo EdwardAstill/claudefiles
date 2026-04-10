@@ -47,13 +47,26 @@ tools = ["Read", "Write", "Bash"]
 [skills.git-worktree-workflow]
 tools = ["Bash"]
 
-[skills.simple-orchestrator]
-# Reads only in-context frontmatter — no additional tools needed
+[skills.task-analyser]
+tools = ["Bash", "Read"]
+
+[skills.cheapskill]
 tools = []
 
-[skills.complex-orchestrator]
-# Reads registry.md
-tools = ["Read"]
+[skills.superskill]
+tools = ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "Agent", "WebSearch", "WebFetch"]
+
+[skills.manager]
+tools = ["Bash", "Read", "Agent"]
+
+[skills.orchestration-consultant]
+tools = []
+
+[skills.version-control-consultant]
+tools = []
+
+[skills.planning-consultant]
+tools = []
 
 [skills.git-expert]
 tools = ["Bash", "Read", "Glob"]
