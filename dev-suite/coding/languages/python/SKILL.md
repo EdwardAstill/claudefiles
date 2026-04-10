@@ -77,6 +77,79 @@ uv run python main.py
 | `print()` for debugging | Use `logging` or a debugger |
 | Ignoring type errors | Fix them — they're real bugs |
 
+## Testing
+
+**Framework:** pytest — always `uv run pytest`, never `python -m pytest` directly.
+
+**Structure:**
+```
+tests/
+  conftest.py         # shared fixtures
+  unit/               # pure function tests, no I/O
+  integration/        # tests that hit real deps (db, filesystem, network)
+```
+
+**Fixtures over setUp/tearDown:**
+```python
+@pytest.fixture
+def db_session():
+    session = create_session()
+    yield session
+    session.rollback()
+    session.close()
+```
+
+**Parametrize for coverage:**
+```python
+@pytest.mark.parametrize("input,expected", [
+    ("hello", "HELLO"),
+    ("", ""),
+])
+def test_upper(input, expected):
+    assert input.upper() == expected
+```
+
+**Run during development:**
+```bash
+uv run pytest tests/unit/ -v           # unit only
+uv run pytest -k "test_auth" -v        # by name pattern
+uv run pytest --cov=src --cov-report=term-missing
+```
+
+## Package Management (uv)
+
+**New project:**
+```bash
+uv init my-project          # creates pyproject.toml, .python-version, .venv
+uv add requests fastapi     # add dependencies
+uv add --dev pytest ruff    # dev-only dependencies
+```
+
+**Lock file:** `uv.lock` — always commit. Reproduces exact dependency tree.
+
+**Run commands:**
+```bash
+uv run python main.py       # runs in project venv
+uv run pytest               # runs pytest from project venv
+uv sync                     # install all deps from lock file
+```
+
+**Global tools:**
+```bash
+uv tool install ruff         # install globally, not per-project
+uvx ruff check .             # run without installing
+```
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Using `python` instead of `uv run` | Always `uv run python` — ensures correct venv |
+| Committing without running `ruff format` | Add `uv run ruff format .` to pre-commit |
+| Missing type hints on public functions | Add them — pyright can't help without them |
+| `from module import *` | Always explicit imports |
+| Catching `Exception` in tests | Let it propagate — don't hide failures |
+
 ## Outputs
 
 - Type-checked, ruff-clean code

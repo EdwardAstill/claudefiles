@@ -102,6 +102,84 @@ struct UserId(u64);
 | Raw pointer manipulation | Use safe abstractions |
 | Ignoring clippy warnings | Fix them — they're almost always right |
 
+## Testing
+
+**Unit tests** — co-locate with source in `#[cfg(test)]` modules:
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_valid_input() {
+        assert_eq!(parse("42"), Ok(42));
+    }
+
+    #[test]
+    fn rejects_empty_string() {
+        assert!(parse("").is_err());
+    }
+}
+```
+
+**Integration tests** — in `tests/` directory, separate crate:
+```
+src/lib.rs
+tests/
+  integration_test.rs   # can only access public API
+```
+
+**Run:**
+```bash
+cargo test                        # all tests
+cargo test test_name              # filter by name
+cargo test -- --nocapture         # show println! output
+```
+
+**cargo-nextest** (faster, better output):
+```bash
+cargo install cargo-nextest
+cargo nextest run
+```
+
+## Package Management
+
+**Add dependencies:**
+```bash
+cargo add serde --features derive   # add with features
+cargo add tokio --features full     # async runtime
+cargo add --dev proptest            # dev-only dep
+```
+
+**Workspace (monorepo):**
+```toml
+# Cargo.toml at root
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+```
+
+**Features** — gate optional functionality:
+```toml
+[features]
+default = ["std"]
+std = []
+async = ["dep:tokio"]
+```
+
+**Lock file:** `Cargo.lock` — commit for binaries, gitignore for libraries.
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| `.unwrap()` in production | Use `?` to propagate, or handle the error explicitly |
+| `.clone()` to appease borrow checker | Rethink ownership — clone is often a design smell |
+| `Arc<Mutex<T>>` as default shared state | Consider channels or ownership transfer first |
+| Ignoring clippy warnings | Fix them — `cargo clippy -- -D warnings` in CI |
+| `impl` blocks scattered across files | Group all `impl Foo` in one place |
+| Returning `Box<dyn Error>` from lib | Define a proper error type with `thiserror` |
+
 ## Outputs
 
 - Clippy-clean, rustfmt-formatted code

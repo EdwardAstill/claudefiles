@@ -119,6 +119,42 @@ $ sum_(i=1)^n i = (n(n+1))/2 $ // display math
 | Using `#v()` to push content around | Use layout primitives (`grid`, `columns`) |
 | Importing without version pins | Always pin: `@preview/pkg:0.1.2` |
 
+## Document Types
+
+**Article / report:**
+```typst
+#set document(title: "Report", author: "Name")
+#set page(paper: "a4", margin: (top: 2cm, rest: 2.5cm))
+#set heading(numbering: "1.1")
+```
+
+**Slides** (using polylux):
+```typst
+#import "@preview/polylux:0.3.1": *
+#set page(paper: "presentation-16-9")
+
+#polylux-slide[
+  = Title slide
+  Subtitle text
+]
+```
+
+**CV:**
+```typst
+#import "@preview/brilliant-cv:2.0.0": cvSection, cvEntry
+```
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Forgetting `#` before function calls | `#text(red)[...]` not `text(red)[...]` |
+| Confusing string `"hello"` and content `[hello]` | Functions taking content use `[...]`, not `"..."` |
+| Math outside `$...$` delimiters | Always wrap math: `$x^2 + y^2$` |
+| Inline styles instead of `#show` rules | Use `#show heading: ...` for consistent styling |
+| Missing version pins on packages | Always `@preview/pkg:0.1.2`, not `@preview/pkg` |
+| Using `#v()` for layout | Use `grid`, `columns`, or `stack` instead |
+
 ## Outputs
 
 - Compiling `.typ` file to PDF

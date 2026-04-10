@@ -89,6 +89,89 @@ import type { User } from './types.js'
 | Optional chaining everywhere `?.` | Model nullability explicitly in types |
 | Enums | Prefer `as const` objects or union types |
 
+## Testing
+
+**Runner:** `bun test` — built-in, no config needed. Falls back to vitest for complex setups.
+
+**Structure:**
+```
+src/
+  feature.ts
+  feature.test.ts    # co-locate tests with source
+tests/
+  integration/       # tests that need real deps
+```
+
+**bun test basics:**
+```typescript
+import { describe, test, expect, beforeEach } from 'bun:test'
+
+describe('UserService', () => {
+  test('creates a user with valid input', () => {
+    const user = createUser({ name: 'Alice', email: 'alice@example.com' })
+    expect(user.id).toBeDefined()
+    expect(user.name).toBe('Alice')
+  })
+
+  test('throws on invalid email', () => {
+    expect(() => createUser({ name: 'Bob', email: 'not-an-email' }))
+      .toThrow('Invalid email')
+  })
+})
+```
+
+**Run:**
+```bash
+bun test                      # all tests
+bun test --watch              # re-run on change
+bun test src/feature.test.ts  # specific file
+```
+
+**Mock:**
+```typescript
+import { mock } from 'bun:test'
+const fetchMock = mock(() => Promise.resolve({ ok: true }))
+```
+
+## Package Management
+
+**New project:**
+```bash
+bun init              # creates package.json, tsconfig.json, index.ts
+bun add express       # add dependency
+bun add -d @types/node vitest  # dev dependency
+```
+
+**Lock file:** `bun.lockb` — binary lockfile, always commit. Use `bun install --frozen-lockfile` in CI.
+
+**Scripts in package.json:**
+```json
+{
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  }
+}
+```
+
+**Run a file directly:**
+```bash
+bun src/index.ts     # no compile step needed
+```
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Missing `"strict": true` in tsconfig | Always start strict — costs more to add later |
+| `as any` to silence type errors | Fix the type — `any` breaks the safety model |
+| Mutating objects directly | Prefer immutable updates: `{ ...obj, field: newValue }` |
+| Floating promises without await | `void doThing()` if intentional, `await` otherwise |
+| `require()` in new code | Always `import` — `require()` loses types |
+| `JSON.parse()` without validation | Use zod or valibot to parse external data |
+
 ## Outputs
 
 - Strictly typed, biome-clean code
