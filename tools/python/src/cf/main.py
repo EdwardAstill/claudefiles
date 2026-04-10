@@ -32,8 +32,8 @@ def _register():
         try:
             mod = importlib.import_module(f"cf.{module_name}")
             app.add_typer(mod.app, name=name)
-        except ImportError:
-            pass
+        except ModuleNotFoundError:
+            pass  # submodule not yet implemented — expected during scaffold
 
 _register()
 
