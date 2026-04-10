@@ -1,7 +1,7 @@
 # claudefiles — Claude Code Guidance
 
 This repo is the source of truth for a personal Claude Code skill suite. Skills are symlinked
-into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level) via `install.sh`.
+into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level) via `cf install`.
 
 ## Slash Commands
 
@@ -14,13 +14,13 @@ and invoked directly by the user when they know what they want.
 
 ## Key Facts
 
-- **Skills live in** `dev-suite/<category>/.../<skill-name>/SKILL.md` — four top-level categories: `management/`, `planning/`, `coding/`, `research/`
-- **Each category has a dispatcher** at `dev-suite/<category>/SKILL.md` that routes to the right leaf skill
-- **Run `cf-agents --tree`** to see the full live hierarchy
-- **Regional docs live at** `dev-suite/<category>/REGION.md` — the manager reads these during planning
-- **Install script:** `install.sh` (bash) — handles symlinks and `manifest.toml` parsing
-- **Bin tools:** `bin/` → symlinked to `~/.local/bin/` on install
-- **Shared scripts:** `lib/` — available to any skill, no install step needed
+- **Skills live in** `skills/<category>/.../<skill-name>/SKILL.md` — four top-level categories: `management/`, `planning/`, `coding/`, `research/`
+- **Each category has a dispatcher** at `skills/<category>/SKILL.md` that routes to the right leaf skill
+- **Run `cf agents --tree`** to see the full live hierarchy
+- **Regional docs live at** `skills/<category>/REGION.md` — the manager reads these during planning
+- **Install with:** `cf install --global --source <clone-dir>` or run `./bootstrap.sh` for initial setup
+- **Scripts:** `tools/scripts/` → symlinked to `~/.local/bin/` on install
+- **Shared code:** `lib/` — available to any skill, no install step needed
 
 ## Skill File Format
 
@@ -66,11 +66,11 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 ## Adding a New Skill — Checklist
 
 - [ ] Decide which category it belongs to: `management/`, `planning/`, `coding/`, or `research/`
-- [ ] Create `dev-suite/<category>/[sub-category/]<skill-name>/SKILL.md` with valid frontmatter
+- [ ] Create `skills/<category>/[sub-category/]<skill-name>/SKILL.md` with valid frontmatter
 - [ ] Add `scripts/` folder if the skill needs helper scripts
 - [ ] Add entry to `manifest.toml` under `[skills.<skill-name>]`
-- [ ] Add entry to the category's `dev-suite/<category>/REGION.md` under `### skill-name`
-- [ ] Re-run `./install.sh --user` if already installed (symlink picks it up on next session)
+- [ ] Add entry to the category's `skills/<category>/REGION.md` under `### skill-name`
+- [ ] Re-run `cf install --global` if already installed (symlink picks it up on next session)
 
 ## Architecture Notes
 
@@ -84,26 +84,26 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 
 **Skills are independent** — each skill works standalone. The orchestrators add coordination on top, they don't replace standalone use.
 
-## Install Script Notes
+## Install Commands
 
-`install.sh` uses symlinks, not copies. Changes to skill files in this repo are immediately
+`cf install` uses symlinks, not copies. Changes to skill files in this repo are immediately
 reflected on the next Claude Code session — no re-install needed.
 
 **Scopes:** `--global` installs to `~/.claude/skills/` + `~/.local/bin/`. `--local [path]`
-installs to `<project>/.claude/skills/`. (`--user` and `--project` are accepted as aliases.)
+installs to `<project>/.claude/skills/`. (`--project` is accepted as an alias for `--local`.)
 
 **Granularity:** `--skill <name>` finds a skill by its SKILL.md `name` field (recursive
-search through dev-suite). `--category <name>` installs a top-level category directory.
-No flag installs the full dev-suite as a single symlink.
+search through skills/). `--category <name>` installs a top-level category directory.
+No flag installs the full skills/ directory as a single symlink.
 
-**GitHub source:** `--from github:owner/repo` clones to `~/.local/share/claudefiles-src/`
-(or pulls if already cached) and installs from there. The rest of the script is
-source-agnostic — all path logic runs the same way after the clone step.
+**GitHub source:** Use `--source <clone-dir>` to install from a local clone, or run
+`./bootstrap.sh` to clone and install in one step. The `bootstrap.sh` script clones to
+`~/.local/share/claudefiles-src/` and installs skills via `cf install`.
 
-**Bin tools** are only symlinked on `--global` full dev-suite installs (no `--skill` or
-`--category` flags). They live in `bin/` and are declared in `manifest.toml` under `[bin]`.
+**Scripts** are only symlinked on `--global` full install (no `--skill` or `--category` flags).
+They live in `tools/scripts/` and are declared in `manifest.toml` under `[bin]`.
 
-`--remove` only removes symlinks created by `install.sh`. It does not touch anything else.
+`cf install --remove` only removes symlinks created by `cf install`. It does not touch anything else.
 
 The manifest TOML parser is a simple awk/grep pipeline — keep manifest.toml clean and
 avoid unusual formatting (inline comments on value lines, multi-line arrays, etc.).
