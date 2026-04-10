@@ -37,6 +37,13 @@ points where your input is most needed — but you can advise on any part of the
 | `subagent-driven-development` | Sequential tasks where each needs a fresh context + review gate |
 | Inline execution (no subagents) | Simple coordination the manager can handle directly |
 
+## Skills I know
+
+| Skill | Use when |
+|-------|----------|
+| `dispatching-parallel-agents` | Multiple independent tasks with no ordering constraints |
+| `subagent-driven-development` | Sequential tasks needing fresh context + review gate per task |
+
 ## How to respond
 
 Comment on the flagged points first, then anything else you spot in the plan.
