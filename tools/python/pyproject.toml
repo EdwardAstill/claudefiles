@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cf"
+version = "1.0.0"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.12",
+]
+
+[project.scripts]
+cf = "cf.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cf"]
+include = ["src/cf/data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
