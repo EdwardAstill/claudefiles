@@ -14,7 +14,7 @@ and invoked directly by the user when they know what they want.
 
 ## Key Facts
 
-- **Skills live in** `dev-suite/<category>/.../<skill-name>/SKILL.md` — three top-level categories: `management/`, `coding/`, `research/`
+- **Skills live in** `dev-suite/<category>/.../<skill-name>/SKILL.md` — four top-level categories: `management/`, `planning/`, `coding/`, `research/`
 - **Each category has a dispatcher** at `dev-suite/<category>/SKILL.md` that routes to the right leaf skill
 - **Run `cf-agents --tree`** to see the full live hierarchy
 - **Registry lives at** `dev-suite/registry.md` — the complex-orchestrator reads this
@@ -43,6 +43,9 @@ without invoking this skill. Write it to be unambiguous about when to trigger.
 The registry is the contract between skills. If it drifts from reality, complex-orchestrator
 will misplan. Keep it accurate.
 
+Run `cf-check` before committing any changes to `dev-suite/` to verify all leaf skills have
+registry entries.
+
 ## manifest.toml
 
 Declares tool requirements per skill and which bin entries to install. Update it when:
@@ -61,7 +64,7 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 
 ## Adding a New Skill — Checklist
 
-- [ ] Decide which category it belongs to: `management/`, `coding/`, or `research/`
+- [ ] Decide which category it belongs to: `management/`, `planning/`, `coding/`, or `research/`
 - [ ] Create `dev-suite/<category>/[sub-category/]<skill-name>/SKILL.md` with valid frontmatter
 - [ ] Add `scripts/` folder if the skill needs helper scripts
 - [ ] Add entry to `manifest.toml` under `[skills.<skill-name>]`
