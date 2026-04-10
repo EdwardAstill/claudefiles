@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# bootstrap.sh — install the agent-manager skill and CLI tools globally
+# bootstrap.sh — install the skill-manager skill and CLI tools globally
 #
 # This is the entry point for new machines. It installs just enough to get
-# the agent-manager skill running globally. From there, start a new Claude
+# the skill-manager skill running globally. From there, start a new Claude
 # Code session and ask it to install the rest of the suite.
 #
 # Usage — no local clone needed:
@@ -13,15 +13,25 @@
 #
 # What this does:
 #   1. Clones (or updates) the claudefiles repo to ~/.claudefiles/
-#   2. Installs the agent-manager skill to ~/.claude/skills/
+#   2. Installs the skill-manager skill to ~/.claude/skills/
 #   3. Installs all bin tools (cf-agents, cf-status, etc.) to ~/.local/bin/
 #
 # What to do next:
 #   Start a new Claude Code session and say:
 #   "Install the full claudefiles suite from GitHub."
-#   The agent-manager will handle the rest.
+#   The skill-manager will handle the rest.
 
 set -euo pipefail
+
+# ── Pre-flight checks ─────────────────────────────────────────────────────────
+
+for cmd in git bash curl; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "Error: '$cmd' is required but not installed." >&2
+        echo "Install $cmd before running bootstrap.sh." >&2
+        exit 1
+    fi
+done
 
 GITHUB_REPO="EdwardAstill/claudefiles"
 CACHE_DIR="$HOME/.claudefiles"
@@ -67,30 +77,30 @@ else
     ok "Cloned to $CACHE_DIR"
 fi
 
-# ── Step 2: Install agent-manager skill ──────────────────────────────────────
+# ── Step 2: Install skill-manager skill ──────────────────────────────────────
 
-header "2 / 3  Installing agent-manager skill"
+header "2 / 3  Installing skill-manager skill"
 
-# Find agent-manager by searching for SKILL.md with name: agent-manager
+# Find skill-manager by searching for SKILL.md with name: skill-manager
 SKILL_DIR=""
 while IFS= read -r skill_md; do
     found_name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
-    if [[ "$found_name" == "agent-manager" ]]; then
+    if [[ "$found_name" == "skill-manager" ]]; then
         SKILL_DIR="$(dirname "$skill_md")"
         break
     fi
 done < <(find "$CACHE_DIR/dev-suite" -name "SKILL.md" 2>/dev/null)
 
 if [[ -z "$SKILL_DIR" ]]; then
-    echo -e "  ${red}✗${reset}  agent-manager skill not found in $CACHE_DIR/dev-suite" >&2
+    echo -e "  ${red}✗${reset}  skill-manager skill not found in $CACHE_DIR/dev-suite" >&2
     exit 1
 fi
 
 mkdir -p "$SKILLS_TARGET"
 
-LINK="$SKILLS_TARGET/agent-manager"
+LINK="$SKILLS_TARGET/skill-manager"
 if [[ -L "$LINK" ]]; then
-    ok "agent-manager already linked — skipping"
+    ok "skill-manager already linked — skipping"
 elif [[ -e "$LINK" ]]; then
     warn "$LINK exists but is not a symlink — skipping (remove it manually if you want to re-link)"
 else
@@ -155,10 +165,10 @@ fi
 
 header "Done"
 echo ""
-echo "  agent-manager is installed globally."
+echo "  skill-manager is installed globally."
 echo ""
 echo "  Next steps:"
 echo "    1. Start a new Claude Code session in your project"
-echo "    2. Say: \"Set up this project\" — the agent-manager will ask you to"
+echo "    2. Say: \"Set up this project\" — the skill-manager will ask you to"
 echo "       describe your project and install the right skills for it."
 echo ""
