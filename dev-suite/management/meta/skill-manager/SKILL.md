@@ -29,9 +29,10 @@ To see the full tree:
 cf-agents --tree
 ```
 
-Three categories:
-- `management/` — orchestration (simple + complex), meta tooling (this skill + writing-skills)
-- `coding/` — quality, version control, API design
+Four categories:
+- `management/` — orchestration (task-analyser, cheapskill, superskill, manager, consultants), meta tooling (this skill + writing-skills)
+- `planning/` — brainstorming, writing-plans, executing-plans
+- `coding/` — quality, version control, language experts, API design
 - `research/` — technical docs lookup, general research
 
 ## /setup — Set Up Skills for This Project
@@ -59,7 +60,7 @@ Three categories:
 
 | Signal in description | Install |
 |----------------------|---------|
-| Any project | `simple-orchestrator`, `complex-orchestrator` |
+| Any project | `task-analyser`, `superskill` |
 | Git work, branches, parallel features, worktrees | `git-expert` |
 | GitHub, PRs, CI, Actions, open source | `github-expert` |
 | API design, endpoints, REST, GraphQL, contracts | `api-architect` |
@@ -77,8 +78,8 @@ When in doubt, install it — skills are cheap to add and easy to remove.
 ```
 Based on your description, here's what I'll install:
 
-  ✓  simple-orchestrator    routes every task to the right skill
-  ✓  complex-orchestrator   coordinates multi-skill workflows
+  ✓  task-analyser          routes every task to the right path
+  ✓  superskill             capable general agent for most tasks
   ✓  git-expert             you mentioned working across multiple features in parallel
   ✓  docs-agent             unfamiliar libraries likely given the stack
   ✗  github-expert          skipping — you said this is a solo local project

@@ -6,7 +6,7 @@ into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level) via `
 ## Slash Commands
 
 Any skill can be invoked directly with `/skill-name`. For example, `/git-expert` triggers
-the git-expert skill immediately without waiting for simple-orchestrator to route it.
+the git-expert skill immediately without waiting for task-analyser to route it.
 
 Slash commands are the manual override. The task-analyser is the automatic layer.
 Skills should be designed to work both ways — invoked automatically by the task-analyser,

@@ -5,7 +5,7 @@ description: >
   coordination needed. Invoked by task-analyser. Runs a planning phase — reads regional
   docs, then consults planning-consultant, version-control-consultant, and
   orchestration-consultant sequentially in the same conversation — then an execution phase
-  dispatching specialist skills as subagents. Replaces complex-orchestrator.
+  dispatching specialist skills as subagents.
 ---
 
 # Manager
