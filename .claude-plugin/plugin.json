@@ -1,0 +1,10 @@
+{
+  "name": "claudefiles",
+  "description": "Personal Claude Code skill suite and CLI toolset",
+  "version": "1.0.0",
+  "author": {
+    "name": "Edward Astill"
+  },
+  "repository": "https://github.com/EdwardAstill/claudefiles",
+  "license": "MIT"
+}

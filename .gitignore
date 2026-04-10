@@ -1,1 +1,4 @@
 .claudefiles/
+__pycache__/
+*.pyc
+*.pyo
