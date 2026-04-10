@@ -60,8 +60,9 @@ Any signal hitting Difficult → manager. All signals Simple → cheapskill. Oth
 
 **Handoff context:**
 - cheapskill: task text + subtask list
-- superskill: task text + subtasks + relevant codebase context
-- manager: task text + subtasks + which regions are involved + codebase context
+- superskill: task text + subtasks + codebase context (active file paths, git branch, recent
+  commits — whatever cf-context / cf-status produce; not full file contents)
+- manager: task text + subtasks + which regions are involved + same codebase context as superskill
 
 ---
 
@@ -115,8 +116,12 @@ or cross-domain planning.
    - Back and forth until advice is incorporated
 4. Synthesises all consultant input into a final execution plan
 
-Consultants are loaded sequentially. Each sees the full evolving plan, not just their slice.
-The manager's flagging is a suggestion, not a restriction — consultants can advise on any part.
+Consultants are loaded sequentially in this order: planning-consultant first (may flag that
+a brainstorm/spec phase is needed before any code work), then version-control-consultant,
+then orchestration-consultant. This order ensures structural concerns are resolved before
+coordination decisions are made. Each consultant sees the full evolving plan, not just their
+slice. The manager's flagging is a suggestion, not a restriction — consultants can advise on
+any part.
 
 #### Execution phase
 
@@ -162,8 +167,17 @@ One per top-level category. Replace `registry.md`.
 
 **Location:** `dev-suite/<category>/REGION.md`
 
-**Content:** Catalog of available skills in that region — name, purpose, when to use, what
-it produces, how it chains. Written for the manager to quickly inventory available tools.
+**Content format:** Each entry follows this structure:
+```
+### skill-name
+- **Purpose:** one sentence
+- **Use when:** trigger conditions
+- **Produces:** what it outputs
+- **Chains into:** which skills typically follow it
+```
+
+Written for the manager to quickly inventory available tools during the planning phase.
+Not exhaustive documentation — just enough for the manager to decide which skills to dispatch.
 
 The manager reads only the regional docs for the regions task-analyser identified as relevant.
 
@@ -222,8 +236,26 @@ dev-suite/registry.md
 - `manifest.toml` — add entries for 4 new skills + 3 consultants; remove simple/complex-orchestrator
 - `dev-suite/management/SKILL.md` dispatcher — update orchestration section to reference new skills
 - `CLAUDE.md` — update registry reference (registry.md → regional docs), update orchestration notes
-- `cf-check` — still works unchanged (walks SKILL.md files, checks against registry; registry.md
-  reference needs updating to use regional docs, or cf-check is updated to check regional docs)
+- `cf-check` — update to walk SKILL.md files and verify each leaf skill has an entry in its
+  category's REGION.md (matching `### skill-name` heading). Remove the registry.md check.
+  Exit non-zero if any leaf skill is missing from its REGION.md.
+
+---
+
+## Consultant vs Specialist — Role Boundary
+
+Consultants and specialist skills serve distinct roles and never overlap:
+
+| | Consultants | Specialist skills |
+|---|---|---|
+| **When** | Planning phase only | Execution phase only |
+| **How invoked** | Loaded into same conversation as manager | Dispatched as subagents |
+| **Purpose** | Advise on how to structure the plan | Do the actual work |
+| **Output** | Refined plan | Completed task output |
+
+A consultant never executes work. A specialist skill is never consulted for planning advice.
+The manager reads consultant advice, synthesises it into a plan, then dispatches specialists
+to execute that plan.
 
 ---
 
