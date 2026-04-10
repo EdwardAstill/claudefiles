@@ -26,10 +26,10 @@ def gitignore_bus() -> None:
     ignore = root / ".gitignore"
     entry = ".claudefiles/"
     if ignore.exists():
-        lines = ignore.read_text().splitlines()
-        if entry in lines:
+        content = ignore.read_text()
+        if entry in content.splitlines():
             return
-        with ignore.open("a") as f:
-            f.write(f"\n{entry}\n")
+        sep = "" if content.endswith("\n") else "\n"
+        ignore.write_text(content + sep + entry + "\n")
     else:
-        ignore.write_text(f"{entry}\n")
+        ignore.write_text(entry + "\n")
