@@ -20,6 +20,9 @@ tools = ["Read", "Agent"]
 [skills.skill-manager]
 tools = ["Bash", "Read"]
 
+[skills.skills]
+tools = []
+
 [skills.writing-skills]
 tools = ["Read", "Write", "Agent"]
 

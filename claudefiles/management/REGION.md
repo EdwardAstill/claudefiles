@@ -57,3 +57,9 @@ Skills for orchestration, coordination, and skill system tooling.
 - **Use when:** User wants to author a new skill or edit an existing one
 - **Produces:** New or updated SKILL.md with valid frontmatter and structured body
 - **Chains into:** skill-manager (install after writing)
+
+### skills
+- **Purpose:** Display the full claudefiles skill catalog grouped by category
+- **Use when:** User wants to see all available skills and their invocation names
+- **Produces:** Formatted catalog output
+- **Chains into:** (terminal)

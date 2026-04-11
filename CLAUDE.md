@@ -5,9 +5,13 @@ into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level) via `
 
 ## Slash Commands
 
-Any skill can be invoked directly with `/skill-name`. For example, `/git-expert` triggers
-the git-expert skill immediately. Slash commands are the manual override — use them when
-you know exactly what you want. Otherwise executor handles routing automatically.
+Skills are nested under the `claudefiles/` prefix, so slash commands use the form
+`/claudefiles:skill-name`. For example, `/claudefiles:git-expert` or
+`/claudefiles:brainstorming`. These are the manual override — use them when you know
+exactly what you want. Otherwise executor handles routing automatically.
+
+For day-to-day use you don't need to type these — `using-claudefiles` fires at session
+start and the system routes through executor automatically.
 
 ## Which Skill When
 
