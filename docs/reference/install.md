@@ -1,40 +1,47 @@
 # Install Reference
 
-## bootstrap.sh
-
-The entry point for new machines. No local clone needed.
+## Quick Start
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
 ```
 
-Installs the `agent-manager` skill and all bin tools globally, cloning the repo to `~/.local/share/claudefiles-src/`. Re-running pulls the latest and skips already-linked entries.
+## bootstrap.sh
+
+New machine entry point. Does three things:
+
+1. Clones repo to `~/.local/share/claudefiles-src/` (or pulls latest if it exists)
+2. Installs `cf` Python CLI via `uv tool install --force -e tools/python/`
+3. Runs `install.sh --global` for skills and bin tools
+
+Re-running pulls the latest and re-installs — safe to use as an update mechanism.
 
 ## install.sh
 
-Full control over what gets installed and where.
+**Single source of truth for all install logic.** Both `bootstrap.sh` and `cf install`
+delegate to this script.
 
 ### Scopes
 
 | Flag | Installs to |
 |------|-------------|
-| `--global` | `~/.claude/skills/` + `~/.local/bin/` |
-| `--local [path]` | `<project>/.claude/skills/` |
+| `--global` (or `--user`) | `~/.claude/skills/` |
+| `--local [path]` (or `--project`) | `<project>/.claude/skills/` |
 
 ### Granularity
 
 | Flag | What gets installed |
 |------|---------------------|
-| (none) | Full claudefiles |
-| `--category <name>` | One category (`management`, `coding`, `research`) |
+| (none) | All 39 skills as individual symlinks + bin wrappers |
+| `--category <name>` | One category directory |
 | `--skill <name>` | One skill by its SKILL.md `name` field |
 
 ### Source
 
 | Flag | Source |
 |------|--------|
-| (none) | Local repo |
-| `--from github:owner/repo` | Clones/updates to `~/.local/share/claudefiles-src/` |
+| (none) | Local repo (where install.sh lives) |
+| `--from github:owner/repo` | Clones to `~/.claudefiles/`, installs from there |
 
 ### Other flags
 
@@ -43,6 +50,15 @@ Full control over what gets installed and where.
 | `--dry-run` | Preview without making changes |
 | `--remove` | Remove installed symlinks |
 | `--list-categories` | Show available categories |
+
+### How It Works
+
+1. Finds all leaf skills (SKILL.md files with no children)
+2. Builds a flat `skills/` directory with symlinks to each leaf
+3. Symlinks each skill individually into the target directory
+4. On `--local`, adds `.claudefiles/` to project `.gitignore`
+
+Individual skill symlinks enable `/skill-name` slash commands in Claude Code.
 
 ### Examples
 
@@ -56,33 +72,21 @@ Full control over what gets installed and where.
 ./install.sh --global --dry-run                                # preview
 ```
 
-## Agent Communication Bus
+## cf install
 
-Each project gets a `.claudefiles/` folder when any `--write` tool runs. Gitignored — session state, not source.
+Thin Python wrapper that delegates to `install.sh` with full argument passthrough.
 
-```
-.claudefiles/
-├── context.md    ← cf-context output
-├── versions.md   ← cf-versions output
-├── routes.md     ← cf-routes output
-├── repo-map.md   ← cf-status output
-└── notes.md      ← cf-note target
+```bash
+cf install --global --dry-run    # identical to: bash install.sh --global --dry-run
 ```
 
-## Structure
+## Design Principles
 
-```
-claudefiles/
-├── claudefiles/           ← skills
-├── bin/                 ← CLI tools → ~/.local/bin/
-├── lib/                 ← shared scripts (no install needed)
-├── manifest.toml        ← per-skill tool requirements + bin entries + CLI deps
-├── install.sh           ← install/remove
-└── bootstrap.sh         ← new machine entry point
-```
+**Symlinks, not copies.** Changes to skill files are live on the next Claude Code
+session — no re-install needed.
 
-## Design principles
+**One installer.** `install.sh` is the only place install logic lives. `cf install`
+and `bootstrap.sh` both delegate to it, preventing behavioral drift.
 
-**One file beats a wrapper.** If a script is useful standalone, put it in `bin/`. If it's internal to one skill, put it in `scripts/`. If it's shared across skills, put it in `lib/`.
-
-**Symlinks, not copies.** Changes to skill files are live on the next Claude Code session — no re-install needed.
+**Individual skill symlinks.** Each skill gets its own symlink (not a single directory
+symlink). This enables `/skill-name` slash commands in Claude Code.

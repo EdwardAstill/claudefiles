@@ -35,7 +35,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST="$SCRIPT_DIR/manifest.toml"
 CLAUDEFILES="$SCRIPT_DIR/claudefiles"
-BIN_DIR="$SCRIPT_DIR/bin"
 
 MODE=""           # user | project
 SOURCE="local"    # local | github
@@ -103,7 +102,7 @@ if [[ "$SOURCE" == "github" ]]; then
         echo "  Up to date: $REPO_DIR"
     else
         echo "  Cloning github.com/$GITHUB_REPO → $REPO_DIR ..."
-        mkdir -p "$CACHE_BASE"
+        mkdir -p "$(dirname "$REPO_DIR")"
         git clone --quiet "https://github.com/$GITHUB_REPO" "$REPO_DIR"
         echo "  Cloned."
     fi
@@ -143,7 +142,6 @@ else
     SKILLS_TARGET="$PROJECT_PATH/.claude/skills"
 fi
 
-BIN_TARGET="$HOME/.local/bin"
 
 # ── Resolve skill source and link name ───────────────────────────────────────
 # Three modes: full claudefiles, one category, or one named skill.
@@ -243,19 +241,6 @@ do_remove() {
     fi
 }
 
-# ── Read bin entries from manifest.toml ───────────────────────────────────────
-
-parse_bin_entries() {
-    # Simple TOML parser for [bin] install = ["a", "b"]
-    awk '/^\[bin\]/{found=1;next} found && /^\[/{found=0} found' "$MANIFEST" \
-        | grep '^install' \
-        | sed 's/.*=\s*//' \
-        | tr -d '[]"' \
-        | tr ',' '\n' \
-        | tr -d ' \t' \
-        | grep -v '^$'
-}
-
 # ── Install ───────────────────────────────────────────────────────────────────
 
 install_all() {
@@ -270,7 +255,6 @@ install_all() {
 
     echo "  Source        : $SKILL_SRC"
     echo "  Skills target : $SKILLS_TARGET"
-    [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]] && echo "  Bin target    : $BIN_TARGET"
     "$DRY_RUN" && echo "  [dry-run mode — no changes will be made]"
     echo ""
 
@@ -289,17 +273,6 @@ install_all() {
         fi
     else
         do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
-    fi
-
-    # Only install bin tools on global installs, and only for full claudefiles or all-category installs
-    if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
-        echo ""
-        echo "Bin tools:"
-        while IFS= read -r entry; do
-            [[ -z "$entry" ]] && continue
-            do_symlink "$BIN_DIR/$entry" "$BIN_TARGET/$entry"
-            chmod +x "$BIN_DIR/$entry" 2>/dev/null || true
-        done < <(parse_bin_entries)
     fi
 
     # Add .claudefiles/ to project .gitignore on project installs
@@ -344,15 +317,6 @@ remove_all() {
         done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
     else
         do_remove "$SKILLS_TARGET/$SKILL_LINK_NAME"
-    fi
-
-    if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
-        echo ""
-        echo "Bin tools:"
-        while IFS= read -r entry; do
-            [[ -z "$entry" ]] && continue
-            do_remove "$BIN_TARGET/$entry"
-        done < <(parse_bin_entries)
     fi
 
     echo ""

@@ -36,6 +36,62 @@ Skills for implementation, quality, version control, and language-specific work.
 - **Produces:** Simpler code with same behaviour; committed
 - **Chains into:** verification-before-completion
 
+### security-review
+- **Purpose:** Security audit — OWASP top 10, injection vectors, auth/authz, secrets exposure, dependency CVEs
+- **Use when:** Before shipping code that handles user input, auth, or sensitive data; periodic security audit
+- **Produces:** Prioritized security findings (critical/warning/info) with fix recommendations
+- **Chains into:** verification-before-completion
+
+### performance-profiling
+- **Purpose:** Diagnose and fix performance issues — profiling, algorithmic analysis, benchmarks
+- **Use when:** Code is correct but slow; optimizing hot paths; evaluating scalability
+- **Produces:** Profile results, bottleneck identification, optimized code with benchmarks
+- **Chains into:** tdd, verification-before-completion
+
+### refactoring-patterns
+- **Purpose:** Large-scale code restructuring using proven patterns (strangler fig, extract method, etc.)
+- **Use when:** Restructuring existing code that has grown unwieldy; migrating architecture; not for small cleanups (that's simplify)
+- **Produces:** Restructured code with tests green at every step; committed
+- **Chains into:** tdd, verification-before-completion
+
+### dependency-management
+- **Purpose:** Dependency hygiene — version bumps, CVE scanning, breaking change analysis, lock file management
+- **Use when:** Updating dependencies; auditing for vulnerabilities; evaluating new dependencies
+- **Produces:** Updated dependencies with verified compatibility; audit report
+- **Chains into:** verification-before-completion
+
+### observability
+- **Purpose:** Structured logging, distributed tracing, metrics instrumentation
+- **Use when:** Adding logging/tracing/metrics to a service; debugging production issues via logs; setting up monitoring
+- **Produces:** Instrumented code with structured logs, traces, or metrics
+- **Chains into:** verification-before-completion
+
+### accessibility
+- **Purpose:** Web/UI accessibility compliance — WCAG 2.1 AA, semantic HTML, ARIA, keyboard navigation
+- **Use when:** Building or reviewing UI components; accessibility audit; fixing a11y issues
+- **Produces:** Accessible UI code; audit findings with fix recommendations
+- **Chains into:** verification-before-completion
+
+---
+
+## Data
+
+### database-expert
+- **Purpose:** Schema design, migrations, query optimization, indexing, ORM patterns
+- **Use when:** Designing database schema; writing migrations; optimizing slow queries; reviewing data layer code
+- **Produces:** Schema design, migration files, optimized queries, indexing recommendations
+- **Chains into:** tdd, verification-before-completion
+
+---
+
+## Infrastructure
+
+### infrastructure-expert
+- **Purpose:** Dockerfiles, docker-compose, Kubernetes, Terraform/Pulumi, cloud config, reverse proxies
+- **Use when:** Writing or reviewing infrastructure config; containerizing an app; setting up deployment
+- **Produces:** Infrastructure config files; deployment setup
+- **Chains into:** verification-before-completion
+
 ---
 
 ## Version Control
@@ -83,21 +139,21 @@ Skills for implementation, quality, version control, and language-specific work.
 ## Languages
 
 ### python-expert
-- **Purpose:** Python implementation with type safety — pyright LSP, uv, ruff, pytest
-- **Use when:** Writing, debugging, or reviewing Python code
-- **Produces:** Type-checked, ruff-clean, tested Python code
+- **Purpose:** Python toolchain and conventions — pyright LSP, uv, ruff, pytest integration
+- **Use when:** Need LSP diagnostics, package management, linting, or testing patterns for Python
+- **Produces:** Type-checked, ruff-clean, tested Python code with proper toolchain usage
 - **Chains into:** tdd, systematic-debugging, verification-before-completion
 
 ### typescript-expert
-- **Purpose:** TypeScript/JS implementation — typescript-language-server LSP, bun, biome
-- **Use when:** Writing, debugging, or reviewing TypeScript or JavaScript code
-- **Produces:** Strictly typed, biome-clean, tested TypeScript code
+- **Purpose:** TypeScript toolchain and conventions — typescript-language-server LSP, bun, biome
+- **Use when:** Need LSP diagnostics, bun/npm tooling, biome linting, or strict typing patterns for TS/JS
+- **Produces:** Strictly typed, biome-clean, tested TypeScript code with proper toolchain usage
 - **Chains into:** tdd, systematic-debugging, verification-before-completion
 
 ### rust-expert
-- **Purpose:** Rust implementation — rust-analyzer LSP, cargo, clippy, rustfmt
-- **Use when:** Writing, debugging, or reviewing Rust code
-- **Produces:** Clippy-clean, rustfmt-formatted, tested Rust code
+- **Purpose:** Rust toolchain and conventions — rust-analyzer LSP, cargo, clippy, rustfmt
+- **Use when:** Need LSP diagnostics, cargo tooling, clippy linting, or Rust-specific patterns (ownership, lifetimes)
+- **Produces:** Clippy-clean, rustfmt-formatted, tested Rust code with proper toolchain usage
 - **Chains into:** tdd, systematic-debugging, verification-before-completion
 
 ### typst-expert

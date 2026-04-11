@@ -1,6 +1,11 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+description: >
+  Use when encountering any bug, test failure, or unexpected behavior — before
+  proposing fixes. Finds root cause through structured investigation: reproduce,
+  trace, hypothesize, test, fix. NOT for writing new tests (tdd) or verifying
+  completed work (verification-before-completion). Use this when something is
+  broken and you don't know why.
 ---
 
 # Systematic Debugging
@@ -188,6 +193,8 @@ You MUST complete each phase before proceeding to the next.
    - Test passes now?
    - No other tests broken?
    - Issue actually resolved?
+   - For non-trivial fixes, use `Skill("verification-before-completion")` for
+     the full verification checklist before claiming the bug is fixed.
 
 4. **If Fix Doesn't Work**
    - STOP

@@ -1,11 +1,11 @@
 ---
 name: codebase-explainer
 description: >
-  Use when you need to understand an unfamiliar codebase before working in it —
-  how it's structured, how data flows through it, what the key abstractions are,
-  and how components connect. Also use when a new developer needs onboarding,
-  when something isn't behaving as expected and you need to trace why, or when
-  planning a change that spans multiple layers.
+  Codebase mental-model builder. Answers "how does this codebase work?" — maps
+  architecture layers, traces execution paths, identifies key abstractions. Use
+  when entering an unfamiliar codebase, onboarding, or planning changes that span
+  multiple layers. NOT for external library docs (docs-agent) or evaluating
+  approaches (research-agent). Reads the code itself to build understanding.
 ---
 
 # Codebase Explainer
@@ -16,8 +16,8 @@ patterns, and documents dependencies to give you a working mental model fast.
 ## Step 1: Orient at the Top Level
 
 ```bash
-cf-context   # project fingerprint: name, language, build system
-cf-status    # recent commits — what's actively changing?
+cf context   # project fingerprint: name, language, build system
+cf status    # recent commits — what's actively changing?
 ```
 
 Then scan:

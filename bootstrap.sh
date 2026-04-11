@@ -10,6 +10,7 @@ if [[ -d "$CLONE_DIR/.git" ]]; then
     git -C "$CLONE_DIR" pull --ff-only
 else
     echo "Cloning claudefiles..."
+    mkdir -p "$(dirname "$CLONE_DIR")"
     git clone https://github.com/EdwardAstill/claudefiles "$CLONE_DIR"
 fi
 
@@ -18,16 +19,13 @@ if [[ -d "$HOME/.claudefiles" && ! -L "$HOME/.claudefiles" ]]; then
     echo "Note: old ~/.claudefiles/ clone detected — safe to remove after verifying bootstrap succeeded."
 fi
 
-# Install cf package
+# Install cf Python CLI
 echo "Installing cf package..."
-uv tool install -e "$CLONE_DIR/tools/python/"
+uv tool install --force -e "$CLONE_DIR/tools/python/"
 
-# Ensure cf is on PATH for this shell
-export PATH="$(uv tool dir --bin):$PATH"
-
-# Install skills
+# Install skills and bin tools via install.sh (single source of truth)
 echo "Installing skills..."
-cf install --global --source "$CLONE_DIR" "$@"
+bash "$CLONE_DIR/install.sh" --global "$@"
 
 echo ""
 echo "Done! Run 'cf agents' to see installed skills and tools."

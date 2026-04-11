@@ -9,7 +9,7 @@ gate before parallel agent dispatch.
 
 ## 1. executor kicks off
 
-Runs `cf-context` + `cf-status` to orient. Assesses: does this need parallel agents?
+Runs `cf context` + `cf status` to orient. Assesses: does this need parallel agents?
 
 Yes — likely frontend (UI components, websocket client), backend (websocket server,
 event emitter), and a database schema change. Three separate domains that could run

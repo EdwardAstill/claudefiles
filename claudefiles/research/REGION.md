@@ -5,14 +5,16 @@ Skills for documentation lookup and research.
 ---
 
 ### docs-agent
-- **Purpose:** Fetch current documentation for libraries, frameworks, SDKs, APIs, and CLI tools
-- **Use when:** Need accurate API signatures, config options, or working examples for a specific library
+- **Purpose:** Answers "how do I use X?" — exact API signatures, config options, working code examples
+- **Use when:** Need current documentation for a specific library, framework, SDK, or CLI tool
+- **NOT for:** "Should I use X?" (research-agent) or "How does this codebase work?" (codebase-explainer)
 - **Produces:** API reference, working example, source URL, version note
 - **Chains into:** api-architect (feeds reference into design), python-expert / typescript-expert / rust-expert
 
 ### research-agent
-- **Purpose:** General research and critical analysis — expert consensus, trade-offs, pitfalls
-- **Use when:** Evaluating an approach, understanding risks, or finding expert consensus before committing
+- **Purpose:** Answers "should I use X?" — trade-off analysis, risk evaluation, expert consensus
+- **Use when:** Choosing between options, evaluating risks, or needing evidence before committing to an approach
+- **NOT for:** API lookups (docs-agent) or codebase understanding (codebase-explainer)
 - **Produces:** Structured report: consensus, nuances, pitfalls, contradictions, recommended direction
 - **Chains into:** api-architect (informs design), brainstorming (informs spec)
 
@@ -29,8 +31,9 @@ Skills for documentation lookup and research.
 - **Chains into:** (terminal)
 
 ### codebase-explainer
-- **Purpose:** Systematic codebase analysis — architecture layers, execution paths, key abstractions, dependencies
-- **Use when:** Unfamiliar codebase needs a working mental model before making changes; onboarding; tracing unexpected behaviour
+- **Purpose:** Answers "how does this codebase work?" — maps architecture, traces execution, identifies abstractions
+- **Use when:** Entering unfamiliar codebase; onboarding; planning changes spanning multiple layers
+- **NOT for:** External library docs (docs-agent) or evaluating approaches (research-agent)
 - **Produces:** Architecture map, traced execution path, key abstractions summary, "where to look" guide
 - **Chains into:** brainstorming (informs design), writing-plans (informs task breakdown)
 

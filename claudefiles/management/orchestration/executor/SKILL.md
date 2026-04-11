@@ -17,8 +17,8 @@ implementation. Makes the routing decision inline — no separate routing step n
 **You cannot make a routing decision — or start any work — without first running:**
 
 ```bash
-cf-context   # project fingerprint: name, language, structure
-cf-status    # git state: branch, recent commits, uncommitted changes
+cf context   # project fingerprint: name, language, structure
+cf status    # git state: branch, recent commits, uncommitted changes
 ```
 
 Skip only if both commands are unavailable (not installed). Skipping because "the task is obvious"
@@ -26,7 +26,7 @@ or "you already know the codebase" is not valid — context reveals assumptions 
 
 ## Step 1: Orient and assess
 
-Run cf-context and cf-status, then ask one question:
+Run cf context and cf status, then ask one question:
 
 > **Does this task need multiple agents working in parallel on separate domains?**
 
@@ -65,6 +65,11 @@ wrong turns — not a full decomposition. Think, then act.
 
 ## Step 3: Execute
 
+**Calibrate effort to the ask.** Before launching research, deep analysis, or
+multi-agent work, check whether the user wants a quick answer or a deep dive.
+When unclear, ask — one sentence: "Quick overview or deep dive?" Default to the
+minimal response that answers the question. Over-delivering wastes tokens and time.
+
 Work through the task with full tool access. When you hit domain-specific work,
 load the relevant skill inline:
 
@@ -77,18 +82,49 @@ Debugging a bug    → Skill("systematic-debugging") → apply in this conversat
 
 Inline loading keeps full context throughout. Subagents lose the session; inline keeps it.
 
-## Step 4: Verify before completion
+## Step 4: Verify before completion (MANDATORY)
 
-Run tests, check output, read the result. Report with evidence, not with assertions.
+**This step is not optional. Every task exits through verification.**
 
-**Iron Law:** Do NOT report completion without running verification.
+Before reporting any work as complete, you MUST:
+
+1. **Run the test suite** — if tests exist, run them. Report the output.
+2. **Run the code** — if you wrote something executable, execute it and show the output.
+3. **Check for regressions** — verify nothing else broke.
+4. **Load verification skill** — for non-trivial tasks, `Skill("verification-before-completion")`
+   provides the full verification checklist.
+
+**Iron Law:** Do NOT report completion without running verification. A task that
+skips verification is not complete — it is a guess.
+
+Evidence means command output, test results, or observable behavior. Phrases like
+"should work," "looks correct," or "I believe this is right" are not evidence.
+
+## Step 5: Escalate to manager (when needed)
+
+If at any point during execution you discover the task requires parallel agents
+across separate domains, escalate. Include a **HANDOFF CONTEXT** block:
+
+```
+## HANDOFF CONTEXT
+**Task:** <original user request>
+**cf context output:** <paste cf context output>
+**cf status output:** <paste cf status output>
+**Work done so far:** <what you completed before escalating>
+**Why escalating:** <specific reason parallelism is needed>
+```
+
+This prevents context loss — the #1 failure mode in multi-agent systems.
 
 ## Specialist skills (load inline with Skill tool)
 
 `python-expert` · `typescript-expert` · `rust-expert` · `typst-expert` ·
 `api-architect` · `git-expert` · `github-expert` · `github-actions-expert` ·
 `tdd` · `systematic-debugging` · `verification-before-completion` ·
-`docs-agent` · `research-agent` · `codebase-explainer`
+`docs-agent` · `research-agent` · `codebase-explainer` ·
+`security-review` · `database-expert` · `performance-profiling` ·
+`infrastructure-expert` · `refactoring-patterns` · `dependency-management` ·
+`observability` · `accessibility`
 
 ## Verification rationalizations
 

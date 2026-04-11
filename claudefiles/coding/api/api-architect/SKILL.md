@@ -93,13 +93,13 @@ For Rust projects:
 ## Tools
 
 - `LSP` — inspect types, signatures, interfaces
-- `cf-routes --write` — extract full route map before review mode (always run this first in review mode)
-- `cf-context --write` — understand project framework before designing
+- `cf routes --write` — extract full route map before review mode (always run this first in review mode)
+- `cf context --write` — understand project framework before designing
 - `Bash` — run grep for routes if LSP unavailable
 - `Read` — read existing spec files
 - `Grep` — find route definitions
 - `Glob` — locate handler files
-- `cf-note` — record API decisions so other agents can read them
+- `cf note` — record API decisions so other agents can read them
 
 ## Anti-patterns
 

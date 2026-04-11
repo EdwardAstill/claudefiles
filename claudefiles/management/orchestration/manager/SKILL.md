@@ -15,6 +15,16 @@ dispatch.
 
 ## Phase 1: Plan
 
+### Read handoff context
+
+If executor escalated here, look for the **HANDOFF CONTEXT** block. It contains:
+- The original user request
+- cf context and cf status output (so you don't re-run them)
+- Work completed before escalation
+- Why parallelism is needed
+
+If no handoff block exists (direct invocation), run cf context and cf status yourself.
+
 ### Read relevant regions
 
 Identify which categories are involved and read their REGION.md files:
@@ -68,6 +78,29 @@ Wait for confirmation.
 - Use when tasks depend on each other's output or share state
 
 **Individual specialist** — dispatch as a single subagent for focused domain work.
+
+## Phase 3: Review and Replan
+
+After agents complete, review results before reporting success:
+
+1. **Check for conflicts** — did any agents touch the same files? Resolve before continuing.
+2. **Run full test suite** — verify the combined output works together.
+3. **Check for discoveries** — did any agent report unexpected findings that invalidate
+   the plan?
+
+### Adaptive replanning
+
+If an agent fails or discovers something that changes the plan:
+
+| Situation | Action |
+|-----------|--------|
+| Agent failed on a task | Analyze why. Re-dispatch with better context, or reassign to a different skill. |
+| Agent discovered a design flaw | Pause remaining agents. Re-evaluate the plan. Update and re-dispatch if needed. |
+| Agent's output conflicts with another's | Make conflicting tasks sequential instead of parallel. Re-dispatch the later one with the earlier one's output as context. |
+| 3+ agents failed on related tasks | Stop. The plan has a structural problem. Re-run the planning phase with what you've learned. |
+
+**Do not force the original plan when reality contradicts it.** Plans are hypotheses.
+Execution is the experiment. Update the plan when the experiment reveals new information.
 
 ## Advisors vs Specialists
 

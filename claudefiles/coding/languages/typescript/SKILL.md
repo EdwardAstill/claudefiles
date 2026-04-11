@@ -1,8 +1,10 @@
 ---
 name: typescript-expert
 description: >
-  TypeScript and JavaScript expert. Use when writing, debugging, or reviewing
-  TS/JS code. Covers strict typing, generics, type narrowing, bun/npm tooling,
+  TypeScript toolchain and conventions specialist. Use when you need
+  typescript-language-server LSP diagnostics, bun/npm tooling, biome linting,
+  or strict typing patterns — the tooling integration the base model doesn't
+  enforce. Covers strict typing, generics, type narrowing, bun/npm tooling,
   and live code introspection via the typescript-language-server LSP.
 ---
 
@@ -31,7 +33,7 @@ Install: `bun install -g typescript typescript-language-server`
 
 - **npm packages:** context7 MCP — excellent coverage, always use for library questions
 - **TypeScript itself:** typescriptlang.org/docs — WebFetch for language features
-- **Version check:** `cf-versions --write` reads `package.json` and lockfiles
+- **Version check:** `cf versions --write` reads `package.json` and lockfiles
 
 ## Toolchain
 

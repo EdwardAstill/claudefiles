@@ -1,116 +1,147 @@
 # Skills Reference
 
-30 skills across four categories. Run `cf agents --tree` to see the live hierarchy with
-invocation names.
+39 leaf skills across four categories. Run `cf agents --tree` to see the live hierarchy.
 
 ---
 
-## management/ — orchestration and tooling
+## management/ — orchestration and tooling (11 skills)
 
 ### Orchestration
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `executor` | `claudefiles:executor` | Every new task — default entry point |
-| `manager` | `claudefiles:manager` | Genuinely parallel multi-agent work |
-| `subagent-driven-development` | `claudefiles:subagent-driven-development` | Sequential plan execution with per-task review gates |
+| Skill | Use when |
+|-------|----------|
+| `executor` | Every new task — default entry point |
+| `manager` | Genuinely parallel multi-agent work |
+| `subagent-driven-development` | Sequential plan execution with per-task review gates |
 
-### Planning advisors (loaded inline by manager)
+### Planning Advisors (loaded inline by manager)
 
-| Skill | Invoke as | Single mandate |
-|-------|-----------|---------------|
-| `design-advisor` | `claudefiles:design-advisor` | Does this need brainstorming or a spec before coding? |
-| `git-advisor` | `claudefiles:git-advisor` | What git strategy fits: worktrees, branches, PRs? |
-| `coordination-advisor` | `claudefiles:coordination-advisor` | Parallel vs sequential? Dependency graph? |
+| Skill | Single mandate |
+|-------|---------------|
+| `design-advisor` | Does this need brainstorming or a spec before coding? |
+| `git-advisor` | What git strategy: worktrees, branches, PRs? |
+| `coordination-advisor` | Parallel vs sequential? Dependency graph? |
 
 ### Meta
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `using-claudefiles` | `claudefiles:using-claudefiles` | Session start (automatic) |
-| `skill-manager` | `claudefiles:skill-manager` | View, install, or remove skills |
-| `writing-skills` | `claudefiles:writing-skills` | Create or edit a SKILL.md |
+| Skill | Use when |
+|-------|----------|
+| `using-claudefiles` | Session start (automatic) |
+| `skill-manager` | View, install, or remove skills |
+| `skills` | Display the full skill catalog |
+| `writing-skills` | Create or edit a SKILL.md |
 
 ---
 
-## planning/ — design before implementation
+## planning/ — design before implementation (2 skills)
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `brainstorming` | `claudefiles:brainstorming` | Requirements unclear; design decisions not yet made |
-| `writing-plans` | `claudefiles:writing-plans` | Implementation is complex enough to need a step-by-step plan |
+| Skill | Use when |
+|-------|----------|
+| `brainstorming` | Requirements unclear — turn an idea into a spec |
+| `writing-plans` | Spec approved — turn it into an implementation plan |
 
 ---
 
-## coding/ — writing, reviewing, and shipping code
+## coding/ — writing, reviewing, and shipping code (21 skills)
 
 ### Quality
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `tdd` | `claudefiles:tdd` | Writing new functionality — test-first |
-| `systematic-debugging` | `claudefiles:systematic-debugging` | Bug or unexpected behaviour |
-| `verification-before-completion` | `claudefiles:verification-before-completion` | Before marking any task done |
-| `code-review` | `claudefiles:code-review` | Requesting or receiving a code review |
-| `simplify` | `claudefiles:simplify` | Code works but is overly complex |
+| Skill | Use when |
+|-------|----------|
+| `tdd` | Writing new functionality — test-first |
+| `systematic-debugging` | Bug, test failure, or unexpected behavior — find root cause first |
+| `verification-before-completion` | Before marking any task done — mandatory in executor |
+| `code-review` | Requesting or receiving a code review |
+| `simplify` | Recently changed code is overly complex |
+| `security-review` | OWASP top 10, injection vectors, auth/authz, dependency CVEs |
+| `performance-profiling` | Code is correct but slow — measure before optimizing |
+| `refactoring-patterns` | Large-scale restructuring (not small cleanups — that's simplify) |
+| `dependency-management` | Version bumps, CVE scanning, breaking change analysis |
+| `observability` | Structured logging, distributed tracing, metrics instrumentation |
+| `accessibility` | WCAG 2.1 AA, semantic HTML, ARIA, keyboard navigation |
 
-### Version control
+### Data
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `git-expert` | `claudefiles:git-expert` | Git operations: branching, merge, history, bisect |
-| `git-worktree-workflow` | `claudefiles:git-worktree-workflow` | Feature work in an isolated worktree |
-| `github-expert` | `claudefiles:github-expert` | GitHub: PRs, issues, browsing external repos |
+| Skill | Use when |
+|-------|----------|
+| `database-expert` | Schema design, migrations, query optimization, ORM patterns |
+
+### Infrastructure
+
+| Skill | Use when |
+|-------|----------|
+| `infrastructure-expert` | Dockerfiles, K8s, Terraform/Pulumi, cloud config, reverse proxies |
+
+### Version Control
+
+| Skill | Use when |
+|-------|----------|
+| `git-expert` | Git operations beyond basics — merge, bisect, reflog, history |
+| `github-expert` | PRs, issues, Actions, browsing repos |
+| `git-worktree-workflow` | Isolated feature work in a worktree |
 
 ### CI/CD
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `github-actions-expert` | `claudefiles:github-actions-expert` | GitHub Actions: write, debug, permissions, matrix |
+| Skill | Use when |
+|-------|----------|
+| `github-actions-expert` | GitHub Actions — write, debug, permissions, matrix, caching |
 
 ### API
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `api-architect` | `claudefiles:api-architect` | Designing or reviewing API contracts |
+| Skill | Use when |
+|-------|----------|
+| `api-architect` | Design or review API contracts — REST, GraphQL, RPC |
 
-### Languages
+### Languages (toolchain + conventions specialists)
 
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `python-expert` | `claudefiles:python-expert` | Python: implementation, type checking, toolchain |
-| `typescript-expert` | `claudefiles:typescript-expert` | TypeScript/JS: implementation, strict types |
-| `rust-expert` | `claudefiles:rust-expert` | Rust: implementation, ownership, cargo |
-| `typst-expert` | `claudefiles:typst-expert` | Typst: document authoring |
-
----
-
-## research/ — information before action
-
-| Skill | Invoke as | Use when |
-|-------|-----------|----------|
-| `docs-agent` | `claudefiles:docs-agent` | Library docs, API reference, versioned examples |
-| `research-agent` | `claudefiles:research-agent` | Trade-offs, risks, consensus across sources |
-| `codebase-explainer` | `claudefiles:codebase-explainer` | Unfamiliar codebase — execution paths, architecture |
-| `note-taker` | `claudefiles:note-taker` | Writing structured notes or interactive lessons |
-| `test-taker` | `claudefiles:test-taker` | Answering questions from reference material |
+| Skill | Focus |
+|-------|-------|
+| `python-expert` | pyright LSP, uv, ruff, pytest — toolchain integration |
+| `typescript-expert` | typescript-language-server LSP, bun, biome — toolchain integration |
+| `rust-expert` | rust-analyzer LSP, cargo, clippy, rustfmt — toolchain integration |
+| `typst-expert` | tinymist LSP, typst compile/watch — document authoring |
 
 ---
 
-## Notes
+## research/ — information before action (5 skills)
 
-**Invocation:** Use the Skill tool with the skill name (without `claudefiles:` prefix):
+| Skill | Answers | Use when |
+|-------|---------|----------|
+| `docs-agent` | "How do I use X?" | Need API signatures, config options, working examples |
+| `research-agent` | "Should I use X?" | Evaluating trade-offs, risks, expert consensus |
+| `codebase-explainer` | "How does this codebase work?" | Entering unfamiliar code, onboarding |
+| `note-taker` | — | Creating notes, lessons, or interactive tutorials |
+| `test-taker` | — | Answering questions from reference material |
+
+---
+
+## Invocation
+
+**Inline (from executor):** `Skill("python-expert")` — loads skill patterns into the
+current conversation. Preserves full session context.
+
+**Slash command:** `/skill-name` — manual override when you know exactly what you want.
+
+**Advisors** are loaded inline by manager during planning only. Never dispatched as
+subagents.
+
+**Specialists** are loaded inline by executor. Only dispatched as subagents when manager
+needs parallel domain work.
+
+---
+
+## Adding a Skill
+
+1. Create `claudefiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
+2. Add entry to `manifest.toml` under `[skills.<skill-name>]`
+3. Add entry to the category's `REGION.md`
+4. Run `cf check` to verify
+5. Run `./install.sh --global` to pick up the new skill
+
+```yaml
+---
+name: skill-name
+description: >
+  Use when [triggering conditions]. Under 1024 chars.
+---
 ```
-Skill("executor")
-Skill("systematic-debugging")
-Skill("rust-expert")
-```
-
-**Specialist skills are loaded inline by executor**, not dispatched as subagents.
-They bring their patterns into the current conversation context, preserving session state.
-
-**Advisors (design-advisor, git-advisor, coordination-advisor) are loaded inline by
-manager** during the planning phase only. They are never dispatched as subagents.
-
-**Adding a skill:** See CLAUDE.md → "Adding a New Skill — Checklist". Run `cf-check`
-after any addition to verify REGION.md sync.

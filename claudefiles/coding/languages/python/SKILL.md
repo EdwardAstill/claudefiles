@@ -1,8 +1,10 @@
 ---
 name: python-expert
 description: >
-  Python language expert. Use when writing, debugging, or reviewing Python code.
-  Covers type hints, async patterns, packaging with uv, linting with ruff,
+  Python toolchain and conventions specialist. Use when you need pyright LSP
+  diagnostics, uv package management, ruff linting, or pytest patterns — the
+  tooling integration and project conventions that the base model doesn't enforce.
+  Not for general Python knowledge (the model already has that). Covers type hints,
   testing with pytest, and live code introspection via the pyright LSP.
 ---
 
@@ -32,7 +34,7 @@ For richer completions and refactoring, `pylsp` is an alternative:
 
 - **Package docs:** context7 MCP — resolve library ID then fetch current docs
 - **Stdlib:** docs.python.org — fetch directly with WebFetch if context7 doesn't have it
-- **Version check:** `cf-versions --write` reads `pyproject.toml` / `requirements.txt`
+- **Version check:** `cf versions --write` reads `pyproject.toml` / `requirements.txt`
 
 Always verify the installed version before fetching docs — APIs change between minor versions.
 

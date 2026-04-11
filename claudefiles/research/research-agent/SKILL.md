@@ -1,11 +1,11 @@
 ---
 name: research-agent
 description: >
-  General research and analysis specialist. Use when you need to understand a topic deeply
-  before committing to an approach — not just "how do I use X" (that's docs-agent) but
-  "what are the trade-offs, risks, and expert consensus around X?" Applies critical thinking,
-  finds consensus across sources, surfaces nuances and pitfalls, and points you toward
-  further investigation. Works for any topic, not just coding.
+  Trade-off and risk analysis specialist. Answers "should I use X?" — evaluates
+  approaches, finds expert consensus, surfaces pitfalls, compares alternatives.
+  NOT for API lookups (docs-agent) or codebase understanding (codebase-explainer).
+  Use when choosing between options, evaluating risks, or needing evidence-based
+  recommendations before committing to an approach. Works for any topic.
 ---
 
 # Research Agent
@@ -30,6 +30,19 @@ This is not a doc fetcher. That is docs-agent. This skill reasons about what it 
 - You need the exact API for a library → use `docs-agent`
 - You need to design an API contract → use `api-architect`
 - The answer is straightforwardly in the docs → use `docs-agent` directly
+
+## Step 0: Calibrate Depth
+
+**Before researching, ask the user what level of depth they want.**
+
+| Level | What to do | Typical output |
+|-------|-----------|----------------|
+| **Quick** | 1-2 web searches, summarize in 5-10 lines | A paragraph with the answer |
+| **Standard** | 3-5 sources, structured report | The output format below |
+| **Deep dive** | 10+ sources, full citations, comparative analysis | Multi-section report with sources |
+
+If the user doesn't specify, **default to Standard**. Do not default to deep dive.
+Do not launch multiple parallel research agents without confirming scope first.
 
 ## Process
 
@@ -98,7 +111,7 @@ digraph research_agent {
 - `WebSearch` — broad search across sources
 - `WebFetch` — read specific articles, papers, blog posts in full
 - `Read` — read local files if researching something within the codebase
-- `cf-note --write` — record findings to `.claudefiles/notes.md` so other agents can read them
+- `cf note --write` — record findings to `.claudefiles/notes.md` so other agents can read them
 
 ## Anti-patterns
 

@@ -9,8 +9,8 @@ description: >
 # Skill Manager
 
 The only skill installed globally. Everything else is installed per-project based
-on what the project actually needs. Use `cf-agents` to inspect current state,
-`install.sh` to install skills, and `cf-setup` to check tool dependencies.
+on what the project actually needs. Use `cf agents` to inspect current state,
+`install.sh` to install skills, and `cf setup` to check tool dependencies.
 
 ## Scopes
 
@@ -26,7 +26,7 @@ All skills live in `~/.claudefiles/claudefiles/` (the home claudefiles install).
 To see the full tree:
 
 ```bash
-cf-agents --tree
+cf agents --tree
 ```
 
 Four categories:
@@ -41,7 +41,7 @@ Four categories:
 
 ### Workflow
 
-1. Run `cf-context --write` to fingerprint the project silently
+1. Run `cf context --write` to fingerprint the project silently
 2. Ask the user one question:
 
    > "Describe your project in a few sentences — what it does, what stack it uses, and what kind of work you'll be doing in it."
@@ -53,7 +53,7 @@ Four categories:
    ```bash
    ~/.claudefiles/install.sh --local --skill <name>
    ```
-7. Run `cf-setup --write` to check tool dependencies and write `.claudefiles/deps.md`
+7. Run `cf setup --write` to check tool dependencies and write `.claudefiles/deps.md`
 8. If anything is missing, show the install commands prominently
 
 ### Skill Selection Mapping
@@ -91,9 +91,9 @@ Install these 4 skills? (yes / adjust)
 ## Checking Current State
 
 ```bash
-cf-agents              # full overview — plugins, global, project, available, CLI deps
-cf-agents --tree       # skill hierarchy tree
-cf-agents --available  # what's in ~/.claudefiles but not installed here
+cf agents              # full overview — plugins, global, project, available, CLI deps
+cf agents --tree       # skill hierarchy tree
+cf agents --available  # what's in ~/.claudefiles but not installed here
 ```
 
 ## Installing and Removing Skills
@@ -114,11 +114,11 @@ cf-agents --available  # what's in ~/.claudefiles but not installed here
 
 ## Checking Tool Dependencies
 
-After installing skills, run `cf-setup` to check that all required CLI tools are present:
+After installing skills, run `cf setup` to check that all required CLI tools are present:
 
 ```bash
-cf-setup           # check deps for all locally installed skills, print report
-cf-setup --write   # also save report to .claudefiles/deps.md
+cf setup           # check deps for all locally installed skills, print report
+cf setup --write   # also save report to .claudefiles/deps.md
 ```
 
 If `bun` or `uv` is missing and skills require them, flag this prominently:

@@ -67,8 +67,9 @@ def _parse_manifest(manifest_path: Path) -> tuple[dict, dict]:
                 val = val.strip().strip('"')
                 if key in ("manager", "package", "description", "install"):
                     cli_data[current_key][key] = val
-    except Exception:
-        pass
+    except Exception as e:
+        import sys
+        print(f"Warning: failed to parse manifest {manifest_path}: {e}", file=sys.stderr)
 
     return skills_data, cli_data
 

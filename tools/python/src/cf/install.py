@@ -1,125 +1,45 @@
-import typer
-import os
+"""Thin wrapper around install.sh — delegates all install logic to the bash script."""
+
 import subprocess
+import sys
 from pathlib import Path
-from typing import Optional
 
-app = typer.Typer(invoke_without_command=True)
+import click
 
 
-def get_source_repo(source: Optional[str]) -> Path:
-    if source:
-        return Path(source)
+def _find_install_sh() -> Path:
+    """Locate install.sh relative to this package's repo root."""
+    import cf
+
+    repo_root = Path(cf.__file__).resolve().parent.parent.parent.parent.parent
+    script = repo_root / "install.sh"
+    if script.is_file():
+        return script
+
+    import os
+
     env_root = os.environ.get("CLAUDE_PLUGIN_ROOT")
     if env_root:
-        return Path(env_root)
-    # Fall back to the package's own location
-    import cf
-    return Path(cf.__file__).parent.parent.parent.parent.parent  # src/cf -> src -> python -> tools -> repo root
+        script = Path(env_root) / "install.sh"
+        if script.is_file():
+            return script
+
+    raise FileNotFoundError(
+        f"Cannot find install.sh (searched {repo_root} and $CLAUDE_PLUGIN_ROOT)"
+    )
 
 
-def find_skill_by_name(skills_root: Path, name: str) -> Optional[Path]:
-    for skill_dir in skills_root.rglob("SKILL.md"):
-        parent = skill_dir.parent
-        if parent.name == name:
-            return parent
-    return None
+@click.command(
+    context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def install_cmd(args):
+    """Install claudefiles skills — delegates to install.sh."""
+    try:
+        script = _find_install_sh()
+    except FileNotFoundError as e:
+        click.echo(str(e), err=True)
+        raise SystemExit(1)
 
-
-def get_skills_source(repo: Path) -> Optional[Path]:
-    for name in ("skills", "claudefiles"):
-        p = repo / name
-        if p.is_dir():
-            return p
-    return None
-
-
-@app.callback(invoke_without_command=True)
-def main(
-    global_: bool = typer.Option(False, "--global"),
-    local: Optional[str] = typer.Option(None, "--local"),
-    skill: Optional[str] = typer.Option(None, "--skill"),
-    category: Optional[str] = typer.Option(None, "--category"),
-    from_: Optional[str] = typer.Option(None, "--from"),
-    dry_run: bool = typer.Option(False, "--dry-run"),
-    remove: bool = typer.Option(False, "--remove"),
-    source: Optional[str] = typer.Option(None, "--source"),
-):
-    """Install claudefiles skills to ~/.claude/skills/ or project .claude/skills/."""
-    # Handle --from (github clone)
-    if from_:
-        if from_.startswith("github:"):
-            _, repo_path = from_.split(":", 1)
-            clone_dir = Path.home() / ".local" / "share" / "claudefiles-src"
-            url = f"https://github.com/{repo_path}"
-            if clone_dir.exists():
-                typer.echo(f"Pulling latest from {url} ...")
-                if not dry_run:
-                    subprocess.run(["git", "-C", str(clone_dir), "pull", "--ff-only"], check=True)
-            else:
-                typer.echo(f"Cloning {url} to {clone_dir} ...")
-                if not dry_run:
-                    subprocess.run(["git", "clone", url, str(clone_dir)], check=True)
-            source = str(clone_dir)
-        else:
-            typer.echo(f"Unknown --from format: {from_}. Use github:owner/repo", err=True)
-            raise typer.Exit(1)
-
-    repo = get_source_repo(source)
-    skills_src = get_skills_source(repo)
-
-    if skills_src is None:
-        typer.echo(f"No skills/ or claudefiles/ found in {repo}", err=True)
-        raise typer.Exit(1)
-
-    # Determine target directory
-    if global_:
-        target = Path.home() / ".claude" / "skills"
-    elif local:
-        target = Path(local) / ".claude" / "skills"
-    else:
-        target = Path(".claude") / "skills"
-
-    # Determine what to install
-    if skill:
-        src_skill = find_skill_by_name(skills_src, skill)
-        if not src_skill:
-            typer.echo(f"Skill not found: {skill}", err=True)
-            raise typer.Exit(1)
-        to_install = [(src_skill, target / skill)]
-    elif category:
-        cat_dir = skills_src / category
-        if not cat_dir.is_dir():
-            typer.echo(f"Category not found: {category}", err=True)
-            raise typer.Exit(1)
-        to_install = [(cat_dir, target / category)]
-    else:
-        # Install all top-level category directories
-        to_install = [
-            (cat, target / cat.name)
-            for cat in sorted(skills_src.iterdir())
-            if cat.is_dir()
-        ]
-
-    if remove:
-        for _, link in to_install:
-            if link.is_symlink():
-                typer.echo(f"Removing symlink: {link}")
-                if not dry_run:
-                    link.unlink()
-            elif link.exists():
-                typer.echo(f"Not a symlink, skipping: {link}")
-        return
-
-    if not dry_run:
-        target.mkdir(parents=True, exist_ok=True)
-
-    for src, link in to_install:
-        if dry_run:
-            typer.echo(f"[dry-run] Would link: {link} -> {src}")
-        else:
-            if link.exists() or link.is_symlink():
-                typer.echo(f"Already exists, skipping: {link}")
-            else:
-                link.symlink_to(src)
-                typer.echo(f"Linked: {link} -> {src}")
+    result = subprocess.run(["bash", str(script)] + list(args))
+    raise SystemExit(result.returncode)

@@ -1,3 +1,4 @@
+import sys
 import typer
 
 app = typer.Typer()
@@ -14,10 +15,8 @@ _SUBCOMMANDS = [
     ("agents", "agents"),
     ("check", "check"),
     ("setup", "setup"),
-    ("github", "github"),
-    ("browser", "browser"),
-    ("install", "install"),
     ("tools", "tools_cmd"),
+    ("tree", "tree"),
 ]
 
 @app.callback(invoke_without_command=True)
@@ -32,10 +31,31 @@ def _register():
         try:
             mod = importlib.import_module(f"cf.{module_name}")
             app.add_typer(mod.app, name=name)
-        except ModuleNotFoundError:
-            pass  # submodule not yet implemented — expected during scaffold
+        except ModuleNotFoundError as e:
+            # Only silence missing submodules, not missing dependencies
+            if f"cf.{module_name}" in str(e):
+                pass
+            else:
+                print(f"Warning: cf {name}: {e}", file=sys.stderr)
 
 _register()
 
+
+# Register install as a visible command (actual execution is intercepted in _run)
+@app.command()
+def install():
+    """Install claudefiles skills — delegates to install.sh."""
+    pass  # Never reached; _run() intercepts first
+
+
+def _run():
+    """Entry point — intercepts 'install' before Typer to allow passthrough args."""
+    if len(sys.argv) > 1 and sys.argv[1] == "install":
+        from cf.install import install_cmd
+        install_cmd(sys.argv[2:], standalone_mode=True)
+    else:
+        app()
+
+
 if __name__ == "__main__":
-    app()
+    _run()

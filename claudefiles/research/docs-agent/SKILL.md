@@ -1,10 +1,11 @@
 ---
 name: docs-agent
 description: >
-  Technical reference lookup specialist. Use when you need current documentation for a
-  library, framework, SDK, API, or CLI tool — even well-known ones. Searches web and
-  reference docs, leverages context7 for versioned library docs. Answers "how do I use X?"
-  not "what should I build?" — that is research-agent's job.
+  Technical reference lookup specialist. Answers "how do I use X?" — exact API
+  signatures, config options, working code examples. Use when you need current
+  documentation for a library, framework, SDK, API, or CLI tool. NOT for "should
+  I use X?" (research-agent) or "how does this codebase work?" (codebase-explainer).
+  Searches web docs and leverages context7 for versioned library docs.
 ---
 
 # Docs Agent
@@ -86,8 +87,8 @@ useEffect(() => {
 - `mcp__context7` — versioned library docs (primary for known libraries)
 - `WebSearch` — for libraries not in context7, or for finding changelogs/migration guides
 - `WebFetch` — fetch specific documentation pages
-- `cf-versions --write` — read exact installed versions before looking up docs (always run this first)
-- `cf-note` — record key findings so other agents can read them
+- `cf versions --write` — read exact installed versions before looking up docs (always run this first)
+- `cf note` — record key findings so other agents can read them
 
 ## Anti-patterns
 

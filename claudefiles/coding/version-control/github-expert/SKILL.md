@@ -133,7 +133,7 @@ gh pr merge 42 --squash --delete-branch
 ## Tools
 
 - `Bash` — all `gh` CLI commands
-- `cf-note` — record findings (e.g. "found auth pattern in owner/repo/src/auth.rs")
+- `cf note` — record findings (e.g. "found auth pattern in owner/repo/src/auth.rs")
 
 ## Relationship to Other Skills
 

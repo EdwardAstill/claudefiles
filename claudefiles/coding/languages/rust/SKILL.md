@@ -1,7 +1,9 @@
 ---
 name: rust-expert
 description: >
-  Rust language expert. Use when writing, debugging, or reviewing Rust code.
+  Rust toolchain and conventions specialist. Use when you need rust-analyzer
+  LSP diagnostics, cargo/clippy/rustfmt tooling, or Rust-specific patterns
+  (ownership, lifetimes, error handling) that benefit from structured guidance.
   Covers ownership, borrowing, lifetimes, error handling, cargo toolchain,
   and live code introspection via the rust-analyzer LSP.
 ---
@@ -32,7 +34,7 @@ Install: `rustup component add rust-analyzer`
 - **Crate docs:** docs.rs — WebFetch `https://docs.rs/<crate>/<version>/<crate>/` for any crate
 - **std:** doc.rust-lang.org/std — WebFetch for stdlib types and traits
 - **context7:** covers popular crates (tokio, serde, axum) — try it first, fall back to docs.rs
-- **Version check:** `cf-versions --write` reads `Cargo.toml` and `Cargo.lock`
+- **Version check:** `cf versions --write` reads `Cargo.toml` and `Cargo.lock`
 - **Local docs:** `cargo doc --open` to browse all deps locally
 
 ## Toolchain

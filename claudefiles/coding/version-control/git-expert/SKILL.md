@@ -20,7 +20,7 @@ The user should never have to think hard about what to do next in git. That is t
 Run this automatically — it is always safe and gives the full picture in one shot:
 
 ```bash
-cf-status --write
+cf status --write
 ```
 
 This produces the full repo map: trunk state, all branches, all worktrees, commit history
@@ -141,8 +141,8 @@ WORKTREE CONTEXT
 - `Bash` — git commands, env patching
 - `Read` — reading .env files
 - `Glob` — finding config files
-- `lib/port-finder.sh` — finds next free port
-- `bin/cf-status` — full branch/worktree topology map (run on every invocation)
+- `cf worktree` — create worktrees with port allocation
+- `cf status` — full branch/worktree topology map (run on every invocation)
 
 ## Anti-patterns
 

@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cf = "cf.main:app"
+cf = "cf.main:_run"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cf"]

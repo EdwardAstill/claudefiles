@@ -1,6 +1,7 @@
 # claudefiles
 
-Personal Claude Code skill suite and CLI toolset. Skills route tasks to the right specialist. The `cf` command provides tools for context gathering, git workflows, and external API integrations.
+Personal Claude Code skill suite and CLI toolset. 39 skills route tasks to the right
+specialist. The `cf` CLI provides context gathering, git workflows, and skill management.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
@@ -8,70 +9,70 @@ curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/boots
 
 ---
 
-## Structure
+## How It Works
+
+Every new task enters through **executor**, which orients with project context, handles
+the task end-to-end, and loads specialist skills inline as needed. For genuinely parallel
+multi-agent work, executor escalates to **manager**.
 
 ```
-tools/
-  python/          # cf command — uv + Typer package
-    src/cf/
-      main.py      # entrypoint
-      agents.py    # cf agents
-      check.py     # cf check
-      context.py   # cf context
-      status.py    # cf status
-      versions.py  # cf versions
-      worktree.py  # cf worktree
-      note.py      # cf note
-      read.py      # cf read
-      routes.py    # cf routes
-      init.py      # cf init
-      setup.py     # cf setup
-      github.py    # cf github
-      browser.py   # cf browser
-    pyproject.toml
-  tools.json       # unified tool registry (internal + external)
-
-skills/            # skill hierarchy — symlinked to ~/.claude/skills/ on install
-  management/
-  planning/
-  coding/
-  research/
-
-lib/               # shared Python utilities
-bootstrap.sh       # new machine entry point
-migrate.sh         # one-time migration script
+user message → executor → handles end-to-end (loads specialists inline)
+                     └──→ manager (parallel agents, if needed)
 ```
+
+Skills are loaded on demand — only names and descriptions are visible until invoked.
+This keeps the context window clean while providing deep specialist knowledge when needed.
 
 ---
 
-## The `cf` command
+## Structure
 
-All tools are subcommands of a single `cf` Typer application. Install it once with `uv tool install -e tools/python/` and it stays live as you edit the source — no reinstall needed.
+```
+claudefiles/           skill hierarchy (4 categories)
+├── management/        orchestration, advisors, meta
+├── planning/          brainstorming, implementation plans
+├── coding/            languages, quality, git, CI/CD, API, data, infrastructure
+└── research/          docs, research, codebase analysis, notes
+
+tools/python/          cf CLI — Python/Typer package
+lib/                   shared shell utilities
+install.sh             skill installer (single source of truth)
+bootstrap.sh           new machine entry point
+manifest.toml          per-skill tool requirements
+```
+
+See [docs/skill-tree.md](docs/skill-tree.md) for the full ASCII hierarchy.
+
+---
+
+## The `cf` CLI
+
+Installed via `uv tool install -e tools/python/`. Editable — source changes are
+live immediately.
 
 ### Context tools
 
 ```bash
-cf context           # fingerprint the current project — language, stack, framework, git state
-cf context --write   # also save to .claudefiles/context.md
+cf context             # project fingerprint: language, stack, framework
+cf context --write     # also save to .claudefiles/context.md
 
-cf status            # full repo branch/worktree topology
-cf status --write    # also save to .claudefiles/repo-map.md
+cf status              # full repo branch/worktree topology
+cf status --write      # also save to .claudefiles/repo-map.md
 
-cf versions          # dependency versions from package.json, Cargo.toml, pyproject.toml, etc.
-cf versions --write  # also save to .claudefiles/versions.md
+cf versions            # dependency versions from lockfiles and manifests
+cf versions --write    # also save to .claudefiles/versions.md
 
-cf routes            # scan codebase for API route definitions
-cf routes --write    # also save to .claudefiles/routes.md
+cf routes              # scan codebase for API route definitions
+cf routes --write      # also save to .claudefiles/routes.md
 
-cf read              # dump all .claudefiles/ bus state
-cf read context      # single file
-cf read notes
+cf read                # dump all .claudefiles/ bus state
+cf read context        # single file
 
-cf init              # bootstrap .claudefiles/ in current project, populate all bus files
+cf init                # bootstrap .claudefiles/ in current project
 cf init --dry-run
 
-cf note "message"            # append to .claudefiles/notes.md
-cf note --agent research "x" # tag by agent
+cf note "message"              # append to .claudefiles/notes.md
+cf note --agent research "x"   # tag by agent
 cf note --read
 cf note --clear
 ```
@@ -79,97 +80,98 @@ cf note --clear
 ### Skill and tool management
 
 ```bash
-cf agents              # full inventory: plugins, skills, MCP servers, tool status
+cf agents              # full inventory: skills, MCP servers, tool status
+cf agents --tree       # skill hierarchy tree
 cf agents --global     # global scope only
 cf agents --project    # current project only
-cf agents --tree       # skill hierarchy tree
 cf agents --available  # in claudefiles but not installed
 
-cf tools               # list all available tools with descriptions
-cf tools --json        # machine-readable output for skills
+cf tools               # list all available tools
+cf tools --json        # machine-readable
 
-cf check               # verify all leaf skills have entries in their category's REGION.md
-cf check --verbose
+cf check               # verify REGION.md entries for all leaf skills
+cf setup               # check tool dependencies for installed skills
+```
+
+### Install
+
+```bash
+cf install --global                      # full install (delegates to install.sh)
+cf install --global --skill git-expert   # one skill
+cf install --global --category research  # one category
+cf install --local /path/to/project      # project-level install
+cf install --global --remove             # uninstall
+cf install --global --dry-run            # preview
 ```
 
 ### Git
 
 ```bash
-cf worktree <branch> [base]  # create git worktree and open terminal with Claude Code
-```
-
-### API and automation
-
-```bash
-cf github <subcommand>   # GitHub — PRs, issues, branches, Actions
-cf browser <subcommand>  # browser automation via Playwright — screenshot, scrape, navigate
+cf worktree <branch> [base]   # create worktree + open Claude Code
 ```
 
 ---
 
-## Tool registry — `tools/tools.json`
+## Skills (39)
 
-Single source of truth for all tools. Skills call `cf tools` to discover what's available.
+### Management (11)
 
-**Internal tools** are subcommands of the `cf` package:
+| Skill | Use when |
+|-------|----------|
+| `executor` | Every new task — default entry point |
+| `manager` | Genuinely parallel multi-agent work |
+| `subagent-driven-development` | Sequential plan execution with review gates |
+| `design-advisor` | Planning: does this need a spec first? |
+| `git-advisor` | Planning: what git strategy? |
+| `coordination-advisor` | Planning: parallel vs sequential agents? |
+| `using-claudefiles` | Session start (automatic) |
+| `skill-manager` | View, install, or remove skills |
+| `skills` | Display skill catalog |
+| `writing-skills` | Create or edit a SKILL.md |
 
-```json
-{
-  "name": "github",
-  "type": "internal",
-  "package": "cf",
-  "description": "Interact with GitHub — list PRs, issues, create branches",
-  "usage": "cf github <subcommand>"
-}
-```
+### Planning (2)
 
-**External tools** are installed via a package manager:
+| Skill | Use when |
+|-------|----------|
+| `brainstorming` | Requirements unclear — idea to spec |
+| `writing-plans` | Spec to implementation plan |
 
-```json
-{
-  "name": "qmd",
-  "type": "external",
-  "manager": "bun",
-  "package": "@tobilu/qmd",
-  "description": "Local markdown search — BM25 + vector + LLM reranking, fully local",
-  "usage": "qmd <query> [--dir <path>]",
-  "examples": ["qmd 'authentication flow'", "qmd 'error handling' --dir src/"]
-}
-```
+### Coding (21)
 
-`cf agents` reads `tools.json` and checks PATH to report install status. `cf install` reads it to install missing tools.
+| Sub-category | Skill | Use when |
+|-------------|-------|----------|
+| **Languages** | `python-expert` | pyright LSP, uv, ruff, pytest |
+| | `typescript-expert` | ts-language-server LSP, bun, biome |
+| | `rust-expert` | rust-analyzer LSP, cargo, clippy |
+| | `typst-expert` | tinymist LSP, typst compile |
+| **Quality** | `tdd` | Writing new functionality — test first |
+| | `systematic-debugging` | Bug or unexpected behavior |
+| | `verification-before-completion` | Before marking any task done |
+| | `code-review` | Requesting or receiving review |
+| | `simplify` | Recently changed code is complex |
+| | `security-review` | OWASP, CVEs, injection, auth |
+| | `performance-profiling` | Correct but slow |
+| | `refactoring-patterns` | Large-scale restructuring |
+| | `dependency-management` | Version bumps, CVE scanning |
+| | `observability` | Logging, tracing, metrics |
+| | `accessibility` | WCAG 2.1 AA, ARIA, a11y |
+| **Data** | `database-expert` | Schema, migrations, queries |
+| **Infrastructure** | `infrastructure-expert` | Docker, K8s, Terraform |
+| **Version control** | `git-expert` | Git operations beyond basics |
+| | `github-expert` | PRs, issues, Actions |
+| | `git-worktree-workflow` | Isolated feature work |
+| **CI/CD** | `github-actions-expert` | GitHub Actions workflows |
+| **API** | `api-architect` | API design and review |
 
----
+### Research (5)
 
-## Skills
-
-Skills live in `skills/` under four categories. Run `cf agents --tree` to see the live hierarchy.
-
-| Category | Purpose |
-|----------|---------|
-| `management/` | Orchestration — task routing, planning, agent coordination |
-| `planning/` | Brainstorming, spec writing, plan execution |
-| `coding/` | Languages, git, APIs, quality (TDD, debugging, review) |
-| `research/` | Docs lookup, general research |
-
-### Orchestration
-
-Every new task starts with `executor`. It orients with `cf context`/`cf status`, makes the routing decision inline, and handles the task end-to-end.
-
-| Path | When |
-|------|------|
-| `executor` | Default — everything a single agent can handle (the common case) |
-| `manager` | Genuinely parallel multi-agent work, or 20+ independent subtasks across unrelated domains |
-
-Executor absorbs specialist skills inline (`Skill("rust-expert")`, `Skill("api-architect")`, etc.) — no subagent dispatch for specialisation.
-
-### How skills discover tools
-
-Skills call `cf tools` at the start of their context-gathering step to get a description of every available tool. For machine-readable use: `cf tools --json`. This means adding a new tool to `tools.json` makes it immediately visible to all skills — no skill files need to be updated.
-
-### REGION.md
-
-Each category has a `REGION.md` that catalogs its leaf skills. The `manager` skill reads these during planning. Run `cf check` before committing to verify all leaf skills have entries.
+| Skill | Use when |
+|-------|----------|
+| `docs-agent` | "How do I use X?" — API lookup |
+| `research-agent` | "Should I use X?" — trade-off analysis |
+| `codebase-explainer` | "How does this codebase work?" |
+| `note-taker` | Create notes or interactive lessons |
+| `test-taker` | Answer questions from reference material |
 
 ---
 
@@ -181,93 +183,74 @@ Each category has a `REGION.md` that catalogs its leaf skills. The `manager` ski
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
 ```
 
-`bootstrap.sh` is a five-line script: clone the repo, run `uv tool install -e tools/python/`, then delegate to `cf install --global`.
+Clones to `~/.local/share/claudefiles-src/`, installs the `cf` CLI via `uv tool`,
+then runs `install.sh --global` for skills.
 
-### `cf install`
-
-Full control over what gets installed and where.
-
-| Flag | Installs to |
-|------|-------------|
-| `--global` | `~/.claude/skills/` |
-| `--local [path]` | `<project>/.claude/skills/` |
-
-| Flag | What |
-|------|------|
-| (none) | Full skills/ suite |
-| `--category <name>` | One category |
-| `--skill <name>` | One skill by its SKILL.md `name` field |
+### From a local clone
 
 ```bash
-cf install --global                                        # full global install
-cf install --global --from github:EdwardAstill/claudefiles # from GitHub
-cf install --global --category research
-cf install --global --skill git-expert
-cf install --local /path/to/project
-cf install --global --remove
-cf install --global --dry-run
+git clone https://github.com/EdwardAstill/claudefiles ~/.local/share/claudefiles-src
+cd ~/.local/share/claudefiles-src
+uv tool install --force -e tools/python/    # install cf CLI
+./install.sh --global                        # install skills
 ```
 
-Skills are installed as symlinks — changes to skill files are live on the next Claude Code session, no reinstall needed.
+### Project-level install
+
+```bash
+./install.sh --local /path/to/project
+```
+
+Symlinks skills into `<project>/.claude/skills/` and adds `.claudefiles/` to `.gitignore`.
 
 ### Update
 
-```bash
-bootstrap.sh   # re-running pulls latest (git pull --ff-only) and re-runs cf install
-```
+Re-run `bootstrap.sh` — it pulls the latest and re-installs.
 
 ---
 
-## Agent communication bus
+## Agent Communication Bus
 
-Each project gets a `.claudefiles/` folder (gitignored) as shared state between agents.
+Each project gets a `.claudefiles/` folder (gitignored) for cross-agent state:
 
-| File | Written by | Purpose |
+| File | Written by | Content |
 |------|-----------|---------|
-| `context.md` | `cf context --write` | Project fingerprint — language, stack, framework |
-| `repo-map.md` | `cf status --write` | Git topology — branches, worktrees, ahead/behind |
-| `versions.md` | `cf versions --write` | Dependency versions for doc lookups |
+| `context.md` | `cf context --write` | Project fingerprint |
+| `repo-map.md` | `cf status --write` | Git topology |
+| `versions.md` | `cf versions --write` | Dependency versions |
 | `routes.md` | `cf routes --write` | API surface map |
-| `notes.md` | `cf note` | Free-form findings, decisions, context from any agent |
+| `notes.md` | `cf note` | Free-form findings |
 
 Run `cf init` to bootstrap all files at once.
 
 ---
 
-## Adding a tool
+## Adding a Skill
 
-**Internal (Python subcommand):**
-
-1. Add `tools/python/src/cf/<name>.py` with a Typer app
-2. Register it in `main.py`: `app.add_typer(<name>.app, name="<name>")`
-3. Add an entry to `tools/tools.json` with `"type": "internal"`
-
-**External:**
-
-1. Add an entry to `tools/tools.json` with `"type": "external"` and install info
-
----
-
-## Adding a skill
-
-1. Decide which category: `management/`, `planning/`, `coding/`, or `research/`
-2. Create `skills/<category>/[sub-category/]<skill-name>/SKILL.md` with `name` and `description` frontmatter
-3. Add entry to `manifest.toml` under `[skills.<skill-name>]`
-4. Add entry to the category's `skills/<category>/REGION.md` under `### skill-name`
-5. Run `cf check` to verify
-6. Run `cf install --global` if not already installed (symlink picks it up on next session)
-
----
-
-## Skill file format
+1. Create `claudefiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
+2. Add entry to `manifest.toml` under `[skills.<skill-name>]`
+3. Add entry to the category's `REGION.md`
+4. Run `cf check` to verify
+5. Run `./install.sh --global` to pick up the new skill
 
 ```yaml
 ---
 name: skill-name
 description: >
-  Use when [triggering conditions]. Keep under 1024 chars total.
-  This is what Claude reads to decide whether to invoke the skill.
+  Use when [triggering conditions]. Under 1024 chars.
 ---
 ```
 
-The `description` field is the only thing visible to other skills without invoking the skill. Write it to be unambiguous about when to trigger.
+---
+
+## Docs
+
+| Document | Content |
+|----------|---------|
+| [docs/skill-tree.md](docs/skill-tree.md) | Full skill hierarchy + routing diagrams |
+| [docs/reference/cli.md](docs/reference/cli.md) | CLI command reference |
+| [docs/reference/install.md](docs/reference/install.md) | Install system reference |
+| [docs/reference/orchestration.md](docs/reference/orchestration.md) | Routing architecture deep-dive |
+| [docs/reference/skills.md](docs/reference/skills.md) | Complete skill catalog with invocation names |
+| [docs/reference/workflows.md](docs/reference/workflows.md) | End-to-end workflow traces |
+| [docs/reference/agent-orchestration-patterns.md](docs/reference/agent-orchestration-patterns.md) | Research: agent routing, scaling, failure modes |

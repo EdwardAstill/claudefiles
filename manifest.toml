@@ -1,9 +1,7 @@
 # claudefiles manifest
 # Declares per-skill tool requirements and bin entries for install.sh
 
-[bin]
-# Scripts in bin/ to symlink to ~/.local/bin/
-install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents", "cf-setup", "cf-check"]
+# No bin/ wrappers — use `cf <subcommand>` directly via the Python CLI.
 
 [skills.using-claudefiles]
 tools = []
@@ -75,6 +73,9 @@ tools = ["Bash", "Read", "Write"]
 [skills.git-expert]
 tools = ["Bash", "Read", "Glob"]
 
+[skills.github-expert]
+tools = ["Bash", "Read", "Glob"]
+
 [skills.api-architect]
 tools = ["Bash", "Read", "Grep", "Glob"]
 # LSP tools (typescript-lsp, rust-analyzer-lsp) assumed installed via plugins
@@ -103,6 +104,30 @@ cli = ["rust-analyzer"]
 [skills.typst-expert]
 tools = ["LSP", "Bash", "Read"]
 cli = ["tinymist"]
+
+[skills.security-review]
+tools = ["Bash", "Read", "Grep", "Glob"]
+
+[skills.database-expert]
+tools = ["Bash", "Read", "Grep"]
+
+[skills.performance-profiling]
+tools = ["Bash", "Read", "Grep"]
+
+[skills.infrastructure-expert]
+tools = ["Bash", "Read", "Glob"]
+
+[skills.refactoring-patterns]
+tools = ["Bash", "Read", "Grep", "Glob"]
+
+[skills.dependency-management]
+tools = ["Bash", "Read", "Grep"]
+
+[skills.observability]
+tools = ["Bash", "Read", "Grep"]
+
+[skills.accessibility]
+tools = ["Bash", "Read", "Grep", "WebFetch"]
 
 # ── CLI tool registry ─────────────────────────────────────────────────────────
 # Tools installed via bun, uv, cargo, or rustup.
