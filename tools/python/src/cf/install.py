@@ -27,7 +27,7 @@ def find_skill_by_name(skills_root: Path, name: str) -> Optional[Path]:
 
 
 def get_skills_source(repo: Path) -> Optional[Path]:
-    for name in ("skills", "dev-suite"):
+    for name in ("skills", "claudefiles"):
         p = repo / name
         if p.is_dir():
             return p
@@ -69,7 +69,7 @@ def main(
     skills_src = get_skills_source(repo)
 
     if skills_src is None:
-        typer.echo(f"No skills/ or dev-suite/ found in {repo}", err=True)
+        typer.echo(f"No skills/ or claudefiles/ found in {repo}", err=True)
         raise typer.Exit(1)
 
     # Determine target directory

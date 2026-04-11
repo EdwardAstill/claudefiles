@@ -7,8 +7,8 @@ app = typer.Typer(invoke_without_command=True)
 
 
 def find_skills_root(cwd: Path) -> Path | None:
-    """Find skills root: check for 'skills/' first, then 'dev-suite/' as fallback."""
-    for name in ("skills", "dev-suite"):
+    """Find skills root: check for 'skills/' first, then 'claudefiles/' as fallback."""
+    for name in ("skills", "claudefiles"):
         p = cwd / name
         if p.is_dir():
             return p
@@ -38,7 +38,7 @@ def main(verbose: bool = typer.Option(False, "--verbose")):
     root = find_skills_root(cwd)
 
     if root is None:
-        typer.echo("No skills/ or dev-suite/ directory found in current directory.")
+        typer.echo("No skills/ or claudefiles/ directory found in current directory.")
         raise typer.Exit(0)
 
     issues = []

@@ -1,40 +1,116 @@
 # Skills Reference
 
-Skills live in `dev-suite/` organized into three categories. Run `cf-agents --tree` to see the live hierarchy.
+30 skills across four categories. Run `cf agents --tree` to see the live hierarchy with
+invocation names.
+
+---
 
 ## management/ — orchestration and tooling
 
-| Skill | Purpose |
-|-------|---------|
-| `simple-orchestrator` | Always-on triage — routes simple tasks directly, escalates complex ones |
-| `complex-orchestrator` | Full planner — reads the registry, coordinates multi-skill workflows |
-| `agent-manager` | Skill visibility and management — what's installed globally vs per-project |
+### Orchestration
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `executor` | `claudefiles:executor` | Every new task — default entry point |
+| `manager` | `claudefiles:manager` | Genuinely parallel multi-agent work |
+| `subagent-driven-development` | `claudefiles:subagent-driven-development` | Sequential plan execution with per-task review gates |
+
+### Planning advisors (loaded inline by manager)
+
+| Skill | Invoke as | Single mandate |
+|-------|-----------|---------------|
+| `design-advisor` | `claudefiles:design-advisor` | Does this need brainstorming or a spec before coding? |
+| `git-advisor` | `claudefiles:git-advisor` | What git strategy fits: worktrees, branches, PRs? |
+| `coordination-advisor` | `claudefiles:coordination-advisor` | Parallel vs sequential? Dependency graph? |
+
+### Meta
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `using-claudefiles` | `claudefiles:using-claudefiles` | Session start (automatic) |
+| `skill-manager` | `claudefiles:skill-manager` | View, install, or remove skills |
+| `writing-skills` | `claudefiles:writing-skills` | Create or edit a SKILL.md |
+
+---
+
+## planning/ — design before implementation
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `brainstorming` | `claudefiles:brainstorming` | Requirements unclear; design decisions not yet made |
+| `writing-plans` | `claudefiles:writing-plans` | Implementation is complex enough to need a step-by-step plan |
+
+---
 
 ## coding/ — writing, reviewing, and shipping code
 
-| Skill | Purpose |
-|-------|---------|
-| `git-expert` | Version control manager — worktrees, branches, merge, cleanup |
-| `github-expert` | GitHub and gh CLI specialist — PRs, issues, Actions, browsing external repos |
-| `api-architect` | API design (from feature → contract) and review (existing code) |
-| `coding-quality` | Dispatcher for TDD, debugging, verification, code review (coming soon) |
+### Quality
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `tdd` | `claudefiles:tdd` | Writing new functionality — test-first |
+| `systematic-debugging` | `claudefiles:systematic-debugging` | Bug or unexpected behaviour |
+| `verification-before-completion` | `claudefiles:verification-before-completion` | Before marking any task done |
+| `code-review` | `claudefiles:code-review` | Requesting or receiving a code review |
+| `simplify` | `claudefiles:simplify` | Code works but is overly complex |
+
+### Version control
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `git-expert` | `claudefiles:git-expert` | Git operations: branching, merge, history, bisect |
+| `git-worktree-workflow` | `claudefiles:git-worktree-workflow` | Feature work in an isolated worktree |
+| `github-expert` | `claudefiles:github-expert` | GitHub: PRs, issues, browsing external repos |
+
+### CI/CD
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `github-actions-expert` | `claudefiles:github-actions-expert` | GitHub Actions: write, debug, permissions, matrix |
+
+### API
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `api-architect` | `claudefiles:api-architect` | Designing or reviewing API contracts |
+
+### Languages
+
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `python-expert` | `claudefiles:python-expert` | Python: implementation, type checking, toolchain |
+| `typescript-expert` | `claudefiles:typescript-expert` | TypeScript/JS: implementation, strict types |
+| `rust-expert` | `claudefiles:rust-expert` | Rust: implementation, ownership, cargo |
+| `typst-expert` | `claudefiles:typst-expert` | Typst: document authoring |
+
+---
 
 ## research/ — information before action
 
-| Skill | Purpose |
-|-------|---------|
-| `docs-agent` | Technical reference lookup — exact APIs, examples, versioned docs |
-| `research-agent` | General research and critical analysis — consensus, trade-offs, pitfalls |
+| Skill | Invoke as | Use when |
+|-------|-----------|----------|
+| `docs-agent` | `claudefiles:docs-agent` | Library docs, API reference, versioned examples |
+| `research-agent` | `claudefiles:research-agent` | Trade-offs, risks, consensus across sources |
+| `codebase-explainer` | `claudefiles:codebase-explainer` | Unfamiliar codebase — execution paths, architecture |
+| `note-taker` | `claudefiles:note-taker` | Writing structured notes or interactive lessons |
+| `test-taker` | `claudefiles:test-taker` | Answering questions from reference material |
 
-## Orchestration
+---
 
-`simple-orchestrator` activates on every task and either routes directly to a specialist or escalates to `complex-orchestrator` for full multi-skill coordination.
+## Notes
 
-## Adding a skill
+**Invocation:** Use the Skill tool with the skill name (without `claudefiles:` prefix):
+```
+Skill("executor")
+Skill("systematic-debugging")
+Skill("rust-expert")
+```
 
-1. Decide which category: `management/`, `coding/`, or `research/`
-2. Create `dev-suite/<category>/[sub-category/]<skill-name>/SKILL.md` with `name` and `description` frontmatter
-3. Add a `scripts/` folder if the skill needs helper scripts
-4. Add an entry to `manifest.toml` under `[skills.<skill-name>]`
-5. Add an entry to `dev-suite/registry.md` with inputs, outputs, and chain targets
-6. Re-run `./install.sh --global` (symlink picks up changes on next session)
+**Specialist skills are loaded inline by executor**, not dispatched as subagents.
+They bring their patterns into the current conversation context, preserving session state.
+
+**Advisors (design-advisor, git-advisor, coordination-advisor) are loaded inline by
+manager** during the planning phase only. They are never dispatched as subagents.
+
+**Adding a skill:** See CLAUDE.md → "Adding a New Skill — Checklist". Run `cf-check`
+after any addition to verify REGION.md sync.

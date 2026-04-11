@@ -25,7 +25,7 @@ Full control over what gets installed and where.
 
 | Flag | What gets installed |
 |------|---------------------|
-| (none) | Full dev-suite |
+| (none) | Full claudefiles |
 | `--category <name>` | One category (`management`, `coding`, `research`) |
 | `--skill <name>` | One skill by its SKILL.md `name` field |
 
@@ -73,7 +73,7 @@ Each project gets a `.claudefiles/` folder when any `--write` tool runs. Gitigno
 
 ```
 claudefiles/
-├── dev-suite/           ← skills
+├── claudefiles/           ← skills
 ├── bin/                 ← CLI tools → ~/.local/bin/
 ├── lib/                 ← shared scripts (no install needed)
 ├── manifest.toml        ← per-skill tool requirements + bin entries + CLI deps

@@ -3,8 +3,8 @@
 # Run from repo root. Stages all changes but does not commit.
 set -euo pipefail
 
-echo "Step 1: Rename dev-suite/ → skills/"
-git mv dev-suite/ skills/
+echo "Step 1: Rename claudefiles/ → skills/"
+git mv claudefiles/ skills/
 
 echo "Step 2: Move bin/ → tools/scripts/"
 mkdir -p tools
@@ -31,7 +31,7 @@ grep -r "lib/common.sh\|lib/port-finder.sh" skills/ || echo "  (none found)"
 
 echo "Step 5: Update CLAUDE.md path references"
 sed -i \
-  -e 's|dev-suite/|skills/|g' \
+  -e 's|claudefiles/|skills/|g' \
   -e 's|bin/|tools/scripts/|g' \
   CLAUDE.md
 
@@ -49,4 +49,4 @@ PYEOF
 
 echo ""
 echo "Migration complete. Review changes with: git diff --cached"
-echo "Commit with: git commit -m 'chore: migrate repo structure (dev-suite→skills, bin→tools/scripts)'"
+echo "Commit with: git commit -m 'chore: migrate repo structure (claudefiles→skills, bin→tools/scripts)'"

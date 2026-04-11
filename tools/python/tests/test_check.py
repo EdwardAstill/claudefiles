@@ -12,7 +12,7 @@ def make_skill(path: Path, name: str):
 
 
 def test_check_passes_when_in_sync(tmp_path, monkeypatch):
-    suite = tmp_path / "dev-suite"
+    suite = tmp_path / "claudefiles"
     cat = suite / "coding"
     make_skill(cat / "git-expert", "git-expert")
     (cat / "REGION.md").write_text("### git-expert\nDoes git things\n")
@@ -23,7 +23,7 @@ def test_check_passes_when_in_sync(tmp_path, monkeypatch):
 
 
 def test_check_fails_when_missing(tmp_path, monkeypatch):
-    suite = tmp_path / "dev-suite"
+    suite = tmp_path / "claudefiles"
     cat = suite / "coding"
     make_skill(cat / "git-expert", "git-expert")
     (cat / "REGION.md").write_text("# empty\n")

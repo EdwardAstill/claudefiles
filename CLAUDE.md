@@ -6,11 +6,28 @@ into `~/.claude/skills/` (user-level) or `.claude/skills/` (project-level) via `
 ## Slash Commands
 
 Any skill can be invoked directly with `/skill-name`. For example, `/git-expert` triggers
-the git-expert skill immediately without waiting for task-analyser to route it.
+the git-expert skill immediately. Slash commands are the manual override — use them when
+you know exactly what you want. Otherwise executor handles routing automatically.
 
-Slash commands are the manual override. The task-analyser is the automatic layer.
-Skills should be designed to work both ways — invoked automatically by the task-analyser,
-and invoked directly by the user when they know what they want.
+## Which Skill When
+
+| Situation | Skill |
+|-----------|-------|
+| New task (default) | `executor` |
+| New feature / component / design | `brainstorming` first, then executor |
+| Bug or unexpected behaviour | `systematic-debugging` |
+| Unfamiliar codebase | `codebase-explainer` |
+| Implementation plan to execute | `writing-plans` → `subagent-driven-development` |
+| Python / TypeScript / Rust / Typst work | `python-expert` / `typescript-expert` / `rust-expert` / `typst-expert` |
+| API design or review | `api-architect` |
+| Git operations / worktrees | `git-expert` / `git-worktree-workflow` |
+| GitHub PRs, issues, Actions | `github-expert` / `github-actions-expert` |
+| Look up library docs | `docs-agent` |
+| Research trade-offs / risks | `research-agent` |
+| Answer questions from reference material | `test-taker` |
+| Write notes or interactive lessons | `note-taker` |
+| Parallel multi-agent work | `manager` |
+| Create or edit a skill | `writing-skills` |
 
 ## Key Facts
 
@@ -33,18 +50,18 @@ description: >
 ---
 ```
 
-The description field is the only thing visible to other skills and to task-analyser
-without invoking this skill. Write it to be unambiguous about when to trigger.
+The description field is the only thing visible to other skills without invoking this
+skill. Write it to be unambiguous about when to trigger.
 
 ## Regional Docs Sync Rule
 
 **Any time a new leaf skill is added or removed, update the REGION.md for its category.**
 
-Regional docs (`dev-suite/<category>/REGION.md`) are the skill catalogs the manager reads
+Regional docs (`claudefiles/<category>/REGION.md`) are the skill catalogs the manager reads
 during planning. Each entry uses `### skill-name` heading format. If they drift from
 reality, the manager will mis-plan.
 
-Run `cf-check` before committing any changes to `dev-suite/` to verify all leaf skills have
+Run `cf-check` before committing any changes to `claudefiles/` to verify all leaf skills have
 entries in their category's REGION.md.
 
 ## manifest.toml
@@ -74,11 +91,11 @@ install = ["cf-worktree"]  # files in bin/ to symlink to ~/.local/bin/
 
 ## Architecture Notes
 
-**Three-path orchestration:**
-- `task-analyser` — always-on entry point. Decomposes task, scores complexity across 3 signals, routes to one of three paths.
-- `cheapskill` — haiku model, direct execution for simple tasks (1–2 subtasks, single domain, no coordination).
-- `superskill` — Sonnet, capable general agent for medium tasks. Full tool access, tests own solution, absorbs specialist skills inline.
-- `manager` — Opus, for difficult tasks. Planning phase: reads relevant REGION.md files + consults planning-consultant → version-control-consultant → orchestration-consultant. Execution phase: dispatches specialists as subagents.
+**Two-path orchestration:**
+- `executor` — default entry point for every new task. Orients with cf-context/cf-status, makes the routing decision inline (single agent or escalate to manager?), then handles the task end-to-end. Absorbs specialist skills inline (rust-expert, typescript-expert, api-architect, etc.) via the Skill tool — no subagent dispatch for specialisation.
+- `manager` — for genuinely multi-agent work only: parallel domains, or scale that overwhelms a single context. Runs a single inline planning review pass (design? git strategy? coordination?), then dispatches agents. Consultants (planning-consultant, version-control-consultant, orchestration-consultant) are available but loaded only when the relevant decision is non-obvious.
+
+**Specialists are skill libraries, not routing destinations.** python-expert, typescript-expert, rust-expert, api-architect, etc. are loaded inline by executor with `Skill("name")`. They are only dispatched as subagents when manager explicitly needs parallel domain work.
 
 **Git expert outputs a WORKTREE CONTEXT block** — other skills should look for this when they need to know where to make changes.
 

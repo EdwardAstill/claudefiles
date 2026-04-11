@@ -52,7 +52,7 @@ render_tree() {
     # Collect immediate children (dirs only)
     while IFS= read -r entry; do
         entries+=("$entry")
-    done < <(find "$dir" -mindepth 1 -maxdepth 1 -type d | sort)
+    done < <(find -L "$dir" -mindepth 1 -maxdepth 1 -type d | sort)
 
     local count="${#entries[@]}"
     local i=0
@@ -97,7 +97,7 @@ print_tree() {
     local entries=()
     while IFS= read -r entry; do
         entries+=("$entry")
-    done < <(find "$root" -mindepth 1 -maxdepth 1 -type d | sort)
+    done < <(find -L "$root" -mindepth 1 -maxdepth 1 -type d | sort)
 
     local count="${#entries[@]}"
     local i=0
@@ -195,7 +195,10 @@ plugins_file = sys.argv[1]
 settings_file = sys.argv[2] if len(sys.argv) > 2 else None
 
 with open(plugins_file) as f:
-    plugins = json.load(f)
+    raw = json.load(f)
+
+# Support both flat format and v2 format {"version": 2, "plugins": {...}}
+plugins = raw.get("plugins", raw) if isinstance(raw, dict) else raw
 
 enabled = set()
 if settings_file and os.path.exists(settings_file):
@@ -204,6 +207,8 @@ if settings_file and os.path.exists(settings_file):
     enabled = {k for k, v in settings.get("enabledPlugins", {}).items() if v}
 
 for plugin_key, installs in plugins.items():
+    if not isinstance(installs, list):
+        continue
     if not installs:
         continue
     install = installs[0]
@@ -262,7 +267,7 @@ if "$TREE_ONLY"; then
     echo ""
     echo "SKILL TREE"
     echo "$DIVIDER"
-    print_tree "$CLAUDEFILES_ROOT/dev-suite" "dev-suite/"
+    print_tree "$CLAUDEFILES_ROOT/claudefiles" "claudefiles/"
     echo ""
     exit 0
 fi
@@ -336,7 +341,7 @@ if "$SHOW_AVAILABLE"; then
     echo "AVAILABLE IN CLAUDEFILES  (not yet installed)"
     echo "$DIVIDER"
 
-    DEV_SUITE="$CLAUDEFILES_ROOT/dev-suite"
+    CLAUDEFILES="$CLAUDEFILES_ROOT/claudefiles"
     USER_SKILLS="$HOME/.claude/skills"
 
     found_any=false
@@ -351,7 +356,7 @@ if "$SHOW_AVAILABLE"; then
         echo "  • $name  [not installed]"
         [[ -n "$desc" ]] && echo "    $desc"
         found_any=true
-    done < <(find "$DEV_SUITE" -name "SKILL.md" | sort)
+    done < <(find "$CLAUDEFILES" -name "SKILL.md" | sort)
 
     "$found_any" || echo "  (all claudefiles skills are installed)"
     echo ""

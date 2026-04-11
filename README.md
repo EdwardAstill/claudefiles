@@ -154,13 +154,14 @@ Skills live in `skills/` under four categories. Run `cf agents --tree` to see th
 
 ### Orchestration
 
-Every task goes through `task-analyser`, which scores complexity and routes to one of three paths:
+Every new task starts with `executor`. It orients with `cf context`/`cf status`, makes the routing decision inline, and handles the task end-to-end.
 
-| Path | Model | When |
-|------|-------|------|
-| `cheapskill` | Haiku | Simple tasks — 1–2 subtasks, single domain, no coordination |
-| `superskill` | Sonnet | Medium tasks — full tool access, absorbs specialist skills inline |
-| `manager` | Opus | Complex tasks — reads REGION.md files, dispatches specialists as subagents |
+| Path | When |
+|------|------|
+| `executor` | Default — everything a single agent can handle (the common case) |
+| `manager` | Genuinely parallel multi-agent work, or 20+ independent subtasks across unrelated domains |
+
+Executor absorbs specialist skills inline (`Skill("rust-expert")`, `Skill("api-architect")`, etc.) — no subagent dispatch for specialisation.
 
 ### How skills discover tools
 
@@ -269,4 +270,4 @@ description: >
 ---
 ```
 
-The `description` field is the only thing visible to other skills and to `task-analyser` without invoking the skill. Write it to be unambiguous about when to trigger.
+The `description` field is the only thing visible to other skills without invoking the skill. Write it to be unambiguous about when to trigger.

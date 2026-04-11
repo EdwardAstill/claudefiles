@@ -2,7 +2,7 @@
 # install.sh — install claudefiles skills and bin tools
 #
 # Usage:
-#   ./install.sh --global                              # install full dev-suite + bin globally
+#   ./install.sh --global                              # install full claudefiles + bin globally
 #   ./install.sh --global --category coding           # install one category globally
 #   ./install.sh --global --skill agent-manager       # install one skill globally (bootstrap)
 #   ./install.sh --local                              # install to current project
@@ -22,7 +22,7 @@
 #   --local   (or --project)     install to <project>/.claude/skills/
 #
 # Granularity options (pick one):
-#   (none)                       install full dev-suite as one symlink
+#   (none)                       install full claudefiles as one symlink
 #   --category <name>            install one top-level category (management, coding, research)
 #   --skill <name>               install one named skill by its SKILL.md name field
 #
@@ -34,7 +34,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST="$SCRIPT_DIR/manifest.toml"
-DEV_SUITE="$SCRIPT_DIR/dev-suite"
+CLAUDEFILES="$SCRIPT_DIR/claudefiles"
 BIN_DIR="$SCRIPT_DIR/bin"
 
 MODE=""           # user | project
@@ -109,7 +109,7 @@ if [[ "$SOURCE" == "github" ]]; then
     fi
 
     # Override all source paths to use the cached copy
-    DEV_SUITE="$REPO_DIR/dev-suite"
+    CLAUDEFILES="$REPO_DIR/claudefiles"
     BIN_DIR="$REPO_DIR/bin"
     MANIFEST="$REPO_DIR/manifest.toml"
 fi
@@ -118,8 +118,8 @@ fi
 
 if "$LIST_CATS"; then
     echo "Available categories:"
-    echo "  all         — install the full dev-suite (default)"
-    for d in "$DEV_SUITE"/*/; do
+    echo "  all         — install the full claudefiles (default)"
+    for d in "$CLAUDEFILES"/*/; do
         [[ -f "$d/SKILL.md" ]] && echo "  $(basename "$d")"
     done
     exit 0
@@ -146,7 +146,7 @@ fi
 BIN_TARGET="$HOME/.local/bin"
 
 # ── Resolve skill source and link name ───────────────────────────────────────
-# Three modes: full dev-suite, one category, or one named skill.
+# Three modes: full claudefiles, one category, or one named skill.
 
 SKILL_SRC=""
 SKILL_LINK_NAME=""
@@ -160,23 +160,46 @@ if [[ -n "$SKILL_NAME" ]]; then
             SKILL_LINK_NAME="$SKILL_NAME"
             break
         fi
-    done < <(find "$DEV_SUITE" -name "SKILL.md" 2>/dev/null)
+    done < <(find "$CLAUDEFILES" -name "SKILL.md" 2>/dev/null)
 
     if [[ -z "$SKILL_SRC" ]]; then
-        echo "Error: skill '$SKILL_NAME' not found in dev-suite" >&2
-        echo "Run $0 --list-categories to see available categories, or check dev-suite/ for skill names." >&2
+        echo "Error: skill '$SKILL_NAME' not found in claudefiles" >&2
+        echo "Run $0 --list-categories to see available categories, or check claudefiles/ for skill names." >&2
         exit 1
     fi
 
 elif [[ "$CATEGORY" == "all" ]]; then
-    SKILL_SRC="$DEV_SUITE"
-    SKILL_LINK_NAME="dev-suite"
+    # Rebuild flat skills/ directory from claudefiles leaf skills
+    SKILLS_FLAT="$SCRIPT_DIR/skills"
+    mkdir -p "$SKILLS_FLAT"
+
+    # Remove stale symlinks for skills that no longer exist
+    while IFS= read -r link; do
+        name="$(basename "$link")"
+        if ! find "$CLAUDEFILES" -name "SKILL.md" | xargs grep -l "^name: $name$" &>/dev/null; then
+            rm "$link"
+        fi
+    done < <(find "$SKILLS_FLAT" -maxdepth 1 -type l 2>/dev/null)
+
+    # Create/update symlinks for all leaf skills
+    while IFS= read -r skill_md; do
+        dir="$(dirname "$skill_md")"
+        sub_skills=$(find "$dir" -mindepth 2 -name "SKILL.md" 2>/dev/null | wc -l)
+        if [[ "$sub_skills" -eq 0 ]]; then
+            name=$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md")
+            rel="$(python3 -c "import os; print(os.path.relpath('$dir', '$SKILLS_FLAT'))")"
+            ln -sf "$rel" "$SKILLS_FLAT/$name"
+        fi
+    done < <(find "$CLAUDEFILES" -name "SKILL.md")
+
+    SKILL_SRC="$SKILLS_FLAT"
+    SKILL_LINK_NAME="claudefiles"
 
 else
-    SKILL_SRC="$DEV_SUITE/$CATEGORY"
+    SKILL_SRC="$CLAUDEFILES/$CATEGORY"
     SKILL_LINK_NAME="cf-$CATEGORY"
     if [[ ! -d "$SKILL_SRC" ]]; then
-        echo "Error: category '$CATEGORY' not found in dev-suite/" >&2
+        echo "Error: category '$CATEGORY' not found in claudefiles/" >&2
         echo "Run $0 --list-categories to see available categories." >&2
         exit 1
     fi
@@ -241,7 +264,7 @@ install_all() {
     elif [[ "$CATEGORY" != "all" ]]; then
         echo "Installing claudefiles category: $CATEGORY"
     else
-        echo "Installing claudefiles dev-suite"
+        echo "Installing claudefiles plugin"
     fi
 
     echo "  Source        : $SKILL_SRC"
@@ -253,7 +276,7 @@ install_all() {
     echo "Skills:"
     do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
 
-    # Only install bin tools on global installs, and only for full dev-suite or all-category installs
+    # Only install bin tools on global installs, and only for full claudefiles or all-category installs
     if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
         echo ""
         echo "Bin tools:"

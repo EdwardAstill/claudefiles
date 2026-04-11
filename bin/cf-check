@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cf-check — verify all leaf skills in dev-suite have an entry in their category's REGION.md
+# cf-check — verify all leaf skills in claudefiles have an entry in their category's REGION.md
 #
 # Usage:
 #   cf-check           # check from current directory or installed location
@@ -12,12 +12,12 @@ for arg in "$@"; do
     [[ "$arg" == "--verbose" ]] && VERBOSE=true
 done
 
-# Locate dev-suite
+# Locate claudefiles
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-SUITE="$SCRIPT_DIR/../dev-suite"
+SUITE="$SCRIPT_DIR/../claudefiles"
 
 if [[ ! -d "$SUITE" ]]; then
-    echo "Error: dev-suite not found at $SUITE" >&2
+    echo "Error: claudefiles not found at $SUITE" >&2
     exit 1
 fi
 
@@ -38,8 +38,8 @@ while IFS= read -r skill_md; do
     name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
     [[ -z "$name" ]] && continue
 
-    # Derive category from skill path: dev-suite/<category>/...
-    rel="${skill_md#"$SUITE/"}"         # strip leading dev-suite/
+    # Derive category from skill path: claudefiles/<category>/...
+    rel="${skill_md#"$SUITE/"}"         # strip leading claudefiles/
     category="${rel%%/*}"               # first path component = category
     region="$SUITE/$category/REGION.md"
 
@@ -67,7 +67,7 @@ else
         echo "       - $name"
     done
     echo ""
-    echo "  Add ### <skill-name> entries to the relevant dev-suite/<category>/REGION.md."
+    echo "  Add ### <skill-name> entries to the relevant claudefiles/<category>/REGION.md."
     echo ""
     exit 1
 fi

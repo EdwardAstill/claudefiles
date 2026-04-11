@@ -1,179 +1,161 @@
 # Workflows Reference
 
-End-to-end traces of what happens at each stage — user input, scripts that run, files read, files written.
+End-to-end traces of common patterns — what happens at each stage, which skills run,
+which scripts execute, which files are read and written.
 
 ---
 
-## 1. Bootstrap — New Machine
+## 1. New machine setup
 
-**User action:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
 ```
 
-**Script:** `bootstrap.sh`
+| Step | What happens | Output |
+|------|-------------|--------|
+| Clone | Clones repo to `~/.local/share/claudefiles-src/` | Local clone |
+| Build flat skills/ layer | `install.sh` finds all leaf `SKILL.md` files, builds symlinks in `skills/` | `skills/<name>/` symlinks |
+| Install plugin | Symlinks `skills/` → `~/.claude/skills/claudefiles/` | Active on next session |
+| Install bin tools | Symlinks `tools/scripts/cf-*` → `~/.local/bin/` | CLI tools on PATH |
 
-| Step | What happens | Files written |
-|------|-------------|---------------|
-| Clone | `git clone https://github.com/EdwardAstill/claudefiles ~/.claudefiles/` | `~/.claudefiles/**` |
-| Link skill | `ln -s ~/.claudefiles/dev-suite/management/agent-manager ~/.claude/skills/agent-manager` | `~/.claude/skills/agent-manager` → symlink |
-| Link bin tools | `ln -s ~/.claudefiles/bin/cf-* ~/.local/bin/` | `~/.local/bin/cf-agents`, `cf-status`, `cf-context`, `cf-versions`, `cf-routes`, `cf-note`, `cf-init`, `cf-read`, `cf-setup`, `cf-worktree` |
-
-**Result:** One skill globally active (`agent-manager`). All bin tools on PATH. Everything else lives in `~/.claudefiles/` waiting to be installed per-project.
-
----
-
-## 2. Project Setup — /setup
-
-**User action:** Opens a project in Claude Code, says "set up this project" or `/setup`
-
-**Skill invoked:** `agent-manager` (reads `~/.claudefiles/dev-suite/management/agent-manager/SKILL.md`)
-
-| Step | What happens | Scripts/files |
-|------|-------------|---------------|
-| Fingerprint | `cf-context --write` runs | Reads: project files, `package.json`, `Cargo.toml`, `go.mod`, etc. Writes: `.claudefiles/context.md` |
-| Question | Claude asks: "Describe your project in a few sentences" | — |
-| Skill selection | Claude maps description to skills using the selection table in agent-manager SKILL.md | Reads: `~/.claudefiles/dev-suite/*/SKILL.md` frontmatter (in-context) |
-| Present | Claude shows what will be installed and why, what will be skipped and why | — |
-| Confirm | User says yes / adjusts | — |
-| Install skills | `~/.claudefiles/install.sh --local --skill <name>` for each selected skill | Writes: `.claude/skills/<skill-name>` → symlink to `~/.claudefiles/dev-suite/.../` |
-| Check deps | `cf-setup --write` | Reads: `~/.claudefiles/manifest.toml`, scans `.claude/skills/` for installed skill names. Checks PATH for each declared CLI tool. Writes: `.claudefiles/deps.md` |
-| Gitignore | `.claudefiles/` added if missing | Writes: `.gitignore` |
-
-**Files written:**
-```
-<project>/
-├── .claude/skills/
-│   ├── simple-orchestrator  → symlink
-│   ├── git-expert           → symlink
-│   └── ...
-├── .claudefiles/
-│   ├── context.md           ← project fingerprint
-│   └── deps.md              ← tool dependency report
-└── .gitignore               ← .claudefiles/ added
-```
+All 30 skills active globally. Changes to skill files in the repo are live on the next
+session — no reinstall needed.
 
 ---
 
-## 3. Daily Use — Task Routing
+## 2. Standard task — executor path
 
-**User action:** Asks Claude to do anything — "add auth to this API", "what's on this branch", etc.
+**User:** Any new task request.
 
-**Skill invoked:** `simple-orchestrator` (if installed in this project)
+| Step | What happens | Tools/scripts |
+|------|-------------|---------------|
+| Orient | `cf-context` + `cf-status` | Reads project structure, git state |
+| Assess | Is genuine parallelism needed? Almost always no. | Inline decision |
+| Plan (if needed) | 2–4 line approach for non-trivial tasks | In-context |
+| Execute | Full tool access, specialist skills loaded on demand | Skill tool (inline) |
+| Verify | Run tests, check output | Bash, Read |
+| Report | Report with evidence, not assertions | — |
 
-| Step | What happens |
-|------|-------------|
-| Assessment | simple-orchestrator reads its own body (loaded on invocation), assesses task on three axes: scope, research needed, agent coordination needed |
-| Low complexity | Routes directly to the right specialist skill |
-| High complexity | Passes to `complex-orchestrator` with a context summary |
+Specialist skills loaded inline during execution (examples):
 
-**Complex orchestrator path:**
+| Signal | Skill loaded |
+|--------|-------------|
+| Rust, Cargo, ownership issues | `rust-expert` |
+| Python type errors, toolchain | `python-expert` |
+| API design question arises | `api-architect` |
+| Bug appears mid-task | `systematic-debugging` |
+| Library API needed | `docs-agent` |
+| About to finish | `verification-before-completion` |
+
+Inline loading keeps full session context. The specialist's patterns apply in the
+same conversation — no context loss.
+
+---
+
+## 3. Multi-agent task — manager path
+
+**Trigger:** Executor escalates (or user invokes manager directly) when the task
+genuinely requires parallel agents.
+
+### Phase 1 — Plan
 
 | Step | What happens | Files read |
 |------|-------------|------------|
-| Read context | `cf-context --write`, `cf-status --write`, `cf-note --read` | `.claudefiles/context.md`, `.claudefiles/repo-map.md`, `.claudefiles/notes.md` |
-| Read registry | Open `~/.claudefiles/dev-suite/registry.md` | Registry: skill inputs, outputs, chain targets |
-| Plan | Decide which skills to invoke, in what order, parallel or sequential | — |
-| Present plan | Show user the execution plan, wait for approval | — |
-| Execute | Dispatch skills/agents, collect outputs, hand results between skills | — |
+| Read regions | `cat claudefiles/{coding,planning,research}/REGION.md` | Skill catalogs for involved categories |
+| Answer three questions | Design? Git strategy? Coordination? | In-context |
+| Load advisors (if needed) | `Skill("design-advisor")` / `Skill("git-advisor")` / `Skill("coordination-advisor")` | Advisor SKILL.md |
+| Confirm with user | Present: which agents, what order, what each produces | — |
+| Wait | Do not execute until confirmed | — |
+
+### Phase 2 — Execute
+
+| Pattern | When | How |
+|---------|------|-----|
+| Parallel agents | Independent domains, no shared state | Multiple Agent calls in one message |
+| Sequential with gates | Tasks depend on each other's output | `Skill("subagent-driven-development")` |
+| Single specialist | Focused domain work | Single Agent call |
+
+After all agents return:
+- Review summaries for conflicts
+- Run full test suite
+- Resolve any divergence before reporting
 
 ---
 
-## 4. Git Workflow — git-expert
+## 4. Feature work — git-worktree-workflow path
 
-**User action:** "Create a worktree for the auth feature" or any git operation
+**User:** "Build the auth feature" or any discrete feature that needs isolation.
 
-**Skill invoked:** `git-expert`
+| Step | What happens | Scripts |
+|------|-------------|---------|
+| Assess git strategy | Is isolation needed? (new feature, risky changes, parallel work?) | Inline or `git-advisor` |
+| Create worktree | `git worktree add ../worktree-<branch> -b <branch>` | `cf-worktree` |
+| Emit context block | WORKTREE CONTEXT block for other skills to read | In-context |
+| Implement | executor or agents work inside the worktree | — |
+| Complete | Merge, PR, or discard — four options documented in the skill | `github-expert` for PRs |
+| Cleanup | `git worktree remove` | `cf-worktree` |
 
-| Step | What happens | Scripts/files |
-|------|-------------|---------------|
-| Situation assessment | `cf-status --write` | Reads: git state. Writes: `.claudefiles/repo-map.md` |
-| Display | Claude presents Situation Summary: branch, status, worktrees, upstream | — |
-| Recommend | Claude offers 2–3 next paths with exact commands and explanations | — |
-| Worktree creation (if requested) | `lib/port-finder.sh` finds free port | Reads: nothing. Returns: port number |
-| Create worktree | `git worktree add ../worktree-<branch> -b <branch> <base>` | Writes: `../worktree-<branch>/` directory |
-| Emit context | Claude outputs WORKTREE CONTEXT block | Other skills read this to know where to work |
-| Open terminal (optional) | `cf-worktree <branch>` | Launches new terminal window at worktree path with Claude Code |
-
-**WORKTREE CONTEXT block (published by git-expert, consumed by other skills):**
+WORKTREE CONTEXT block (published, consumed by other skills):
 ```
 WORKTREE CONTEXT
   Path:    /path/to/worktree-feature-auth
   Branch:  feature/auth
-  Port:    3001
   Status:  ready
 ```
 
 ---
 
-## 5. Research Workflow — docs-agent / research-agent
+## 5. New feature design — brainstorming + writing-plans path
 
-**User action:** "How do I use Hono's streaming API?" or "Should I use Prisma or Drizzle?"
+**User:** "I want to add X" with unclear requirements or complex implementation.
 
-**Skill invoked:** `docs-agent` (how do I) or `research-agent` (should I)
-
-### docs-agent
-
-| Step | What happens | Tools used |
-|------|-------------|------------|
-| Identify library + version | `cf-versions` (if needed) | Reads: `package.json`, lockfiles. Writes: `.claudefiles/versions.md` |
-| Fetch docs | context7 MCP → resolve library ID → fetch current docs | External: context7 MCP server |
-| Supplement | WebSearch / WebFetch for examples or changelogs | External: web |
-| Output | Exact API signature, working example, source URL, version note | — |
-| Record (optional) | `cf-note --agent docs "finding"` | Writes: `.claudefiles/notes.md` |
-
-### research-agent
-
-| Step | What happens | Tools used |
-|------|-------------|------------|
-| Search | WebSearch across multiple sources | External: web |
-| Fetch | WebFetch on top results | External: web |
-| Synthesise | Build structured report: consensus, nuances, pitfalls, contradictions | — |
-| Output | Report with confidence levels, recommended direction, further investigation pointers | — |
-| Record | `cf-note --agent research "finding"` | Writes: `.claudefiles/notes.md` |
+| Step | Skill | Output |
+|------|-------|--------|
+| Clarify requirements | `brainstorming` | Spec document at `docs/specs/YYYY-MM-DD-<topic>-design.md` |
+| Write implementation plan | `writing-plans` | Plan document at `docs/plans/YYYY-MM-DD-<topic>.md` |
+| Execute plan | `subagent-driven-development` | Committed, reviewed implementation |
+| Finish | `git-worktree-workflow` (if applicable) | Merged or PR'd |
 
 ---
 
-## 6. Agent Communication Bus
+## 6. Research workflow
 
-`.claudefiles/` is the shared state layer. Any agent can write to it; any agent can read from it.
+### Technical reference — docs-agent
 
-| File | Written by | Read by | Purpose |
+**User:** "How does Hono's streaming API work?" / "What's the Prisma upsert syntax?"
+
+| Step | What happens | Tools |
+|------|-------------|-------|
+| Identify library + version | `cf-versions` if needed | Reads lockfiles |
+| Fetch docs | context7 MCP → resolve library ID → fetch docs | `context7` MCP |
+| Supplement | WebSearch / WebFetch for examples | Web |
+| Output | Exact API, working example, source URL, version note | — |
+
+### Trade-off research — research-agent
+
+**User:** "Should I use Prisma or Drizzle?" / "What are the risks of X?"
+
+| Step | What happens | Tools |
+|------|-------------|-------|
+| Search | WebSearch across multiple sources | Web |
+| Fetch | WebFetch on top results | Web |
+| Synthesise | Consensus, nuances, pitfalls, contradictions | In-context |
+| Output | Structured report: confidence levels, recommendation, further investigation | — |
+
+---
+
+## 7. Agent communication bus
+
+`.claudefiles/` is the shared state layer — written by CLI tools, read by any skill.
+
+| File | Written by | Read by | Content |
 |------|-----------|---------|---------|
-| `context.md` | `cf-context --write` | complex-orchestrator, any skill | Project fingerprint — language, stack, framework, git state |
-| `repo-map.md` | `cf-status --write` | git-expert, complex-orchestrator | Git topology — branches, worktrees, ahead/behind |
-| `versions.md` | `cf-versions --write` | docs-agent | Dependency versions for doc lookups |
-| `routes.md` | `cf-routes --write` | api-architect | API surface map |
-| `notes.md` | `cf-note` | Any skill via `cf-note --read` | Free-form findings, decisions, context from any agent |
-| `deps.md` | `cf-setup --write` | agent-manager | Tool dependency status for installed skills |
+| `context.md` | `cf-context` | executor, manager | Project fingerprint: language, stack, structure |
+| `repo-map.md` | `cf-status` | executor, git-expert | Git state: branch, commits, worktrees |
+| `versions.md` | `cf-versions` | docs-agent | Dependency versions for doc lookups |
+| `routes.md` | `cf-routes` | api-architect | API surface map |
+| `notes.md` | `cf-note` | Any skill | Free-form findings, decisions, context |
 
-**Reading all bus state at once:**
-```bash
-cf-read              # dump all files
-cf-read notes        # single file
-```
+Read all at once: `cf-read` · Single file: `cf-read notes`
 
-**Initialising from scratch:**
-```bash
-cf-init              # creates .claudefiles/, populates all files, adds to .gitignore
-```
-
-`.claudefiles/` is gitignored — it's session state, not source.
-
----
-
-## 7. Updating claudefiles
-
-**User action:** "Update claudefiles" or re-run bootstrap
-
-```bash
-bootstrap.sh   # re-running pulls latest from GitHub (git pull --ff-only)
-```
-
-Because skills are symlinks, the updated files are live immediately in the next Claude Code session — no reinstall needed.
-
-To update what skills are installed in a project:
-```bash
-~/.claudefiles/install.sh --local --skill <new-skill>
-~/.claudefiles/install.sh --local --remove --skill <old-skill>
-```
+`.claudefiles/` is gitignored — session state, not source.

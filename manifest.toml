@@ -5,17 +5,14 @@
 # Scripts in bin/ to symlink to ~/.local/bin/
 install = ["cf-worktree", "cf-status", "cf-context", "cf-versions", "cf-routes", "cf-note", "cf-init", "cf-read", "cf-agents", "cf-setup", "cf-check"]
 
+[skills.using-claudefiles]
+tools = []
+
 [skills.brainstorming]
 tools = ["Read", "Write", "Glob", "Agent"]
 
 [skills.writing-plans]
 tools = ["Read", "Write"]
-
-[skills.executing-plans]
-tools = ["Read", "Agent"]
-
-[skills.dispatching-parallel-agents]
-tools = ["Agent"]
 
 [skills.subagent-driven-development]
 tools = ["Read", "Agent"]
@@ -35,11 +32,8 @@ tools = ["Bash", "Read", "Grep"]
 [skills.verification-before-completion]
 tools = ["Bash", "Read"]
 
-[skills.requesting-code-review]
+[skills.code-review]
 tools = ["Bash", "Read", "Agent"]
-
-[skills.receiving-code-review]
-tools = ["Read", "Write", "Bash"]
 
 [skills.simplify]
 tools = ["Read", "Write", "Bash"]
@@ -47,26 +41,33 @@ tools = ["Read", "Write", "Bash"]
 [skills.git-worktree-workflow]
 tools = ["Bash"]
 
-[skills.task-analyser]
-tools = ["Bash", "Read"]
-
-[skills.cheapskill]
-tools = []
-
-[skills.superskill]
+[skills.executor]
 tools = ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "Agent", "WebSearch", "WebFetch"]
 
 [skills.manager]
 tools = ["Bash", "Read", "Agent"]
 
-[skills.orchestration-consultant]
+[skills.design-advisor]
 tools = []
 
-[skills.version-control-consultant]
+[skills.git-advisor]
 tools = []
 
-[skills.planning-consultant]
+[skills.coordination-advisor]
 tools = []
+
+[skills.github-actions-expert]
+tools = ["Bash", "Read", "Glob"]
+
+[skills.codebase-explainer]
+tools = ["Bash", "Read", "Glob", "Grep"]
+
+[skills.note-taker]
+tools = ["Bash", "Read", "Write"]
+
+[skills.test-taker]
+tools = ["Bash", "Read", "Write"]
+
 
 [skills.git-expert]
 tools = ["Bash", "Read", "Glob"]

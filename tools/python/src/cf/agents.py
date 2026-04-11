@@ -119,7 +119,7 @@ def main(
     tree: bool = typer.Option(False, "--tree", help="Print skill hierarchy as indented tree"),
     global_: bool = typer.Option(False, "--global", help="User-level skills only"),
     project: bool = typer.Option(False, "--project", help="Project-level skills only"),
-    available: bool = typer.Option(False, "--available", help="Skills in dev-suite not yet installed"),
+    available: bool = typer.Option(False, "--available", help="Skills in claudefiles not yet installed"),
     mcp: bool = typer.Option(False, "--mcp", help="MCP servers only"),
 ) -> None:
     """Overview of all Claude Code skills and MCP servers across every scope."""
@@ -147,16 +147,16 @@ def main(
         return
 
     if available:
-        # Show skills in dev-suite not yet installed
+        # Show skills in claudefiles not yet installed
         cf_bin = Path(__file__).parent
-        # Try to find the dev-suite relative to this package install
-        dev_suite = _find_dev_suite()
-        if dev_suite is None:
-            typer.echo("Cannot find dev-suite. Is claudefiles installed?")
+        # Try to find the claudefiles relative to this package install
+        claudefiles = _find_claudefiles()
+        if claudefiles is None:
+            typer.echo("Cannot find claudefiles. Is claudefiles installed?")
             return
         typer.echo("AVAILABLE IN CLAUDEFILES (not yet installed)")
         found_any = False
-        for skill_md in sorted(dev_suite.rglob("SKILL.md")):
+        for skill_md in sorted(claudefiles.rglob("SKILL.md")):
             name = _read_skill_name(skill_md)
             if not name:
                 continue
@@ -205,11 +205,11 @@ def main(
         render_tree(project_skills, "PROJECT SKILLS (.claude/skills/)")
 
 
-def _find_dev_suite() -> Optional[Path]:
-    """Try to locate the dev-suite directory from common install locations."""
+def _find_claudefiles() -> Optional[Path]:
+    """Try to locate the claudefiles directory from common install locations."""
     candidates = [
-        Path.home() / ".claudefiles" / "dev-suite",
-        Path.home() / ".local" / "share" / "claudefiles-src" / "dev-suite",
+        Path.home() / ".claudefiles" / "claudefiles",
+        Path.home() / ".local" / "share" / "claudefiles-src" / "claudefiles",
     ]
     for c in candidates:
         if c.exists():
