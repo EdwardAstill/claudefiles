@@ -192,8 +192,9 @@ elif [[ "$CATEGORY" == "all" ]]; then
         fi
     done < <(find "$CLAUDEFILES" -name "SKILL.md")
 
+    # SKILL_SRC set to flat dir; individual symlinks installed per skill (not as one block)
     SKILL_SRC="$SKILLS_FLAT"
-    SKILL_LINK_NAME="claudefiles"
+    SKILL_LINK_NAME=""   # empty = individual-skill install mode
 
 else
     SKILL_SRC="$CLAUDEFILES/$CATEGORY"
@@ -274,7 +275,21 @@ install_all() {
     echo ""
 
     echo "Skills:"
-    do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
+    if [[ -z "$SKILL_LINK_NAME" ]]; then
+        # Individual skill mode: symlink each skill directly into SKILLS_TARGET
+        # This gives /skill-name slash commands in Claude Code
+        while IFS= read -r skill_dir; do
+            name="$(basename "$skill_dir")"
+            do_symlink "$(realpath "$skill_dir")" "$SKILLS_TARGET/$name"
+        done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
+        # Remove stale claudefiles prefix symlink if it exists from previous installs
+        if [[ -L "$SKILLS_TARGET/claudefiles" ]]; then
+            rm "$SKILLS_TARGET/claudefiles"
+            echo "  [removed] stale prefix symlink: $SKILLS_TARGET/claudefiles"
+        fi
+    else
+        do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
+    fi
 
     # Only install bin tools on global installs, and only for full claudefiles or all-category installs
     if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
@@ -321,7 +336,15 @@ remove_all() {
     echo ""
 
     echo "Skills:"
-    do_remove "$SKILLS_TARGET/$SKILL_LINK_NAME"
+    if [[ -z "$SKILL_LINK_NAME" ]]; then
+        # Individual skill mode: remove each skill symlink from SKILLS_TARGET
+        while IFS= read -r skill_dir; do
+            name="$(basename "$skill_dir")"
+            do_remove "$SKILLS_TARGET/$name"
+        done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
+    else
+        do_remove "$SKILLS_TARGET/$SKILL_LINK_NAME"
+    fi
 
     if [[ "$MODE" == "user" && -z "$SKILL_NAME" && "$CATEGORY" == "all" ]]; then
         echo ""
