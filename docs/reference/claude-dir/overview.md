@@ -35,22 +35,22 @@ Leave these alone unless you know what you're doing.
 
 ## claudefiles managed
 
-| Path | What it is | Managed by |
-|------|------------|------------|
-| `skills/` → `~/dotfiles/app-configuration/claude/.claude/skills/` | Installed skills (symlink into dotfiles) | `install.sh` |
-| `logs/claudefiles.jsonl` | Skill invocation log | `hooks/skill-logger.py` (PostToolUse hook) |
-| `data/` | Persistent data store — `registry.json` + per-source tree files | `cf index` |
-| `secrets` | API keys in `KEY=value` format (chmod 600) | `cf secrets` |
+| Path | What it is | Managed by | Doc |
+|------|------------|------------|-----|
+| `skills/` | Installed skills → symlink into dotfiles | `install.sh` | [install](../install.md) |
+| `logs/claudefiles.jsonl` | Skill invocation log | `hooks/skill-logger.py` | [cli](../cli.md#cf-log) |
+| `data/` | Persistent data store for `cf index`/`cf search` | `cf index` | [cli](../cli.md#cf-index) |
+| `secrets` | API keys, chmod 600 | `cf secrets` | [secrets](./secrets.md) |
 
 ---
 
 ## Dotfiles symlinks
 
-Two entries are symlinks managed via dotfiles, not claudefiles:
-
-- `skills/` → `~/dotfiles/app-configuration/claude/.claude/skills/`
-- `.mcp.json` → `~/dotfiles/app-configuration/claude/.claude/.mcp.json`
-- `image-cache/` → `~/dotfiles/app-configuration/claude/.claude/image-cache/`
+| Path | Points to |
+|------|-----------|
+| `skills/` | `~/dotfiles/app-configuration/claude/.claude/skills/` |
+| `.mcp.json` | `~/dotfiles/app-configuration/claude/.claude/.mcp.json` |
+| `image-cache/` | `~/dotfiles/app-configuration/claude/.claude/image-cache/` |
 
 Changes to MCP config or skills go through the dotfiles repo, not directly in `~/.claude/`.
 
@@ -70,5 +70,5 @@ ls ~/.claude/data/                   # data store contents
 ## Safe to edit
 
 - `~/.claude/settings.json` — add hooks, change model, toggle plugins
-- `~/.claude/secrets` — but use `cf secrets set/remove` instead of editing directly
-- `~/.claude/data/` — rebuild with `cf index` if anything looks stale
+- `~/.claude/secrets` — use `cf secrets set/remove` rather than editing directly
+- `~/.claude/data/` — rebuild with `cf index` if stale
