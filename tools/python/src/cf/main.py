@@ -15,6 +15,8 @@ _SUBCOMMANDS = [
     ("agents", "agents"),
     ("check", "check"),
     ("log", "log"),
+    ("index", "index"),
+    ("search", "search"),
     ("setup", "setup"),
     ("tools", "tools_cmd"),
     ("tree", "tree"),
