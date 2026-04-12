@@ -84,15 +84,31 @@ cf init --dry-run      # preview
 ### cf agents
 
 Full inventory of Claude Code skills and MCP servers across every scope.
+Default output groups skills by category (derived from `manifest.toml`), with a compact
+28-char-aligned column layout. Skills not in the manifest appear under `(uncategorized)`.
 
 ```bash
-cf agents              # full overview
-cf agents --tree       # skill hierarchy tree
-cf agents --global     # user-level only
-cf agents --project    # current project only
+cf agents              # full overview, grouped by category
+cf agents --tree       # deep skill hierarchy tree
+cf agents --global     # user-level skills only
+cf agents --project    # current project skills only
 cf agents --available  # in claudefiles but not installed
 cf agents --mcp        # MCP servers only
 ```
+
+### cf log
+
+View the skill invocation log. Skills are recorded automatically by the
+`hooks/skill-logger.py` PostToolUse hook whenever a `SKILL.md` is read.
+
+```bash
+cf log                 # last 20 invocations (timestamp + skill name)
+cf log --tail 50       # last 50 entries
+cf log --skill tdd     # filter to one skill
+cf log --stats         # frequency table sorted by invocation count
+```
+
+Log file: `~/.claude/logs/claudefiles.jsonl`
 
 ### cf check
 
