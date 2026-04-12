@@ -208,6 +208,47 @@ fi
 
 log() { echo "  $*"; }
 
+ensure_uv() {
+    if command -v uv &>/dev/null; then
+        echo "  [ok] uv $(uv --version 2>/dev/null)"
+        return
+    fi
+    echo "  uv not found — installing..."
+    if "$DRY_RUN"; then
+        echo "  [dry-run] curl -LsSf https://astral.sh/uv/install.sh | sh"
+        return
+    fi
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
+    echo "  [ok] uv installed"
+}
+
+install_cf_cli() {
+    echo ""
+    echo "CLI (cf):"
+    if "$DRY_RUN"; then
+        echo "  [dry-run] uv tool install -e $SCRIPT_DIR/tools/python/"
+        return
+    fi
+    uv tool install --force -e "$SCRIPT_DIR/tools/python/" --quiet
+    echo "  [ok] cf installed — run 'cf agents' to verify"
+}
+
+wire_hooks() {
+    local hooks_script="$SCRIPT_DIR/hooks/install-hooks.sh"
+    echo ""
+    echo "Hooks:"
+    if [[ ! -f "$hooks_script" ]]; then
+        echo "  [skip] hooks/install-hooks.sh not found"
+        return
+    fi
+    if "$DRY_RUN"; then
+        bash "$hooks_script" --dry-run
+        return
+    fi
+    bash "$hooks_script"
+}
+
 do_symlink() {
     local src="$1" dst="$2"
     if "$DRY_RUN"; then
@@ -250,13 +291,19 @@ install_all() {
     elif [[ "$CATEGORY" != "all" ]]; then
         echo "Installing claudefiles category: $CATEGORY"
     else
-        echo "Installing claudefiles plugin"
+        echo "Installing claudefiles"
     fi
 
     echo "  Source        : $SKILL_SRC"
     echo "  Skills target : $SKILLS_TARGET"
     "$DRY_RUN" && echo "  [dry-run mode — no changes will be made]"
     echo ""
+
+    # Ensure uv is available for global installs (needed for cf CLI and hook scripts)
+    if [[ "$MODE" == "user" ]]; then
+        ensure_uv
+        echo ""
+    fi
 
     echo "Skills:"
     if [[ -z "$SKILL_LINK_NAME" ]]; then
@@ -295,6 +342,12 @@ install_all() {
         fi
     fi
 
+    # Install cf CLI and wire hooks for global installs
+    if [[ "$MODE" == "user" ]]; then
+        install_cf_cli
+        wire_hooks
+    fi
+
     # Add .claudefiles/ to project .gitignore on project installs
     if [[ "$MODE" == "project" ]]; then
         local ignore="$PROJECT_PATH/.gitignore"
@@ -309,14 +362,19 @@ install_all() {
     fi
 
     echo ""
-    echo "Done."
-    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     if ! "$DRY_RUN"; then
-        echo "To activate skills, start a new Claude Code session."
-        if [[ "$MODE" == "project" ]]; then
-            echo "Skills installed to project: $PROJECT_PATH"
-            echo "Run cf-init inside the project to populate the agent bus."
+        echo "Done. Start a new Claude Code session to activate skills."
+        if [[ "$MODE" == "user" ]]; then
+            echo ""
+            echo "  cf agents       — verify installed skills"
+            echo "  cf log --stats  — skill usage stats"
         fi
+        if [[ "$MODE" == "project" ]]; then
+            echo "Skills installed to: $PROJECT_PATH"
+        fi
+    else
+        echo "Dry run complete — no changes made."
     fi
 }
 
