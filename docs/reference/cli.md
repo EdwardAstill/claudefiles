@@ -140,6 +140,43 @@ cf tools --json        # machine-readable for skills
 
 ---
 
+## Secrets
+
+### cf secrets
+
+Manages API keys and tokens stored at `~/.claude/secrets` (`KEY=value` format, chmod 600).
+Never stored in any repo or project directory.
+
+```bash
+cf secrets set ANNAS_API_KEY <key>     # store or update a key
+cf secrets get ANNAS_API_KEY           # print the value (raw, no label)
+cf secrets list                        # list key names only (never values)
+cf secrets remove ANNAS_API_KEY        # delete a key
+cf secrets env                         # print all as `export KEY=value` lines
+cf secrets exec -- <cmd> [args]        # run a command with all secrets injected
+```
+
+**Using a secret in a shell command:**
+```bash
+# Inline injection (one-off):
+ANNAS_API_KEY=$(cf secrets get ANNAS_API_KEY) anna download <md5>
+
+# Inject all secrets then run:
+cf secrets exec -- anna download <md5>
+
+# Export everything for the session:
+eval $(cf secrets env)
+```
+
+**File format** (`~/.claude/secrets`):
+```
+# comments are ignored
+ANNAS_API_KEY=abc123
+GITHUB_TOKEN=ghp_xxx
+```
+
+---
+
 ## Data Sources
 
 ### cf index
