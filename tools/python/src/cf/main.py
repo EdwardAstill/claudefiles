@@ -14,6 +14,7 @@ _SUBCOMMANDS = [
     ("worktree", "worktree"),
     ("agents", "agents"),
     ("check", "check"),
+    ("log", "log"),
     ("setup", "setup"),
     ("tools", "tools_cmd"),
     ("tree", "tree"),
