@@ -275,6 +275,26 @@ install_all() {
         do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
     fi
 
+    # Install hooks/ directory for global installs
+    if [[ "$MODE" == "user" ]]; then
+        local hooks_src="$SCRIPT_DIR/hooks"
+        local hooks_dst="$HOME/.claude/skills/hooks"
+        if [[ -d "$hooks_src" ]]; then
+            if "$DRY_RUN"; then
+                echo "  [dry-run] symlink: $hooks_dst → $hooks_src"
+            elif [[ -L "$hooks_dst" ]]; then
+                echo "  [skip] already linked: $hooks_dst"
+            elif [[ -e "$hooks_dst" ]]; then
+                echo "  [warn] exists (not a symlink): $hooks_dst — skipping"
+            else
+                ln -s "$hooks_src" "$hooks_dst"
+                echo "  [link] $hooks_dst → $hooks_src"
+                # Make hook scripts executable
+                chmod +x "$hooks_src"/*.py "$hooks_src"/*.sh 2>/dev/null || true
+            fi
+        fi
+    fi
+
     # Add .claudefiles/ to project .gitignore on project installs
     if [[ "$MODE" == "project" ]]; then
         local ignore="$PROJECT_PATH/.gitignore"
