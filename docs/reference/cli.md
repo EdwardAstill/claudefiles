@@ -140,6 +140,57 @@ cf tools --json        # machine-readable for skills
 
 ---
 
+## Data Sources
+
+### cf index
+
+Build a structural file tree for a directory and register it as a searchable data source.
+Stores the tree in `~/.claude/data/<name>/tree.md` and registers a qmd collection for
+full-text search. Multiple sources (notes, docs, codebases) can be indexed independently.
+
+```bash
+cf index /path/to/dir                  # index as source named after the directory
+cf index /path/to/dir --name notes     # explicit name
+cf index --list                        # show all registered sources
+cf index --no-qmd /path/to/dir         # tree only, skip qmd registration
+cf index --files /path/to/dir          # show all files (default: dirs + leaf files)
+cf index --depth 3 /path/to/dir        # limit tree depth
+cf index --remove notes                # unregister a source
+```
+
+The tree shows directories with recursive file counts at every level, and lists individual
+files only at leaf directories (dirs with no subdirs). Useful for orienting Claude to a
+large file tree without reading every file.
+
+Data store: `~/.claude/data/` — persistent across sessions, not tied to any project.
+
+### cf search
+
+Search indexed data sources via qmd (BM25 + vector + LLM reranking).
+
+```bash
+cf search --source notes calcium signalling     # search a specific source
+cf search complex analysis                      # search across all sources
+cf search --tree --source notes                 # show structural file tree
+cf search --list                                # list registered sources
+cf search --source notes --mode search topic    # BM25 only (fast, no model needed)
+cf search --source notes --mode vsearch topic   # vector similarity only
+cf search --source notes --files topic          # return file paths only
+cf search --source notes --full topic           # return full documents
+cf search --source notes -n 20 topic            # max 20 results (default: 10)
+```
+
+**Search modes:**
+| Mode | Speed | Quality | Requires |
+|------|-------|---------|----------|
+| `search` | Fast | Keyword match | Nothing |
+| `vsearch` | Medium | Semantic similarity | Embeddings (`qmd embed`) |
+| `query` | Slow | Best — hybrid + reranking | Model download (~640MB) |
+
+The `query` mode (default) triggers a one-time model download on first use.
+
+---
+
 ## Install
 
 Delegates to `install.sh` — all args pass through verbatim.
