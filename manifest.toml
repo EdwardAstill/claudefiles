@@ -5,129 +5,167 @@
 
 [skills.using-claudefiles]
 tools = []
+category = "management/meta"
 
 [skills.brainstorming]
 tools = ["Read", "Write", "Glob", "Agent"]
+category = "planning"
 
 [skills.writing-plans]
 tools = ["Read", "Write"]
+category = "planning"
 
 [skills.subagent-driven-development]
 tools = ["Read", "Agent"]
+category = "management/orchestration"
 
 [skills.skill-manager]
 tools = ["Bash", "Read"]
+category = "management/meta"
 
 [skills.skills]
 tools = []
+category = "management/meta"
 
 [skills.writing-skills]
 tools = ["Read", "Write", "Agent"]
+category = "management/meta"
 
 [skills.tdd]
 tools = ["Bash", "Read", "Write"]
+category = "coding/quality"
 
 [skills.systematic-debugging]
 tools = ["Bash", "Read", "Grep"]
+category = "coding/quality"
 
 [skills.verification-before-completion]
 tools = ["Bash", "Read"]
+category = "coding/quality"
 
 [skills.code-review]
 tools = ["Bash", "Read", "Agent"]
+category = "coding/quality"
 
 [skills.simplify]
 tools = ["Read", "Write", "Bash"]
+category = "coding/quality"
 
 [skills.git-worktree-workflow]
 tools = ["Bash"]
+category = "coding/version-control"
 
 [skills.executor]
 tools = ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "Agent", "WebSearch", "WebFetch"]
+category = "management/orchestration"
 
 [skills.manager]
 tools = ["Bash", "Read", "Agent"]
+category = "management/orchestration"
 
 [skills.design-advisor]
 tools = []
+category = "management/consultants"
 
 [skills.git-advisor]
 tools = []
+category = "management/consultants"
 
 [skills.coordination-advisor]
 tools = []
+category = "management/consultants"
 
 [skills.github-actions-expert]
 tools = ["Bash", "Read", "Glob"]
+category = "coding/ci-cd"
 
 [skills.codebase-explainer]
 tools = ["Bash", "Read", "Glob", "Grep"]
+category = "research"
 
 [skills.note-taker]
 tools = ["Bash", "Read", "Write"]
+category = "research"
 
 [skills.test-taker]
 tools = ["Bash", "Read", "Write"]
+category = "research"
 
 
 [skills.git-expert]
 tools = ["Bash", "Read", "Glob"]
+category = "coding/version-control"
 
 [skills.github-expert]
 tools = ["Bash", "Read", "Glob"]
+category = "coding/version-control"
 
 [skills.api-architect]
 tools = ["Bash", "Read", "Grep", "Glob"]
-# LSP tools (typescript-lsp, rust-analyzer-lsp) assumed installed via plugins
+category = "coding/api"
 
 [skills.docs-agent]
 tools = ["WebSearch", "WebFetch"]
 mcp = ["context7"]
 cli = ["qmd"]
+category = "research"
 
 [skills.research-agent]
 tools = ["WebSearch", "WebFetch", "Read"]
 cli = ["qmd"]
+category = "research"
 
 [skills.python-expert]
 tools = ["LSP", "Bash", "Read"]
 cli = ["pyright"]
+category = "coding/languages"
 
 [skills.typescript-expert]
 tools = ["LSP", "Bash", "Read"]
 cli = ["typescript-language-server"]
+category = "coding/languages"
 
 [skills.rust-expert]
 tools = ["LSP", "Bash", "Read"]
 cli = ["rust-analyzer"]
+category = "coding/languages"
 
 [skills.typst-expert]
 tools = ["LSP", "Bash", "Read"]
 cli = ["tinymist"]
+category = "coding/languages"
 
 [skills.security-review]
 tools = ["Bash", "Read", "Grep", "Glob"]
+category = "coding/quality"
 
 [skills.database-expert]
 tools = ["Bash", "Read", "Grep"]
+category = "coding/data"
 
 [skills.performance-profiling]
 tools = ["Bash", "Read", "Grep"]
+category = "coding/quality"
 
 [skills.infrastructure-expert]
 tools = ["Bash", "Read", "Glob"]
+category = "coding/infrastructure"
 
 [skills.refactoring-patterns]
 tools = ["Bash", "Read", "Grep", "Glob"]
+category = "coding/quality"
 
 [skills.dependency-management]
 tools = ["Bash", "Read", "Grep"]
+category = "coding/quality"
 
 [skills.observability]
 tools = ["Bash", "Read", "Grep"]
+category = "coding/quality"
 
 [skills.accessibility]
 tools = ["Bash", "Read", "Grep", "WebFetch"]
+category = "coding/quality"
 
 # ── CLI tool registry ─────────────────────────────────────────────────────────
 # Tools installed via bun, uv, cargo, or rustup.

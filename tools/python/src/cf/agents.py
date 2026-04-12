@@ -2,6 +2,7 @@
 
 import json
 import shutil
+import tomllib
 import importlib.resources as pkg_resources
 from pathlib import Path
 from typing import Optional
@@ -86,6 +87,77 @@ def _read_skill_name(skill_md: Path) -> Optional[str]:
         if line.startswith("name:"):
             return line.split(":", 1)[1].strip()
     return None
+
+
+def _load_manifest_categories() -> dict[str, str]:
+    """Load skill -> category mappings from manifest.toml. Returns empty dict if not found."""
+    candidates = [
+        Path("./manifest.toml"),
+        Path.home() / ".local" / "share" / "claudefiles-src" / "manifest.toml",
+        Path.home() / ".claudefiles" / "manifest.toml",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            try:
+                data = tomllib.loads(candidate.read_text())
+                skills = data.get("skills", {})
+                return {
+                    name: info["category"]
+                    for name, info in skills.items()
+                    if isinstance(info, dict) and "category" in info
+                }
+            except Exception:
+                pass
+    return {}
+
+
+def render_grouped(skills_dir: Path, title: str) -> None:
+    """Render skills grouped by category in a compact format."""
+    if not skills_dir.exists():
+        typer.echo(f"{title}: (none)")
+        return
+
+    # Collect all skill names from the skills directory
+    skill_names: list[str] = []
+    for item in sorted(skills_dir.iterdir()):
+        if item.is_dir() or item.is_symlink():
+            skill_names.append(item.name)
+
+    if not skill_names:
+        typer.echo(f"{title}: (none)")
+        return
+
+    # Load category mappings
+    categories = _load_manifest_categories()
+
+    # Group skills by category
+    grouped: dict[str, list[str]] = {}
+    for name in skill_names:
+        cat = categories.get(name, "(uncategorized)")
+        grouped.setdefault(cat, []).append(name)
+
+    # Sort categories, putting (uncategorized) last
+    sorted_cats = sorted(k for k in grouped if k != "(uncategorized)")
+    if "(uncategorized)" in grouped:
+        sorted_cats.append("(uncategorized)")
+
+    typer.echo(f"\n{title}\n")
+
+    col_width = 28
+    wrap_at = 100
+
+    for cat in sorted_cats:
+        skills = grouped[cat]
+        prefix = f"  {cat:<{col_width}}"
+        line = prefix
+        for skill in skills:
+            candidate = line + skill + "  "
+            if len(candidate) > wrap_at and line != prefix:
+                typer.echo(line.rstrip())
+                line = " " * (col_width + 2) + skill + "  "
+            else:
+                line = candidate
+        typer.echo(line.rstrip())
 
 
 def get_mcp_servers() -> dict:
@@ -183,8 +255,8 @@ def main(
                 typer.echo(f"  {p.get('name', '?')} ({p.get('version', '?')})")
             typer.echo("")
 
-        render_tree(user_skills, "USER SKILLS")
-        render_tree(project_skills, "PROJECT SKILLS")
+        render_grouped(user_skills, "USER SKILLS")
+        render_grouped(project_skills, "PROJECT SKILLS")
 
         servers = get_mcp_servers()
         if servers:
@@ -200,9 +272,9 @@ def main(
                     status = "✓" if shutil.which(t["name"]) else "✗"
                     typer.echo(f"  {status} {t['name']}")
     elif global_:
-        render_tree(user_skills, "USER SKILLS (~/.claude/skills/)")
+        render_grouped(user_skills, "USER SKILLS (~/.claude/skills/)")
     elif project:
-        render_tree(project_skills, "PROJECT SKILLS (.claude/skills/)")
+        render_grouped(project_skills, "PROJECT SKILLS (.claude/skills/)")
 
 
 def _find_claudefiles() -> Optional[Path]:
