@@ -38,7 +38,10 @@ Leave these alone unless you know what you're doing.
 | Path | What it is | Managed by | Doc |
 |------|------------|------------|-----|
 | `skills/` | Installed skills → symlink into dotfiles | `install.sh` | [install](../install.md) |
-| `logs/claudefiles.jsonl` | Skill invocation log | `hooks/skill-logger.py` | [cli](../cli.md#cf-log) |
+| `logs/claudefiles.jsonl` | Skill invocation log (automated) | `hooks/skill-logger.py` | [logging](../logging.md) |
+| `logs/observations.md` | Qualitative notes — patterns, routing misses | manual | [logging](../logging.md) |
+| `logs/backlog.md` | Actionable improvement items | manual | [logging](../logging.md) |
+| `logs/.sessions/` | Per-session state for logger (auto-cleaned) | `hooks/skill-logger.py` | — |
 | `data/` | Persistent data store for `cf index`/`cf search` | `cf index` | [cli](../cli.md#cf-index) |
 | `secrets` | API keys, chmod 600 | `cf secrets` | [secrets](./secrets.md) |
 

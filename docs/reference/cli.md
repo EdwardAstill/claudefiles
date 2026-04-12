@@ -102,13 +102,17 @@ View the skill invocation log. Skills are recorded automatically by the
 `hooks/skill-logger.py` PostToolUse hook whenever a `SKILL.md` is read.
 
 ```bash
-cf log                 # last 20 invocations (timestamp + skill name)
+cf log                 # last 20 invocations
 cf log --tail 50       # last 50 entries
 cf log --skill tdd     # filter to one skill
-cf log --stats         # frequency table sorted by invocation count
+cf log --stats         # frequency table + escalation count
+cf log --escalations   # only sessions where executor handed off to manager
 ```
 
-Log file: `~/.claude/logs/claudefiles.jsonl`
+Each entry records the skill name, session ID, the skill that was active before it
+(`parent_skill`), and whether the session included an executor→manager escalation.
+
+Log file: `~/.claude/logs/claudefiles.jsonl` — see [logging reference](logging.md) for the full system.
 
 ### cf check
 
