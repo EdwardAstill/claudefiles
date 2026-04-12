@@ -22,7 +22,7 @@ on what the project actually needs. Use `cf agents` to inspect current state,
 
 ## Skill Hierarchy
 
-All skills live in `~/.claudefiles/claudefiles/` (the home claudefiles install).
+All skills live in `~/.local/share/claudefiles-src/claudefiles/` (the home claudefiles install).
 To see the full tree:
 
 ```bash
@@ -51,7 +51,7 @@ Four categories:
 5. Wait for confirmation
 6. Install each selected skill:
    ```bash
-   ~/.claudefiles/install.sh --local --skill <name>
+   ~/.local/share/claudefiles-src/install.sh --local --skill <name>
    ```
 7. Run `cf setup --write` to check tool dependencies and write `.claudefiles/deps.md`
 8. If anything is missing, show the install commands prominently
@@ -93,23 +93,23 @@ Install these 4 skills? (yes / adjust)
 ```bash
 cf agents              # full overview — plugins, global, project, available, CLI deps
 cf agents --tree       # skill hierarchy tree
-cf agents --available  # what's in ~/.claudefiles but not installed here
+cf agents --available  # what's in ~/.local/share/claudefiles-src but not installed here
 ```
 
 ## Installing and Removing Skills
 
 ```bash
 # Install a skill into the current project
-~/.claudefiles/install.sh --local --skill <name>
+~/.local/share/claudefiles-src/install.sh --local --skill <name>
 
 # Install a whole category
-~/.claudefiles/install.sh --local --category research
+~/.local/share/claudefiles-src/install.sh --local --category research
 
 # Remove
-~/.claudefiles/install.sh --local --remove --skill <name>
+~/.local/share/claudefiles-src/install.sh --local --remove --skill <name>
 
 # Preview
-~/.claudefiles/install.sh --local --skill <name> --dry-run
+~/.local/share/claudefiles-src/install.sh --local --skill <name> --dry-run
 ```
 
 ## Checking Tool Dependencies
@@ -157,4 +157,4 @@ Then add `cli = ["tool-name"]` to the relevant `[skills.<name>]` entry.
 ## What Skill Manager Does NOT Do
 
 - Does not manage marketplace plugins — those are managed via Claude Code's plugin system
-- Does not create or edit skills — edit SKILL.md files directly in `~/.claudefiles/claudefiles/`
+- Does not create or edit skills — edit SKILL.md files directly in `~/.local/share/claudefiles-src/claudefiles/`

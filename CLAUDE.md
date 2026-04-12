@@ -111,12 +111,17 @@ mcp = ["context7"]         # MCP server names (optional)
 
 ## Install
 
+**Two modes:**
+
+- **Mode A — global everything:** `./install.sh --global` installs all skills to `~/.claude/skills/`, wires hooks, installs the cf CLI. Works across every project with no per-project setup.
+- **Mode B — skill-manager only:** `./install.sh --global --skill skill-manager` installs one skill globally. Then in each project, say "set up this project" and skill-manager selects and installs the relevant skills locally to `.claude/skills/`.
+
 **Single source of truth:** `install.sh` handles all install logic. Both `bootstrap.sh` and `cf install` delegate to it.
 
 `install.sh` uses symlinks, not copies. Changes to skill files are immediately
 reflected on the next Claude Code session — no re-install needed.
 
-**Scopes:** `--global` installs to `~/.claude/skills/`. `--local [path]`
+**Scopes:** `--global` installs to `~/.claude/skills/` (also installs hooks + cf CLI). `--local [path]`
 installs to `<project>/.claude/skills/`. (`--project` is accepted as an alias for `--local`.)
 
 **Granularity:** `--skill <name>` finds a skill by its SKILL.md `name` field.
