@@ -161,3 +161,9 @@ Skills for implementation, quality, version control, and language-specific work.
 - **Use when:** Writing or debugging Typst documents
 - **Produces:** Compiling .typ document with correct output
 - **Chains into:** (terminal)
+
+### ui-expert
+- **Purpose:** React + Tailwind + shadcn/ui frontend development — component patterns, visual iteration, screenshot verification
+- **Use when:** Building or iterating on UI; choosing between design options; verifying visual output in the browser
+- **Produces:** React/TypeScript components, Tailwind-styled and responsive; design alternatives shown in browser via preview server; visual screenshots for verification
+- **Chains into:** accessibility, tdd, verification-before-completion

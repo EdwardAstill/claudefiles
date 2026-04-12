@@ -125,6 +125,10 @@ tools = ["LSP", "Bash", "Read"]
 cli = ["typescript-language-server"]
 category = "coding/languages"
 
+[skills.ui-expert]
+tools = ["Bash", "Read", "Write"]
+category = "coding/languages"
+
 [skills.rust-expert]
 tools = ["LSP", "Bash", "Read"]
 cli = ["rust-analyzer"]

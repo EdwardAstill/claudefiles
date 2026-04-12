@@ -21,6 +21,8 @@ _SUBCOMMANDS = [
     ("tools", "tools_cmd"),
     ("tree", "tree"),
     ("secrets", "secrets"),
+    ("preview", "preview"),
+    ("screenshot", "screenshot"),
 ]
 
 @app.callback(invoke_without_command=True)
