@@ -1,5 +1,5 @@
 from typer.testing import CliRunner
-from cf.main import app
+from af.main import app
 import subprocess
 
 runner = CliRunner()
@@ -13,10 +13,10 @@ def test_status_output_headers(git_repo, monkeypatch):
     assert "TRUNK" in result.output
 
 def test_status_write(git_repo, monkeypatch):
-    """Test that --write flag creates repo-map.md in .claudefiles/."""
+    """Test that --write flag creates repo-map.md in .agentfiles/."""
     monkeypatch.chdir(git_repo)
     runner.invoke(app, ["status", "--write"])
-    assert (git_repo / ".claudefiles" / "repo-map.md").exists()
+    assert (git_repo / ".agentfiles" / "repo-map.md").exists()
 
 def test_status_trunk_info(git_repo, monkeypatch):
     """Test that status shows trunk branch name and commit info."""

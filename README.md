@@ -1,10 +1,10 @@
-# claudefiles
+# agentfiles
 
-Personal Claude Code skill suite and CLI toolset. 39 skills route tasks to the right
-specialist. The `cf` CLI provides context gathering, git workflows, and skill management.
+Personal Claude Code skill suite and CLI toolset. 40 skills route tasks to the right
+specialist. The `af` CLI provides context gathering, git workflows, and skill management.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 ```
 
 ---
@@ -28,13 +28,13 @@ This keeps the context window clean while providing deep specialist knowledge wh
 ## Structure
 
 ```
-claudefiles/           skill hierarchy (4 categories)
+agentfiles/           skill hierarchy (4 categories)
 ├── management/        orchestration, advisors, meta
 ├── planning/          brainstorming, implementation plans
 ├── coding/            languages, quality, git, CI/CD, API, data, infrastructure
 └── research/          docs, research, codebase analysis, notes
 
-tools/python/          cf CLI — Python/Typer package
+tools/python/          af CLI — Python/Typer package
 lib/                   shared shell utilities
 install.sh             skill installer (single source of truth)
 bootstrap.sh           new machine entry point
@@ -45,7 +45,7 @@ See [docs/skill-tree.md](docs/skill-tree.md) for the full ASCII hierarchy.
 
 ---
 
-## The `cf` CLI
+## The `af` CLI
 
 Installed via `uv tool install -e tools/python/`. Editable — source changes are
 live immediately.
@@ -53,61 +53,61 @@ live immediately.
 ### Context tools
 
 ```bash
-cf context             # project fingerprint: language, stack, framework
-cf context --write     # also save to .claudefiles/context.md
+af context             # project fingerprint: language, stack, framework
+af context --write     # also save to .agentfiles/context.md
 
-cf status              # full repo branch/worktree topology
-cf status --write      # also save to .claudefiles/repo-map.md
+af status              # full repo branch/worktree topology
+af status --write      # also save to .agentfiles/repo-map.md
 
-cf versions            # dependency versions from lockfiles and manifests
-cf versions --write    # also save to .claudefiles/versions.md
+af versions            # dependency versions from lockfiles and manifests
+af versions --write    # also save to .agentfiles/versions.md
 
-cf routes              # scan codebase for API route definitions
-cf routes --write      # also save to .claudefiles/routes.md
+af routes              # scan codebase for API route definitions
+af routes --write      # also save to .agentfiles/routes.md
 
-cf read                # dump all .claudefiles/ bus state
-cf read context        # single file
+af read                # dump all .agentfiles/ bus state
+af read context        # single file
 
-cf init                # bootstrap .claudefiles/ in current project
-cf init --dry-run
+af init                # bootstrap .agentfiles/ in current project
+af init --dry-run
 
-cf note "message"              # append to .claudefiles/notes.md
-cf note --agent research "x"   # tag by agent
-cf note --read
-cf note --clear
+af note "message"              # append to .agentfiles/notes.md
+af note --agent research "x"   # tag by agent
+af note --read
+af note --clear
 ```
 
 ### Skill and tool management
 
 ```bash
-cf agents              # full inventory: skills, MCP servers, tool status
-cf agents --tree       # skill hierarchy tree
-cf agents --global     # global scope only
-cf agents --project    # current project only
-cf agents --available  # in claudefiles but not installed
+af agents              # full inventory: skills, MCP servers, tool status
+af agents --tree       # skill hierarchy tree
+af agents --global     # global scope only
+af agents --project    # current project only
+af agents --available  # in agentfiles but not installed
 
-cf tools               # list all available tools
-cf tools --json        # machine-readable
+af tools               # list all available tools
+af tools --json        # machine-readable
 
-cf check               # verify REGION.md entries for all leaf skills
-cf setup               # check tool dependencies for installed skills
+af check               # verify REGION.md entries for all leaf skills
+af setup               # check tool dependencies for installed skills
 ```
 
 ### Install
 
 ```bash
-cf install --global                      # full install (delegates to install.sh)
-cf install --global --skill git-expert   # one skill
-cf install --global --category research  # one category
-cf install --local /path/to/project      # project-level install
-cf install --global --remove             # uninstall
-cf install --global --dry-run            # preview
+af install --global                      # full install (delegates to install.sh)
+af install --global --skill git-expert   # one skill
+af install --global --category research  # one category
+af install --local /path/to/project      # project-level install
+af install --global --remove             # uninstall
+af install --global --dry-run            # preview
 ```
 
 ### Git
 
 ```bash
-cf worktree <branch> [base]   # create worktree + open Claude Code
+af worktree <branch> [base]   # create worktree + open Claude Code
 ```
 
 ---
@@ -124,7 +124,7 @@ cf worktree <branch> [base]   # create worktree + open Claude Code
 | `design-advisor` | Planning: does this need a spec first? |
 | `git-advisor` | Planning: what git strategy? |
 | `coordination-advisor` | Planning: parallel vs sequential agents? |
-| `using-claudefiles` | Session start (automatic) |
+| `using-agentfiles` | Session start (automatic) |
 | `skill-manager` | View, install, or remove skills |
 | `skills` | Display skill catalog |
 | `writing-skills` | Create or edit a SKILL.md |
@@ -149,6 +149,7 @@ cf worktree <branch> [base]   # create worktree + open Claude Code
 | | `verification-before-completion` | Before marking any task done |
 | | `code-review` | Requesting or receiving review |
 | | `simplify` | Recently changed code is complex |
+| | `regex-expert` | Mass search and replace, refactoring |
 | | `security-review` | OWASP, CVEs, injection, auth |
 | | `performance-profiling` | Correct but slow |
 | | `refactoring-patterns` | Large-scale restructuring |
@@ -180,18 +181,18 @@ cf worktree <branch> [base]   # create worktree + open Claude Code
 ### New machine
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 ```
 
-Clones to `~/.local/share/claudefiles-src/`, installs the `cf` CLI via `uv tool`,
+Clones to `~/.local/share/agentfiles-src/`, installs the `af` CLI via `uv tool`,
 then runs `install.sh --global` for skills.
 
 ### From a local clone
 
 ```bash
-git clone https://github.com/EdwardAstill/claudefiles ~/.local/share/claudefiles-src
-cd ~/.local/share/claudefiles-src
-uv tool install --force -e tools/python/    # install cf CLI
+git clone https://github.com/EdwardAstill/agentfiles ~/.local/share/agentfiles-src
+cd ~/.local/share/agentfiles-src
+uv tool install --force -e tools/python/    # install af CLI
 ./install.sh --global                        # install skills
 ```
 
@@ -201,7 +202,7 @@ uv tool install --force -e tools/python/    # install cf CLI
 ./install.sh --local /path/to/project
 ```
 
-Symlinks skills into `<project>/.claude/skills/` and adds `.claudefiles/` to `.gitignore`.
+Symlinks skills into `<project>/.claude/skills/` and `<project>/.gemini/skills/`, and adds `.agentfiles/` to `.gitignore`.
 
 ### Update
 
@@ -211,26 +212,26 @@ Re-run `bootstrap.sh` — it pulls the latest and re-installs.
 
 ## Agent Communication Bus
 
-Each project gets a `.claudefiles/` folder (gitignored) for cross-agent state:
+Each project gets a `.agentfiles/` folder (gitignored) for cross-agent state:
 
 | File | Written by | Content |
 |------|-----------|---------|
-| `context.md` | `cf context --write` | Project fingerprint |
-| `repo-map.md` | `cf status --write` | Git topology |
-| `versions.md` | `cf versions --write` | Dependency versions |
-| `routes.md` | `cf routes --write` | API surface map |
-| `notes.md` | `cf note` | Free-form findings |
+| `context.md` | `af context --write` | Project fingerprint |
+| `repo-map.md` | `af status --write` | Git topology |
+| `versions.md` | `af versions --write` | Dependency versions |
+| `routes.md` | `af routes --write` | API surface map |
+| `notes.md` | `af note` | Free-form findings |
 
-Run `cf init` to bootstrap all files at once.
+Run `af init` to bootstrap all files at once.
 
 ---
 
 ## Adding a Skill
 
-1. Create `claudefiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
+1. Create `agentfiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
 2. Add entry to `manifest.toml` under `[skills.<skill-name>]`
 3. Add entry to the category's `REGION.md`
-4. Run `cf check` to verify
+4. Run `af check` to verify
 5. Run `./install.sh --global` to pick up the new skill
 
 ```yaml
@@ -249,6 +250,8 @@ description: >
 |----------|---------|
 | [docs/skill-tree.md](docs/skill-tree.md) | Full skill hierarchy + routing diagrams |
 | [docs/reference/cli.md](docs/reference/cli.md) | CLI command reference |
+| [docs/reference/browser.md](docs/reference/browser.md) | Browser automation (CDP) guide |
+| [docs/reference/external-tools.md](docs/reference/external-tools.md) | External tools and LSPs registry |
 | [docs/reference/install.md](docs/reference/install.md) | Install system reference |
 | [docs/reference/orchestration.md](docs/reference/orchestration.md) | Routing architecture deep-dive |
 | [docs/reference/skills.md](docs/reference/skills.md) | Complete skill catalog with invocation names |

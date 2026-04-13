@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install-hooks.sh — merge claudefiles hook configs into ~/.claude/settings.json
+# install-hooks.sh — merge agentfiles hook configs into ~/.claude/settings.json
 #
 # Usage:
 #   ./hooks/install-hooks.sh [--dry-run]
@@ -58,41 +58,41 @@ if "$DRY_RUN"; then
     exit 0
 fi
 
-# Use Python to deep-merge the hooks config into existing settings
-python3 - "$SETTINGS" <<PYEOF
-import json, sys, copy
+# Merge the hooks config into existing settings
+if command -v jq &>/dev/null; then
+    # Use jq for deep merging if available
+    TMP_SETTINGS=$(mktemp)
+    echo "$HOOKS_CONFIG" | jq -s '.[0] * .[1]' "$SETTINGS" - > "$TMP_SETTINGS"
+    mv "$TMP_SETTINGS" "$SETTINGS"
+    echo "  [updated] $SETTINGS (via jq)"
+else
+    # Fallback to Python if jq is missing
+    python3 - "$SETTINGS" <<PYEOF
+import json, sys
 
 settings_path = sys.argv[1]
-
 with open(settings_path) as f:
     settings = json.load(f)
 
 new_hooks = $HOOKS_CONFIG
-
-# Deep-merge hooks: for each hook type (PreToolUse, PostToolUse, etc.)
-# append entries that aren't already present (matched by command string)
 existing_hooks = settings.setdefault("hooks", {})
 
 for hook_type, new_entries in new_hooks["hooks"].items():
     existing_entries = existing_hooks.setdefault(hook_type, [])
-    # Collect existing commands to avoid duplicates
-    existing_commands = set()
-    for entry in existing_entries:
-        for h in entry.get("hooks", []):
-            existing_commands.add(h.get("command", ""))
+    # Basic deduplication by command
+    existing_commands = {h.get("command", "") for e in existing_entries for h in e.get("hooks", [])}
     for new_entry in new_entries:
         for h in new_entry.get("hooks", []):
             if h.get("command", "") not in existing_commands:
                 existing_entries.append(new_entry)
-                existing_commands.add(h.get("command", ""))
                 break
 
 with open(settings_path, "w") as f:
     json.dump(settings, f, indent=2)
     f.write("\n")
-
-print(f"  [updated] {settings_path}")
 PYEOF
+    echo "  [updated] $SETTINGS (via python fallback)"
+fi
 
 echo "  Done. Hook scripts expected at ~/.claude/skills/hooks/"
 echo "  Run: ./install.sh --global  to install hook scripts to that location."

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Restructure dev-suite/ into a layered category taxonomy (management, coding, research) with category dispatcher skills, update cf agents and agent-manager to display the hierarchy as a tree, and add --category support to install.sh.
+**Goal:** Restructure dev-suite/ into a layered category taxonomy (management, coding, research) with category dispatcher skills, update af agents and agent-manager to display the hierarchy as a tree, and add --category support to install.sh.
 
 **Architecture:** Move existing skills into category subdirectories, create a SKILL.md dispatcher at each category and sub-category level, update all internal references, then update tooling to be hierarchy-aware.
 
@@ -35,7 +35,7 @@
 - `dev-suite/coding/version-control/git-expert/SKILL.md` — lib/ path refs
 - `install.sh` — add --category flag
 - `manifest.toml` — update skill paths
-- `bin/cf agents` — show tree structure
+- `bin/af agents` — show tree structure
 - `dev-suite/management/agent-manager/SKILL.md` — document hierarchy
 - `README.md` — update structure diagram
 - `CLAUDE.md` — update structure description
@@ -220,12 +220,12 @@ and their sub-skills. No path changes needed since registry is read by name not 
 - [ ] **Step 2: Fix complex-orchestrator registry path reference**
 
 The complex-orchestrator reads `dev-suite/registry.md` — check it still references
-the right relative path. No change needed if it uses a relative path from the claudefiles root.
+the right relative path. No change needed if it uses a relative path from the agentfiles root.
 
 - [ ] **Step 3: Fix git-expert lib/ path reference**
 
-git-expert/SKILL.md references `lib/port-finder.sh` and `bin/cf status` — these
-paths are relative to the claudefiles root, not the skill file. Verify the references
+git-expert/SKILL.md references `lib/port-finder.sh` and `bin/af status` — these
+paths are relative to the agentfiles root, not the skill file. Verify the references
 still make sense and are clear to the reader.
 
 ---
@@ -241,7 +241,7 @@ Add `--category <name>` flag. Valid categories: `management`, `coding`, `researc
 
 - [ ] **Step 2: Update symlink logic to respect category**
 
-When `--category coding` is given, symlink `dev-suite/coding/` as `~/.claude/skills/cf-coding/`
+When `--category coding` is given, symlink `dev-suite/coding/` as `~/.claude/skills/af-coding/`
 instead of the full `dev-suite/` as `~/.claude/skills/dev-suite/`.
 
 Full install (no --category) still symlinks the entire dev-suite/.
@@ -255,10 +255,10 @@ Full install (no --category) still symlinks the entire dev-suite/.
 
 ---
 
-## Task 5: Update cf agents to show tree structure
+## Task 5: Update af agents to show tree structure
 
 **Files:**
-- Modify: `bin/cf agents`
+- Modify: `bin/af agents`
 
 - [ ] **Step 1: Replace flat skill listing with tree rendering**
 
@@ -287,14 +287,14 @@ dev-suite/
 - [ ] **Step 2: Add --tree flag to always show tree regardless of scope**
 
 ```bash
-cf agents --tree
+af agents --tree
 ```
 
 - [ ] **Step 3: Test tree output**
 
 ```bash
-bash bin/cf agents --available
-bash bin/cf agents --tree
+bash bin/af agents --available
+bash bin/af agents --tree
 ```
 
 ---
@@ -306,7 +306,7 @@ bash bin/cf agents --tree
 
 - [ ] **Step 1: Add hierarchy section explaining the category structure**
 
-Document the three categories, how to install per-category, and how cf agents --tree
+Document the three categories, how to install per-category, and how af agents --tree
 shows the full picture.
 
 ---
@@ -343,7 +343,7 @@ research/ (docs-agent, research-agent)
 
 Add category dispatcher SKILL.md at each level.
 Add --category flag to install.sh.
-Update cf agents to render skills as a tree.
+Update af agents to render skills as a tree.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 ```
@@ -363,7 +363,7 @@ After all tasks:
 1. `find dev-suite -name "SKILL.md" | sort` — 12 files in correct locations
 2. `./install.sh --user --dry-run` — symlinks dev-suite/ correctly
 3. `./install.sh --user --category coding --dry-run` — symlinks only coding/
-4. `bash bin/cf agents --tree` — renders tree with categories
+4. `bash bin/af agents --tree` — renders tree with categories
 5. New Claude Code session — all 12 skills appear in system-reminder
 6. Invoke `/management` — routes correctly
 7. Invoke `/research` — routes to docs-agent or research-agent correctly

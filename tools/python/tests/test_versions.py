@@ -1,5 +1,5 @@
 from typer.testing import CliRunner
-from cf.main import app
+from af.main import app
 
 runner = CliRunner()
 
@@ -21,7 +21,7 @@ def test_versions_write(git_repo, monkeypatch):
     (git_repo / "pyproject.toml").write_text('[project]\nname="x"')
     monkeypatch.chdir(git_repo)
     runner.invoke(app, ["versions", "--write"])
-    assert (git_repo / ".claudefiles" / "versions.md").exists()
+    assert (git_repo / ".agentfiles" / "versions.md").exists()
 
 def test_routes_finds_express(git_repo, monkeypatch):
     src = git_repo / "src"
@@ -35,4 +35,4 @@ def test_routes_finds_express(git_repo, monkeypatch):
 def test_routes_write(git_repo, monkeypatch):
     monkeypatch.chdir(git_repo)
     runner.invoke(app, ["routes", "--write"])
-    assert (git_repo / ".claudefiles" / "routes.md").exists()
+    assert (git_repo / ".agentfiles" / "routes.md").exists()

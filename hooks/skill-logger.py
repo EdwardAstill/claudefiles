@@ -3,7 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = []
 # ///
-"""PostToolUse skill logger — records SKILL.md reads to ~/.claude/logs/claudefiles.jsonl.
+"""PostToolUse skill logger — records SKILL.md reads to ~/.claude/logs/agentfiles.jsonl.
 
 Each entry captures:
   ts            ISO 8601 UTC timestamp
@@ -20,7 +20,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-LOG_FILE = Path.home() / ".claude" / "logs" / "claudefiles.jsonl"
+LOG_FILE = Path.home() / ".claude" / "logs" / "agentfiles.jsonl"
 SESSION_DIR = Path.home() / ".claude" / "logs" / ".sessions"
 SESSION_MAX_AGE_S = 60 * 60 * 24  # clean up session state older than 24 hours
 

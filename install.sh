@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# install.sh — install claudefiles skills and bin tools
+# install.sh — install agentfiles skills and bin tools for both Claude and Gemini
 #
 # Usage:
-#   ./install.sh --global                              # install full claudefiles + bin globally
+#   ./install.sh --global                              # install full agentfiles + bin globally
 #   ./install.sh --global --category coding           # install one category globally
 #   ./install.sh --global --skill agent-manager       # install one skill globally (bootstrap)
 #   ./install.sh --local                              # install to current project
@@ -12,29 +12,12 @@
 #   ./install.sh --dry-run                            # preview without changes
 #   ./install.sh --remove                             # remove installed symlinks
 #   ./install.sh --list-categories                    # show available categories
-#
-# Source options:
-#   (default)                    use this repo (where install.sh lives)
-#   --from github:owner/repo     clone/update from GitHub, install from that copy
-#
-# Scope options:
-#   --global  (or --user)        install to ~/.claude/skills/ + ~/.local/bin/
-#   --local   (or --project)     install to <project>/.claude/skills/
-#
-# Granularity options (pick one):
-#   (none)                       install full claudefiles as one symlink
-#   --category <name>            install one top-level category (management, coding, research)
-#   --skill <name>               install one named skill by its SKILL.md name field
-#
-# Bootstrap (install just the manager, then use it to install the rest):
-#   curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/install.sh \
-#     | bash -s -- --global --from github:EdwardAstill/claudefiles --skill agent-manager
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST="$SCRIPT_DIR/manifest.toml"
-CLAUDEFILES="$SCRIPT_DIR/claudefiles"
+AGENTFILES="$SCRIPT_DIR/agentfiles"
 
 MODE=""           # user | project
 SOURCE="local"    # local | github
@@ -90,11 +73,9 @@ while [[ $i -lt ${#args[@]} ]]; do
 done
 
 # ── Resolve GitHub source ─────────────────────────────────────────────────────
-# If --from github:owner/repo, clone or update into a local cache directory,
-# then point all paths at that cache. The rest of the script is source-agnostic.
 
 if [[ "$SOURCE" == "github" ]]; then
-    REPO_DIR="$HOME/.claudefiles"
+    REPO_DIR="$HOME/.agentfiles"
 
     if [[ -d "$REPO_DIR/.git" ]]; then
         echo "  Updating cached repo from github.com/$GITHUB_REPO ..."
@@ -108,7 +89,7 @@ if [[ "$SOURCE" == "github" ]]; then
     fi
 
     # Override all source paths to use the cached copy
-    CLAUDEFILES="$REPO_DIR/claudefiles"
+    AGENTFILES="$REPO_DIR/agentfiles"
     BIN_DIR="$REPO_DIR/bin"
     MANIFEST="$REPO_DIR/manifest.toml"
 fi
@@ -117,8 +98,8 @@ fi
 
 if "$LIST_CATS"; then
     echo "Available categories:"
-    echo "  all         — install the full claudefiles (default)"
-    for d in "$CLAUDEFILES"/*/; do
+    echo "  all         — install the full agentfiles (default)"
+    for d in "$AGENTFILES"/*/; do
         [[ -f "$d/SKILL.md" ]] && echo "  $(basename "$d")"
     done
     exit 0
@@ -126,7 +107,6 @@ fi
 
 if [[ -z "$MODE" ]]; then
     echo "Error: specify --global (or --local <path>)" >&2
-    echo "Usage: $0 [--global|--local [<path>]] [--from github:<owner>/<repo>] [--category <name>|--skill <name>] [--dry-run] [--remove]" >&2
     exit 1
 fi
 
@@ -134,23 +114,23 @@ if [[ "$MODE" == "project" && -z "$PROJECT_PATH" ]]; then
     PROJECT_PATH="$(pwd)"
 fi
 
-# ── Resolve install target ────────────────────────────────────────────────────
+# ── Resolve install targets ───────────────────────────────────────────────────
 
+TARGETS=()
 if [[ "$MODE" == "user" ]]; then
-    SKILLS_TARGET="$HOME/.claude/skills"
+    TARGETS+=("$HOME/.claude/skills")
+    TARGETS+=("$HOME/.gemini/skills")
 else
-    SKILLS_TARGET="$PROJECT_PATH/.claude/skills"
+    TARGETS+=("$PROJECT_PATH/.claude/skills")
+    TARGETS+=("$PROJECT_PATH/.gemini/skills")
 fi
 
-
-# ── Resolve skill source and link name ───────────────────────────────────────
-# Three modes: full claudefiles, one category, or one named skill.
+# ── Resolve skill source ──────────────────────────────────────────────────────
 
 SKILL_SRC=""
 SKILL_LINK_NAME=""
 
 if [[ -n "$SKILL_NAME" ]]; then
-    # Single-skill mode: find the skill directory by SKILL.md name field
     while IFS= read -r skill_md; do
         found_name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
         if [[ "$found_name" == "$SKILL_NAME" ]]; then
@@ -158,28 +138,23 @@ if [[ -n "$SKILL_NAME" ]]; then
             SKILL_LINK_NAME="$SKILL_NAME"
             break
         fi
-    done < <(find "$CLAUDEFILES" -name "SKILL.md" 2>/dev/null)
+    done < <(find "$AGENTFILES" -name "SKILL.md" 2>/dev/null)
 
     if [[ -z "$SKILL_SRC" ]]; then
-        echo "Error: skill '$SKILL_NAME' not found in claudefiles" >&2
-        echo "Run $0 --list-categories to see available categories, or check claudefiles/ for skill names." >&2
+        echo "Error: skill '$SKILL_NAME' not found in agentfiles" >&2
         exit 1
     fi
 
 elif [[ "$CATEGORY" == "all" ]]; then
-    # Rebuild flat skills/ directory from claudefiles leaf skills
     SKILLS_FLAT="$SCRIPT_DIR/skills"
     mkdir -p "$SKILLS_FLAT"
-
-    # Remove stale symlinks for skills that no longer exist
     while IFS= read -r link; do
         name="$(basename "$link")"
-        if ! find "$CLAUDEFILES" -name "SKILL.md" | xargs grep -l "^name: $name$" &>/dev/null; then
+        if ! find "$AGENTFILES" -name "SKILL.md" | xargs grep -l "^name: $name$" &>/dev/null; then
             rm "$link"
         fi
     done < <(find "$SKILLS_FLAT" -maxdepth 1 -type l 2>/dev/null)
 
-    # Create/update symlinks for all leaf skills
     while IFS= read -r skill_md; do
         dir="$(dirname "$skill_md")"
         sub_skills=$(find "$dir" -mindepth 2 -name "SKILL.md" 2>/dev/null | wc -l)
@@ -188,66 +163,14 @@ elif [[ "$CATEGORY" == "all" ]]; then
             rel="$(python3 -c "import os; print(os.path.relpath('$dir', '$SKILLS_FLAT'))")"
             ln -sf "$rel" "$SKILLS_FLAT/$name"
         fi
-    done < <(find "$CLAUDEFILES" -name "SKILL.md")
-
-    # SKILL_SRC set to flat dir; individual symlinks installed per skill (not as one block)
+    done < <(find "$AGENTFILES" -name "SKILL.md")
     SKILL_SRC="$SKILLS_FLAT"
-    SKILL_LINK_NAME=""   # empty = individual-skill install mode
-
 else
-    SKILL_SRC="$CLAUDEFILES/$CATEGORY"
-    SKILL_LINK_NAME="cf-$CATEGORY"
-    if [[ ! -d "$SKILL_SRC" ]]; then
-        echo "Error: category '$CATEGORY' not found in claudefiles/" >&2
-        echo "Run $0 --list-categories to see available categories." >&2
-        exit 1
-    fi
+    SKILL_SRC="$AGENTFILES/$CATEGORY"
+    SKILL_LINK_NAME="af-$CATEGORY"
 fi
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
-
-log() { echo "  $*"; }
-
-ensure_uv() {
-    if command -v uv &>/dev/null; then
-        echo "  [ok] uv $(uv --version 2>/dev/null)"
-        return
-    fi
-    echo "  uv not found — installing..."
-    if "$DRY_RUN"; then
-        echo "  [dry-run] curl -LsSf https://astral.sh/uv/install.sh | sh"
-        return
-    fi
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
-    echo "  [ok] uv installed"
-}
-
-install_cf_cli() {
-    echo ""
-    echo "CLI (cf):"
-    if "$DRY_RUN"; then
-        echo "  [dry-run] uv tool install -e $SCRIPT_DIR/tools/python/"
-        return
-    fi
-    uv tool install --force -e "$SCRIPT_DIR/tools/python/" --quiet
-    echo "  [ok] cf installed — run 'cf agents' to verify"
-}
-
-wire_hooks() {
-    local hooks_script="$SCRIPT_DIR/hooks/install-hooks.sh"
-    echo ""
-    echo "Hooks:"
-    if [[ ! -f "$hooks_script" ]]; then
-        echo "  [skip] hooks/install-hooks.sh not found"
-        return
-    fi
-    if "$DRY_RUN"; then
-        bash "$hooks_script" --dry-run
-        return
-    fi
-    bash "$hooks_script"
-}
 
 do_symlink() {
     local src="$1" dst="$2"
@@ -257,13 +180,10 @@ do_symlink() {
     fi
     mkdir -p "$(dirname "$dst")"
     if [[ -L "$dst" ]]; then
-        echo "  [skip] already linked: $dst"
-    elif [[ -e "$dst" ]]; then
-        echo "  [warn] exists (not a symlink): $dst — skipping"
-    else
-        ln -s "$src" "$dst"
-        echo "  [link] $dst → $src"
+        rm "$dst"
     fi
+    ln -s "$src" "$dst"
+    echo "  [link] $dst → $src"
 }
 
 do_remove() {
@@ -275,133 +195,100 @@ do_remove() {
     if [[ -L "$dst" ]]; then
         rm "$dst"
         echo "  [removed] $dst"
-    elif [[ -e "$dst" ]]; then
-        echo "  [warn] $dst exists but is not a symlink — skipping"
-    else
-        echo "  [skip] not found: $dst"
     fi
+}
+
+wire_gemini_hooks() {
+    local gemini_settings
+    local target_skills
+    if [[ "$MODE" == "user" ]]; then
+        gemini_settings="$HOME/.gemini/settings.json"
+        target_skills="$HOME/.gemini"
+    else
+        gemini_settings="$PROJECT_PATH/.gemini/settings.json"
+        target_skills="$PROJECT_PATH/.gemini"
+    fi
+    
+    echo "Gemini Hooks:"
+    if "$DRY_RUN"; then
+        echo "  [dry-run] would configure Gemini hooks in $gemini_settings"
+        return
+    fi
+    
+    bash "$SCRIPT_DIR/hooks/install-gemini-hooks.sh" ${DRY_RUN:+--dry-run} --target "$target_skills"
 }
 
 # ── Install ───────────────────────────────────────────────────────────────────
 
 install_all() {
-    echo ""
-    if [[ -n "$SKILL_NAME" ]]; then
-        echo "Installing claudefiles skill: $SKILL_NAME"
-    elif [[ "$CATEGORY" != "all" ]]; then
-        echo "Installing claudefiles category: $CATEGORY"
-    else
-        echo "Installing claudefiles"
-    fi
-
-    echo "  Source        : $SKILL_SRC"
-    echo "  Skills target : $SKILLS_TARGET"
-    "$DRY_RUN" && echo "  [dry-run mode — no changes will be made]"
-    echo ""
-
-    # Ensure uv is available for global installs (needed for cf CLI and hook scripts)
+    echo "Installing agentfiles"
+    
+    # Install CLI for global mode
     if [[ "$MODE" == "user" ]]; then
-        ensure_uv
-        echo ""
-    fi
-
-    echo "Skills:"
-    if [[ -z "$SKILL_LINK_NAME" ]]; then
-        # Individual skill mode: symlink each skill directly into SKILLS_TARGET
-        # This gives /skill-name slash commands in Claude Code
-        while IFS= read -r skill_dir; do
-            name="$(basename "$skill_dir")"
-            do_symlink "$(realpath "$skill_dir")" "$SKILLS_TARGET/$name"
-        done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
-        # Remove stale claudefiles prefix symlink if it exists from previous installs
-        if [[ -L "$SKILLS_TARGET/claudefiles" ]]; then
-            rm "$SKILLS_TARGET/claudefiles"
-            echo "  [removed] stale prefix symlink: $SKILLS_TARGET/claudefiles"
-        fi
-    else
-        do_symlink "$SKILL_SRC" "$SKILLS_TARGET/$SKILL_LINK_NAME"
-    fi
-
-    # Install hooks/ directory for global installs
-    if [[ "$MODE" == "user" ]]; then
-        local hooks_src="$SCRIPT_DIR/hooks"
-        local hooks_dst="$HOME/.claude/skills/hooks"
-        if [[ -d "$hooks_src" ]]; then
-            if "$DRY_RUN"; then
-                echo "  [dry-run] symlink: $hooks_dst → $hooks_src"
-            elif [[ -L "$hooks_dst" ]]; then
-                echo "  [skip] already linked: $hooks_dst"
-            elif [[ -e "$hooks_dst" ]]; then
-                echo "  [warn] exists (not a symlink): $hooks_dst — skipping"
-            else
-                ln -s "$hooks_src" "$hooks_dst"
-                echo "  [link] $hooks_dst → $hooks_src"
-                # Make hook scripts executable
-                chmod +x "$hooks_src"/*.py "$hooks_src"/*.sh 2>/dev/null || true
-            fi
+        if "$DRY_RUN"; then
+            echo "  [dry-run] uv tool install -e $SCRIPT_DIR/tools/python/"
+        else
+            uv tool install --force -e "$SCRIPT_DIR/tools/python/" --quiet
+            echo "  [ok] af CLI installed"
         fi
     fi
 
-    # Install cf CLI and wire hooks for global installs
+    for target in "${TARGETS[@]}"; do
+        echo "Target: $target"
+        if [[ -z "$SKILL_LINK_NAME" ]]; then
+            while IFS= read -r skill_dir; do
+                name="$(basename "$skill_dir")"
+                do_symlink "$(realpath "$skill_dir")" "$target/$name"
+            done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
+        else
+            do_symlink "$SKILL_SRC" "$target/$SKILL_LINK_NAME"
+        fi
+        
+        # Link hooks specifically for Claude convention
+        if [[ "$target" == *".claude/skills" ]]; then
+            local hooks_src="$SCRIPT_DIR/hooks"
+            do_symlink "$hooks_src" "$target/hooks"
+        fi
+        # Link hooks for Gemini as well (convention-over-config is easier)
+        if [[ "$target" == *".gemini/skills" ]]; then
+            local hooks_src="$SCRIPT_DIR/hooks"
+            do_symlink "$hooks_src" "$target/hooks"
+        fi
+    done
+
     if [[ "$MODE" == "user" ]]; then
-        install_cf_cli
-        wire_hooks
+        bash "$SCRIPT_DIR/hooks/install-hooks.sh" ${DRY_RUN:+--dry-run}
+        wire_gemini_hooks
     fi
 
-    # Add .claudefiles/ to project .gitignore on project installs
+    # Gitignore
     if [[ "$MODE" == "project" ]]; then
         local ignore="$PROJECT_PATH/.gitignore"
         if "$DRY_RUN"; then
-            echo "  [dry-run] add .claudefiles/ to $ignore"
-        elif ! grep -qxF '.claudefiles/' "$ignore" 2>/dev/null; then
-            echo '.claudefiles/' >> "$ignore"
-            echo "  [gitignore] added .claudefiles/ to $ignore"
-        else
-            echo "  [skip] .claudefiles/ already in $ignore"
+            echo "  [dry-run] add .agentfiles/ to $ignore"
+        elif ! grep -qxF '.agentfiles/' "$ignore" 2>/dev/null; then
+            echo '.agentfiles/' >> "$ignore"
         fi
-    fi
-
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    if ! "$DRY_RUN"; then
-        echo "Done. Start a new Claude Code session to activate skills."
-        if [[ "$MODE" == "user" ]]; then
-            echo ""
-            echo "  cf agents       — verify installed skills"
-            echo "  cf log --stats  — skill usage stats"
-        fi
-        if [[ "$MODE" == "project" ]]; then
-            echo "Skills installed to: $PROJECT_PATH"
-        fi
-    else
-        echo "Dry run complete — no changes made."
     fi
 }
-
-# ── Remove ────────────────────────────────────────────────────────────────────
 
 remove_all() {
-    echo ""
-    echo "Removing claudefiles skills"
-    "$DRY_RUN" && echo "  [dry-run mode — no changes will be made]"
-    echo ""
-
-    echo "Skills:"
-    if [[ -z "$SKILL_LINK_NAME" ]]; then
-        # Individual skill mode: remove each skill symlink from SKILLS_TARGET
-        while IFS= read -r skill_dir; do
-            name="$(basename "$skill_dir")"
-            do_remove "$SKILLS_TARGET/$name"
-        done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
-    else
-        do_remove "$SKILLS_TARGET/$SKILL_LINK_NAME"
-    fi
-
-    echo ""
-    echo "Done."
+    for target in "${TARGETS[@]}"; do
+        echo "Removing from: $target"
+        if [[ -z "$SKILL_LINK_NAME" ]]; then
+            while IFS= read -r skill_dir; do
+                name="$(basename "$skill_dir")"
+                do_remove "$target/$name"
+            done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
+        else
+            do_remove "$target/$SKILL_LINK_NAME"
+        fi
+        # Remove hooks link
+        if [[ "$target" == *".claude/skills" || "$target" == *".gemini/skills" ]]; then
+            do_remove "$target/hooks"
+        fi
+    done
 }
-
-# ── Run ───────────────────────────────────────────────────────────────────────
 
 if "$REMOVE"; then
     remove_all

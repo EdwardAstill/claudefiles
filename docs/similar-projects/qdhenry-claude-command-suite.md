@@ -16,7 +16,7 @@ One of the most comprehensive command collections publicly available:
 ## What It Does Well
 
 - **Scale with namespacing** — 200+ commands stay manageable because of consistent namespace grouping; commands don't collapse into an undifferentiated pile.
-- **User-invoked vs model-invoked distinction** — same conceptual split as claudefiles (slash commands vs skills), applied consistently at scale.
+- **User-invoked vs model-invoked distinction** — same conceptual split as agentfiles (slash commands vs skills), applied consistently at scale.
 - **External integrations as first-class skills** — Linear tickets, Cloudflare Workers, GitHub PRs are named skills rather than assumed context. Forces explicit surface area.
 - **Multi-domain coverage** — `/security:*`, `/data:*`, `/orchestration:*` cover domains most toolkits skip.
 
@@ -31,10 +31,10 @@ One of the most comprehensive command collections publicly available:
 
 ---
 
-## What claudefiles Could Learn
+## What agentfiles Could Learn
 
 | Idea | How to Apply |
 |------|-------------|
-| **External system integrations as named skills** | A `linear-expert`, `slack-expert`, or `github-actions-expert` pattern where the skill encapsulates the entire integration surface (claudefiles has `github-expert` — extend this model) |
-| **Namespace grouping in `cf agents`** | When skill count grows beyond 50, namespace prefixes (`/coding:`, `/research:`) in `cf agents --tree` output would help |
+| **External system integrations as named skills** | A `linear-expert`, `slack-expert`, or `github-actions-expert` pattern where the skill encapsulates the entire integration surface (agentfiles has `github-expert` — extend this model) |
+| **Namespace grouping in `af agents`** | When skill count grows beyond 50, namespace prefixes (`/coding:`, `/research:`) in `af agents --tree` output would help |
 | **Explicit multi-domain coverage tracking** | A gap map of "which domains do we have vs. don't have" would make skill additions deliberate rather than organic |

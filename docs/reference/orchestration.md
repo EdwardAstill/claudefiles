@@ -1,6 +1,6 @@
 # Orchestration Reference
 
-How claudefiles routes work, why each design choice was made, and where the system
+How agentfiles routes work, why each design choice was made, and where the system
 has known gaps.
 
 ---
@@ -9,11 +9,11 @@ has known gaps.
 
 ```
 Session start
-    └─ using-claudefiles (establishes skill-checking discipline)
+    └─ using-agentfiles (establishes skill-checking discipline)
 
 Every new task
     └─ executor
-           1. Orient    — cf context + cf status (MANDATORY)
+           1. Orient    — af context + af status (MANDATORY)
            2. Assess    — parallel agents needed? (almost never)
            3. Plan      — 2–4 lines for non-trivial tasks
            4. Execute   — load specialists inline as needed
@@ -25,7 +25,7 @@ Every new task
 
 manager
     Phase 1 — Plan
-        Read HANDOFF CONTEXT from executor (cf context, cf status, work done so far)
+        Read HANDOFF CONTEXT from executor (af context, af status, work done so far)
         Read relevant REGION.md files
         Three questions (load advisors inline if non-obvious):
             design-advisor       → brainstorming or spec first?
@@ -48,7 +48,7 @@ manager
 
 ## Layer by Layer
 
-### using-claudefiles — session-start enforcement
+### using-agentfiles — session-start enforcement
 
 **What it does:** Fires at session start. Establishes executor as the default entry
 point and documents how skills are invoked.
@@ -81,7 +81,7 @@ test results, or observable behavior. Phrases like "should work" are not evidenc
 
 **Why HANDOFF CONTEXT on escalation:** Context loss is the #1 failure mode in
 multi-agent systems. When executor escalates, it passes a structured block containing
-cf context output, cf status output, work completed, and why escalation is needed.
+af context output, af status output, work completed, and why escalation is needed.
 This prevents manager from starting blind.
 
 **Specialist skills available (load inline):**
@@ -158,12 +158,12 @@ is manual: read summaries, check conflicts, run tests, resolve divergence.
 it escalates with HANDOFF CONTEXT. The handoff requires a deliberate step, not automatic
 transfer.
 
-**No skill quality testing.** `cf check` verifies REGION.md entries exist. It cannot
+**No skill quality testing.** `af check` verifies REGION.md entries exist. It cannot
 verify that a skill's content is accurate or well-calibrated. Skills can drift silently.
 
 **No context pressure monitoring.** Loading multiple specialists in a long session fills
 context gradually. The system doesn't track this or warn when context is tight.
 
-**Passive enforcement.** `using-claudefiles` establishes rules at session start but
+**Passive enforcement.** `using-agentfiles` establishes rules at session start but
 doesn't actively block non-compliant behavior — it depends on the rules being read and
 followed.

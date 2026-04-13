@@ -1,9 +1,9 @@
-# claudefiles manifest
+# agentfiles manifest
 # Declares per-skill tool requirements and bin entries for install.sh
 
-# No bin/ wrappers — use `cf <subcommand>` directly via the Python CLI.
+# No bin/ wrappers — use `af <subcommand>` directly via the Python CLI.
 
-[skills.using-claudefiles]
+[skills.using-agentfiles]
 tools = []
 category = "management/meta"
 
@@ -49,6 +49,11 @@ category = "coding/quality"
 
 [skills.simplify]
 tools = ["Read", "Write", "Bash"]
+category = "coding/quality"
+
+[skills.regex-expert]
+tools = ["Bash", "Read"]
+cli = ["sd", "rg"]
 category = "coding/quality"
 
 [skills.git-worktree-workflow]
@@ -107,12 +112,12 @@ category = "coding/api"
 [skills.docs-agent]
 tools = ["WebSearch", "WebFetch"]
 mcp = ["context7"]
-cli = ["qmd"]
+cli = ["mks"]
 category = "research"
 
 [skills.research-agent]
 tools = ["WebSearch", "WebFetch", "Read"]
-cli = ["qmd"]
+cli = ["mks"]
 category = "research"
 
 [skills.python-expert]
@@ -125,8 +130,14 @@ tools = ["LSP", "Bash", "Read"]
 cli = ["typescript-language-server"]
 category = "coding/languages"
 
+[skills.tui-expert]
+tools = ["Bash", "Read", "Write"]
+mcp = ["context7"]
+category = "coding/languages"
+
 [skills.ui-expert]
 tools = ["Bash", "Read", "Write"]
+mcp = ["context7", "firefox-devtools"]
 category = "coding/languages"
 
 [skills.rust-expert]
@@ -173,13 +184,14 @@ category = "coding/quality"
 
 # ── CLI tool registry ─────────────────────────────────────────────────────────
 # Tools installed via bun, uv, cargo, or rustup.
-# cf-agents checks PATH for each and flags missing ones.
+# af-agents checks PATH for each and flags missing ones.
 # Use 'install' to override the default install command.
 
-[cli.qmd]
-manager = "bun"
-package = "@tobilu/qmd"
-description = "Local markdown search — BM25 + vector + LLM reranking, fully local"
+[cli.mks]
+manager = "cargo"
+package = "markstore"
+install = "cargo install --path ~/projects/markstore"
+description = "Local markdown store — BM25 full-text search, semantic vector search, knowledge graph"
 
 [cli.pyright]
 manager = "bun"
@@ -203,3 +215,21 @@ manager = "cargo"
 package = "tinymist"
 install = "cargo install tinymist"
 description = "Typst language server"
+
+[cli.sd]
+manager = "cargo"
+package = "sd"
+install = "cargo install sd"
+description = "Search & Displace — intuitive find & replace using regex"
+
+[cli.rg]
+manager = "cargo"
+package = "ripgrep"
+install = "cargo install ripgrep"
+description = "ripgrep — fastest recursive line-oriented search tool"
+
+[cli.jq]
+manager = "bun"
+package = "jq"
+install = "bun install -g jq"
+description = "Command-line JSON processor"

@@ -1,6 +1,6 @@
 # Skills Reference
 
-39 leaf skills across four categories. Run `cf agents --tree` to see the live hierarchy.
+39 leaf skills across four categories. Run `af agents --tree` to see the live hierarchy.
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Skill | Use when |
 |-------|----------|
-| `using-claudefiles` | Session start (automatic) |
+| `using-agentfiles` | Session start (automatic) |
 | `skill-manager` | View, install, or remove skills |
 | `skills` | Display the full skill catalog |
 | `writing-skills` | Create or edit a SKILL.md |
@@ -132,10 +132,10 @@ needs parallel domain work.
 
 ## Adding a Skill
 
-1. Create `claudefiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
+1. Create `agentfiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
 2. Add entry to `manifest.toml` under `[skills.<skill-name>]`
 3. Add entry to the category's `REGION.md`
-4. Run `cf check` to verify
+4. Run `af check` to verify
 5. Run `./install.sh --global` to pick up the new skill
 
 ```yaml

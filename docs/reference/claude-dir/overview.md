@@ -1,7 +1,7 @@
 # ~/.claude/ Directory Reference
 
 `~/.claude/` is Claude Code's home directory. It has two zones: files Claude Code
-manages itself, and files claudefiles manages.
+manages itself, and files agentfiles manages.
 
 ---
 
@@ -33,17 +33,17 @@ Leave these alone unless you know what you're doing.
 
 ---
 
-## claudefiles managed
+## agentfiles managed
 
 | Path | What it is | Managed by | Doc |
 |------|------------|------------|-----|
 | `skills/` | Installed skills → symlink into dotfiles | `install.sh` | [install](../install.md) |
-| `logs/claudefiles.jsonl` | Skill invocation log (automated) | `hooks/skill-logger.py` | [logging](../logging.md) |
+| `logs/agentfiles.jsonl` | Skill invocation log (automated) | `hooks/skill-logger.py` | [logging](../logging.md) |
 | `logs/observations.md` | Qualitative notes — patterns, routing misses | manual | [logging](../logging.md) |
 | `logs/backlog.md` | Actionable improvement items | manual | [logging](../logging.md) |
 | `logs/.sessions/` | Per-session state for logger (auto-cleaned) | `hooks/skill-logger.py` | — |
-| `data/` | Persistent data store for `cf index`/`cf search` | `cf index` | [cli](../cli.md#cf-index) |
-| `secrets` | API keys, chmod 600 | `cf secrets` | [secrets](./secrets.md) |
+| `data/` | Persistent data store for `af index`/`af search` | `af index` | [cli](../cli.md#af-index) |
+| `secrets` | API keys, chmod 600 | `af secrets` | [secrets](./secrets.md) |
 
 ---
 
@@ -63,15 +63,15 @@ Changes to MCP config or skills go through the dotfiles repo, not directly in `~
 
 ```bash
 cat ~/.claude/settings.json          # current config
-cf agents                            # installed skills
-cf log --stats                       # skill usage
-cf search --list                     # indexed data sources
-cf secrets list                      # stored secret key names (not values)
+af agents                            # installed skills
+af log --stats                       # skill usage
+af search --list                     # indexed data sources
+af secrets list                      # stored secret key names (not values)
 ls ~/.claude/data/                   # data store contents
 ```
 
 ## Safe to edit
 
 - `~/.claude/settings.json` — add hooks, change model, toggle plugins
-- `~/.claude/secrets` — use `cf secrets set/remove` rather than editing directly
-- `~/.claude/data/` — rebuild with `cf index` if stale
+- `~/.claude/secrets` — use `af secrets set/remove` rather than editing directly
+- `~/.claude/data/` — rebuild with `af index` if stale

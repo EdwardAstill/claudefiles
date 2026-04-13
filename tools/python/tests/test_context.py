@@ -1,6 +1,6 @@
 import pytest
 from typer.testing import CliRunner
-from cf.main import app
+from af.main import app
 
 runner = CliRunner()
 
@@ -21,4 +21,4 @@ def test_context_detects_python(git_repo, monkeypatch):
 def test_context_write_creates_file(git_repo, monkeypatch):
     monkeypatch.chdir(git_repo)
     runner.invoke(app, ["context", "--write"])
-    assert (git_repo / ".claudefiles" / "context.md").exists()
+    assert (git_repo / ".agentfiles" / "context.md").exists()

@@ -8,13 +8,13 @@ which scripts execute, which files are read and written.
 ## 1. New Machine Setup
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 ```
 
 | Step | What happens | Output |
 |------|-------------|--------|
-| Clone | Clones repo to `~/.local/share/claudefiles-src/` | Local clone |
-| Install CLI | `uv tool install --force -e tools/python/` | `cf` command on PATH |
+| Clone | Clones repo to `~/.local/share/agentfiles-src/` | Local clone |
+| Install CLI | `uv tool install --force -e tools/python/` | `af` command on PATH |
 | Install skills | `install.sh --global` — builds flat symlinks, installs each skill | 39 skills in `~/.claude/skills/` |
 
 All 39 skills active globally. Changes to skill files in the repo are live on the next
@@ -28,7 +28,7 @@ session — no reinstall needed.
 
 | Step | What happens | Tools |
 |------|-------------|-------|
-| Orient | `cf context` + `cf status` (MANDATORY) | Bash |
+| Orient | `af context` + `af status` (MANDATORY) | Bash |
 | Assess | Parallel agents needed? Almost always no. | Inline |
 | Plan | 2–4 line approach for non-trivial tasks | — |
 | Execute | Full tool access; load specialists inline as needed | Skill tool |
@@ -61,8 +61,8 @@ Inline loading keeps full session context — no context loss.
 
 | Step | What happens |
 |------|-------------|
-| Read handoff | Parse HANDOFF CONTEXT: task, cf context, cf status, work done, why escalating |
-| Read regions | `cat claudefiles/{coding,planning,research}/REGION.md` |
+| Read handoff | Parse HANDOFF CONTEXT: task, af context, af status, work done, why escalating |
+| Read regions | `cat agentfiles/{coding,planning,research}/REGION.md` |
 | Three questions | Design? Git strategy? Coordination? |
 | Load advisors | `Skill("design-advisor")` / `Skill("git-advisor")` / `Skill("coordination-advisor")` — only if non-obvious |
 | Confirm | Present plan to user. Wait for confirmation. |
@@ -120,7 +120,7 @@ Inline loading keeps full session context — no context loss.
 
 | Step | What happens | Tools |
 |------|-------------|-------|
-| Check versions | `cf versions` for installed versions | Reads lockfiles |
+| Check versions | `af versions` for installed versions | Reads lockfiles |
 | Fetch docs | context7 MCP → resolve library → fetch docs | `context7` |
 | Supplement | WebSearch / WebFetch if context7 doesn't have it | Web tools |
 | Output | Exact API, working example, source URL, version note | — |
@@ -138,7 +138,7 @@ Inline loading keeps full session context — no context loss.
 
 | Step | What happens | Tools |
 |------|-------------|-------|
-| Orient | cf context, README, CLAUDE.md | Bash, Read |
+| Orient | af context, README, CLAUDE.md | Bash, Read |
 | Map layers | Identify architecture layers and responsibilities | Grep, Glob |
 | Trace path | Follow a key execution path end-to-end | Read, Grep |
 | Identify abstractions | Core types, DI patterns, error handling | Grep |
@@ -164,14 +164,14 @@ tdd                              write failing test first
 
 ## 8. Agent Communication Bus
 
-`.claudefiles/` is shared state — written by CLI tools, read by any skill.
+`.agentfiles/` is shared state — written by CLI tools, read by any skill.
 
 | File | Written by | Read by | Content |
 |------|-----------|---------|---------|
-| `context.md` | `cf context` | executor, manager | Project fingerprint |
-| `repo-map.md` | `cf status` | executor, git-expert | Git topology |
-| `versions.md` | `cf versions` | docs-agent | Dependency versions |
-| `routes.md` | `cf routes` | api-architect | API surface map |
-| `notes.md` | `cf note` | any skill | Free-form findings |
+| `context.md` | `af context` | executor, manager | Project fingerprint |
+| `repo-map.md` | `af status` | executor, git-expert | Git topology |
+| `versions.md` | `af versions` | docs-agent | Dependency versions |
+| `routes.md` | `af routes` | api-architect | API surface map |
+| `notes.md` | `af note` | any skill | Free-form findings |
 
-Bootstrap all: `cf init` / Read all: `cf read` / Single: `cf read notes`
+Bootstrap all: `af init` / Read all: `af read` / Single: `af read notes`

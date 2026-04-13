@@ -1,0 +1,26 @@
+{
+  "tools": [
+    {"name": "context",  "type": "internal", "package": "af", "description": "Fingerprint the current project — language, stack, git state", "usage": "af context [--write]"},
+    {"name": "status",   "type": "internal", "package": "af", "description": "Full repo branch/worktree topology", "usage": "af status [--write]"},
+    {"name": "versions", "type": "internal", "package": "af", "description": "Dependency versions from lockfiles", "usage": "af versions [--write]"},
+    {"name": "routes",   "type": "internal", "package": "af", "description": "Scan codebase for API route definitions", "usage": "af routes [--write]"},
+    {"name": "note",     "type": "internal", "package": "af", "description": "Shared scratchpad for cross-agent communication", "usage": "af note <message> [--agent <name>] [--read] [--clear]"},
+    {"name": "read",     "type": "internal", "package": "af", "description": "Dump .agentfiles/ bus state", "usage": "af read [context|versions|routes|repo-map|notes]"},
+    {"name": "init",     "type": "internal", "package": "af", "description": "Bootstrap .agentfiles/ in current project", "usage": "af init [--dry-run]"},
+    {"name": "worktree", "type": "internal", "package": "af", "description": "Create git worktree and open Claude Code in new terminal", "usage": "af worktree <branch> [base]"},
+    {"name": "agents",   "type": "internal", "package": "af", "description": "Inventory of skills grouped by category, plugins, MCP servers, and CLI tool status", "usage": "af agents [--tree] [--global] [--project] [--available] [--mcp]"},
+    {"name": "check",    "type": "internal", "package": "af", "description": "Verify all leaf skills have entries in their category REGION.md", "usage": "af check [--verbose]"},
+    {"name": "log",      "type": "internal", "package": "af", "description": "View skill invocation history logged by the PostToolUse hook", "usage": "af log [--skill <name>] [--stats] [--tail N]"},
+    {"name": "index",    "type": "internal", "package": "af", "description": "Build a structural file tree for a directory and register it as a searchable data source", "usage": "af index <path> [--name <name>] [--files] [--depth N] [--no-qmd] [--list] [--remove <name>]"},
+    {"name": "search",   "type": "internal", "package": "af", "description": "Search indexed data sources via qmd (BM25, vector, or hybrid)", "usage": "af search [--source <name>] [--mode query|search|vsearch] [--tree] [--list] <query>"},
+    {"name": "tree",     "type": "internal", "package": "af", "description": "Show folder structure as an indented tree", "usage": "af tree [path] [--depth N] [--json] [--write]"},
+    {"name": "install",  "type": "internal", "package": "af", "description": "Install agentfiles skills — delegates to install.sh", "usage": "af install [--global] [--local] [--skill <name>] [--category <name>] [--from github:owner/repo] [--dry-run] [--remove]"},
+    {"name": "setup",    "type": "internal", "package": "af", "description": "Check project skill dependencies and tool requirements", "usage": "af setup [--write]"},
+    {"name": "tools",    "type": "internal", "package": "af", "description": "List all af subcommands and external CLI dependencies", "usage": "af tools [--json]"},
+    {"name": "qmd",      "type": "external", "manager": "bun", "package": "@tobilu/qmd", "description": "Local markdown search — BM25 + vector + LLM reranking, fully local", "usage": "qmd query <query> [-c <collection>] [-n <num>]"},
+    {"name": "pyright",  "type": "external", "manager": "bun", "package": "pyright", "description": "Python type checker and language server", "usage": "pyright [path]"},
+    {"name": "typescript-language-server", "type": "external", "manager": "bun", "install": "bun install -g typescript typescript-language-server", "description": "TypeScript/JavaScript language server", "usage": "typescript-language-server --stdio"},
+    {"name": "rust-analyzer", "type": "external", "manager": "rustup", "install": "rustup component add rust-analyzer", "description": "Rust language server", "usage": "rust-analyzer"},
+    {"name": "tinymist", "type": "external", "manager": "cargo", "install": "cargo install tinymist", "description": "Typst language server", "usage": "tinymist"}
+  ]
+}

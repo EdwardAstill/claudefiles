@@ -31,10 +31,10 @@ Commands can invoke one another, creating composable pipelines. Coverage spans A
 
 ---
 
-## What claudefiles Could Learn
+## What agentfiles Could Learn
 
 | Idea | How to Apply |
 |------|-------------|
-| **Two-tier UI metaphor** | Consider surfacing the orchestrator/specialist split as a named concept in docs and `cf agents` output |
-| **Namespace prefixes in output** | `cf agents --tree` could show `/orchestration:executor` vs `/coding:python-expert` style namespacing |
+| **Two-tier UI metaphor** | Consider surfacing the orchestrator/specialist split as a named concept in docs and `af agents` output |
+| **Namespace prefixes in output** | `af agents --tree` could show `/orchestration:executor` vs `/coding:python-expert` style namespacing |
 | **Composition documentation** | Document which skills call which (a "who-calls-who" graph) — currently implicit in skill descriptions only |

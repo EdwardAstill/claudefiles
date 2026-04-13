@@ -33,12 +33,12 @@ A focused educational repo demonstrating Claude Code's complete hooks lifecycle.
 
 ---
 
-## What claudefiles Could Learn
+## What agentfiles Could Learn
 
 | Idea | How to Apply | Status |
 |------|-------------|--------|
 | **Add a hooks layer** | `PreToolUse` safety gate blocking dangerous Bash commands; `PostToolUse` skill logger. Install via `hooks/install-hooks.sh`. | **done** — `hooks/safety-gate.py`, `hooks/skill-logger.py` |
 | **Security gates** | `PreToolUse` hook blocks `rm -rf`, `git push --force`, `DROP TABLE/DATABASE`, fork bomb, `dd if=`, `mkfs`. | **done** — `hooks/safety-gate.py` |
-| **JSON audit log** | `PostToolUse` hook appends JSONL to `~/.claude/logs/claudefiles.jsonl` on every SKILL.md read; `cf log` views it. | **done** — `hooks/skill-logger.py` + `cf log` |
-| **`SessionStart` hook replaces manual orientation** | A `SessionStart` hook that runs `cf context` and `cf status` automatically would replace the manual "executor orients at start" step | open |
+| **JSON audit log** | `PostToolUse` hook appends JSONL to `~/.claude/logs/agentfiles.jsonl` on every SKILL.md read; `af log` views it. | **done** — `hooks/skill-logger.py` + `af log` |
+| **`SessionStart` hook replaces manual orientation** | A `SessionStart` hook that runs `af context` and `af status` automatically would replace the manual "executor orients at start" step | open |
 | **UV single-file scripts in `scripts/`** | Skills with helper scripts could ship as UV single-file scripts — zero setup, portable, inline dependencies | open |

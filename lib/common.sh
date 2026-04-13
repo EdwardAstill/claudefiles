@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# common.sh — shared utilities for claudefiles bin scripts
+# common.sh — shared utilities for agentfiles bin scripts
 #
 # Source this from any bin script:
 #   CF_LIB="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)/../lib"
@@ -21,9 +21,9 @@ cf_require_git() {
     fi
 }
 
-# Path to the .claudefiles bus directory (does not create it)
+# Path to the .agentfiles bus directory (does not create it)
 cf_bus() {
-    echo "$(cf_git_root)/.claudefiles"
+    echo "$(cf_git_root)/.agentfiles"
 }
 
 # Create the bus directory if it doesn't exist, return its path
@@ -39,13 +39,13 @@ cf_bus_exists() {
     [[ -d "$(cf_bus)" ]]
 }
 
-# Append .claudefiles/ to the project's .gitignore if not already present
+# Append .agentfiles/ to the project's .gitignore if not already present
 cf_gitignore_bus() {
     local git_root
     git_root="$(cf_git_root)"
     local ignore="$git_root/.gitignore"
-    if ! grep -qxF '.claudefiles/' "$ignore" 2>/dev/null; then
-        echo '.claudefiles/' >> "$ignore"
-        echo "  [gitignore] added .claudefiles/ to $ignore"
+    if ! grep -qxF '.agentfiles/' "$ignore" 2>/dev/null; then
+        echo '.agentfiles/' >> "$ignore"
+        echo "  [gitignore] added .agentfiles/ to $ignore"
     fi
 }

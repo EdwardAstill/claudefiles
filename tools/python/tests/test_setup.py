@@ -1,5 +1,5 @@
 from typer.testing import CliRunner
-from cf.main import app
+from af.main import app
 
 runner = CliRunner()
 
@@ -29,7 +29,7 @@ def test_setup_write_creates_deps(git_repo, monkeypatch):
     (skills_dir / "git-expert" / "SKILL.md").write_text("---\nname: git-expert\n---")
     monkeypatch.chdir(git_repo)
     runner.invoke(app, ["setup", "--write"])
-    assert (git_repo / ".claudefiles" / "deps.md").exists()
+    assert (git_repo / ".agentfiles" / "deps.md").exists()
 
 
 def test_setup_write_deps_content(git_repo, monkeypatch):
@@ -39,7 +39,7 @@ def test_setup_write_deps_content(git_repo, monkeypatch):
     (skills_dir / "git-expert" / "SKILL.md").write_text("---\nname: git-expert\n---")
     monkeypatch.chdir(git_repo)
     runner.invoke(app, ["setup", "--write"])
-    content = (git_repo / ".claudefiles" / "deps.md").read_text()
+    content = (git_repo / ".agentfiles" / "deps.md").read_text()
     assert "git-expert" in content
 
 

@@ -1,6 +1,6 @@
 # Install Reference
 
-## Two Ways to Use claudefiles
+## Two Ways to Use agentfiles
 
 ### Mode A — Install everything globally
 
@@ -8,7 +8,7 @@ All skills available in every Claude Code session, on every project. No per-proj
 
 ```bash
 # New machine (clone + full install in one step):
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 
 # Existing clone:
 ./install.sh --global
@@ -16,7 +16,7 @@ curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/boots
 
 What this installs:
 - All 39 skills → `~/.claude/skills/`
-- `cf` CLI → available on PATH via uv
+- `af` CLI → available on PATH via uv
 - Hook scripts → `~/.claude/skills/hooks/`
 - Hooks wired into `~/.claude/settings.json` (safety gate + skill logger)
 
@@ -30,7 +30,7 @@ locally to `.claude/skills/`. Projects get only what they actually need.
 
 ```bash
 # New machine:
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash -- --skill skill-manager
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash -- --skill skill-manager
 
 # Existing clone:
 ./install.sh --global --skill skill-manager
@@ -43,12 +43,12 @@ you: set up this project
 ```
 
 skill-manager fingerprints the project, asks one question, proposes a skill set,
-and installs on confirmation. See [skill-manager](../../claudefiles/management/meta/skill-manager/SKILL.md)
+and installs on confirmation. See [skill-manager](../../agentfiles/management/meta/skill-manager/SKILL.md)
 for the full workflow.
 
 What this installs globally:
 - `skill-manager` → `~/.claude/skills/`
-- `cf` CLI → available on PATH via uv
+- `af` CLI → available on PATH via uv
 - Hook scripts → `~/.claude/skills/hooks/`
 - Hooks wired into `~/.claude/settings.json`
 
@@ -71,11 +71,11 @@ to keep track of which skills are actually relevant per project.
 ## Updating
 
 Re-run the same command. `install.sh` is idempotent — symlinks that exist are skipped,
-new ones are added, the cf CLI is reinstalled with `--force`.
+new ones are added, the af CLI is reinstalled with `--force`.
 
 ```bash
 # If installed from GitHub via bootstrap:
-bash ~/.local/share/claudefiles-src/bootstrap.sh
+bash ~/.local/share/agentfiles-src/bootstrap.sh
 
 # If working from a local clone:
 git pull && ./install.sh --global
@@ -85,14 +85,14 @@ git pull && ./install.sh --global
 
 ## install.sh reference
 
-**Single source of truth for all install logic.** `bootstrap.sh` and `cf install`
+**Single source of truth for all install logic.** `bootstrap.sh` and `af install`
 both delegate to this script.
 
 ### Scope flags
 
 | Flag | Installs to |
 |------|-------------|
-| `--global` (or `--user`) | `~/.claude/skills/` + hooks + cf CLI |
+| `--global` (or `--user`) | `~/.claude/skills/` + hooks + af CLI |
 | `--local [path]` (or `--project`) | `<project>/.claude/skills/` |
 
 ### Granularity flags
@@ -108,7 +108,7 @@ both delegate to this script.
 | Flag | Source |
 |------|--------|
 | (none) | Local repo (where install.sh lives) |
-| `--from github:owner/repo` | Clones to `~/.local/share/claudefiles-src/`, installs from there |
+| `--from github:owner/repo` | Clones to `~/.local/share/agentfiles-src/`, installs from there |
 
 ### Other flags
 
@@ -134,14 +134,14 @@ both delegate to this script.
 ## bootstrap.sh
 
 Thin shim for new-machine setup from GitHub. Clones (or pulls) the repo to
-`~/.local/share/claudefiles-src/`, then hands off to `install.sh --global`.
+`~/.local/share/agentfiles-src/`, then hands off to `install.sh --global`.
 
 ```bash
 # Full install:
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 
 # skill-manager only (Mode B):
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/bootstrap.sh | bash -s -- --skill skill-manager
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash -s -- --skill skill-manager
 ```
 
 ---
@@ -151,7 +151,7 @@ curl -fsSL https://raw.githubusercontent.com/EdwardAstill/claudefiles/main/boots
 **Symlinks, not copies.** Changes to skill files are live on the next Claude Code
 session — no re-install needed after editing a SKILL.md.
 
-**One installer.** All install logic lives in `install.sh`. `cf install` and
+**One installer.** All install logic lives in `install.sh`. `af install` and
 `bootstrap.sh` both delegate to it.
 
 **Individual skill symlinks.** Each skill gets its own symlink rather than one

@@ -1,7 +1,7 @@
 # Skill Tree
 
 ```
-claudefiles/
+agentfiles/
 ├── management/
 │   ├── orchestration/
 │   │   ├── executor              ← default entry point for every task
@@ -12,7 +12,7 @@ claudefiles/
 │   │   ├── git-advisor
 │   │   └── coordination-advisor
 │   └── meta/
-│       ├── using-claudefiles     ← session-start skill
+│       ├── using-agentfiles     ← session-start skill
 │       ├── skill-manager
 │       ├── skills
 │       └── writing-skills
@@ -66,7 +66,7 @@ claudefiles/
 user message
   │
   ▼
-using-claudefiles (session start)
+using-agentfiles (session start)
   │
   ▼
 executor (every new task)

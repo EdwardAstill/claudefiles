@@ -1,0 +1,10 @@
+{
+  "name": "agentfiles",
+  "description": "Agent-agnostic skill suite and CLI toolset for Claude and Gemini",
+  "version": "1.0.0",
+  "author": {
+    "name": "Edward Astill"
+  },
+  "repository": "https://github.com/EdwardAstill/agentfiles",
+  "license": "MIT"
+}

@@ -8,9 +8,9 @@ chmod 600, never committed to any repo.
 ## Storing keys
 
 ```bash
-cf secrets set ANNAS_API_KEY <key>
-cf secrets set GITHUB_TOKEN ghp_xxx
-cf secrets set OPENAI_API_KEY sk-xxx
+af secrets set ANNAS_API_KEY <key>
+af secrets set GITHUB_TOKEN ghp_xxx
+af secrets set OPENAI_API_KEY sk-xxx
 ```
 
 Re-running `set` overwrites the existing value.
@@ -21,18 +21,18 @@ Re-running `set` overwrites the existing value.
 
 **Inline — single command:**
 ```bash
-ANNAS_API_KEY=$(cf secrets get ANNAS_API_KEY) anna download <md5>
+ANNAS_API_KEY=$(af secrets get ANNAS_API_KEY) anna download <md5>
 ```
 
 **Inject all secrets then run:**
 ```bash
-cf secrets exec -- anna download <md5>
-cf secrets exec -- some-tool --flag value
+af secrets exec -- anna download <md5>
+af secrets exec -- some-tool --flag value
 ```
 
 **Export everything for the session:**
 ```bash
-eval $(cf secrets env)
+eval $(af secrets env)
 anna download <md5>     # ANNAS_API_KEY already in env
 ```
 
@@ -41,12 +41,12 @@ anna download <md5>     # ANNAS_API_KEY already in env
 ## All commands
 
 ```bash
-cf secrets set KEY value     # store or update
-cf secrets get KEY           # print value (raw, exits 1 if not found)
-cf secrets list              # list key names only — never prints values
-cf secrets remove KEY        # delete
-cf secrets env               # print all as `export KEY=value` lines
-cf secrets exec -- CMD ARGS  # run CMD with all secrets injected as env vars
+af secrets set KEY value     # store or update
+af secrets get KEY           # print value (raw, exits 1 if not found)
+af secrets list              # list key names only — never prints values
+af secrets remove KEY        # delete
+af secrets env               # print all as `export KEY=value` lines
+af secrets exec -- CMD ARGS  # run CMD with all secrets injected as env vars
 ```
 
 ---
@@ -75,7 +75,7 @@ GITHUB_TOKEN=ghp_xxx
 | `ANNAS_API_KEY` | `anna download`, `anna get`, `anna batch` |
 
 Add more as needed. Skills that need a key should document it in their SKILL.md
-and read it via `cf secrets get KEY` or `cf secrets exec`.
+and read it via `af secrets get KEY` or `af secrets exec`.
 
 ---
 

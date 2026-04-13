@@ -1,13 +1,13 @@
 # Logging Reference
 
-Three files in `~/.claude/logs/` form the logging system for the claudefiles skill suite.
+Three files in `~/.claude/logs/` form the logging system for the agentfiles skill suite.
 Together they support a monthly review-and-improve cycle.
 
 ---
 
 ## Files
 
-### `claudefiles.jsonl` — Automated invocation log
+### `agentfiles.jsonl` — Automated invocation log
 
 Written by `hooks/skill-logger.py` (PostToolUse hook) whenever a `SKILL.md` is read.
 One JSON line per invocation:
@@ -30,9 +30,9 @@ One JSON line per invocation:
 | `parent_skill` | Last skill active before this one (proxy for caller) |
 | `escalated` | `true` if executor handed off to manager in this session |
 
-View with `cf log`. Key signals to watch:
-- **High escalation rate** (`cf log --escalations`) → executor routing is broken
-- **Skills invoked <2× per month** (`cf log --stats`) → candidates for deletion
+View with `af log`. Key signals to watch:
+- **High escalation rate** (`af log --escalations`) → executor routing is broken
+- **Skills invoked <2× per month** (`af log --stats`) → candidates for deletion
 - **`parent_skill` always null** for a skill → it may never be called by the router
 
 Session state files are kept in `~/.claude/logs/.sessions/` and cleaned up after 24 hours.
@@ -66,8 +66,8 @@ Sections: Skills · Routing/Executor · Tooling/CLI · Docs · Unsorted
 
 **Monthly (10–15 min):**
 
-1. Run `cf log --stats` — spot skills invoked fewer than 2× that month (delete or merge?)
-2. Run `cf log --escalations` — more than 2–3? Executor routing needs tightening
+1. Run `af log --stats` — spot skills invoked fewer than 2× that month (delete or merge?)
+2. Run `af log --escalations` — more than 2–3? Executor routing needs tightening
 3. Read `observations.md` — move actionable items to `backlog.md`
 4. Ask Claude to work through `backlog.md` items
 
@@ -81,12 +81,12 @@ Sections: Skills · Routing/Executor · Tooling/CLI · Docs · Unsorted
 
 ---
 
-## `cf log` Reference
+## `af log` Reference
 
 ```bash
-cf log                    # last 20 invocations
-cf log --tail 50          # last 50 entries
-cf log --skill tdd        # filter to one skill
-cf log --stats            # frequency table + escalation count
-cf log --escalations      # only sessions where executor → manager
+af log                    # last 20 invocations
+af log --tail 50          # last 50 entries
+af log --skill tdd        # filter to one skill
+af log --stats            # frequency table + escalation count
+af log --escalations      # only sessions where executor → manager
 ```
