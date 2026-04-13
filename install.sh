@@ -235,6 +235,11 @@ install_all() {
 
     for target in "${TARGETS[@]}"; do
         echo "Target: $target"
+        # If the target is a dangling symlink, remove it so mkdir -p can succeed
+        if [[ -L "$target" && ! -d "$target" ]]; then
+            rm "$target"
+        fi
+        mkdir -p "$target"
         if [[ -z "$SKILL_LINK_NAME" ]]; then
             while IFS= read -r skill_dir; do
                 name="$(basename "$skill_dir")"

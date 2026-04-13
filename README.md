@@ -3,9 +3,39 @@
 Personal Claude Code skill suite and CLI toolset. 40 skills route tasks to the right
 specialist. The `af` CLI provides context gathering, git workflows, and skill management.
 
+---
+
+## Install
+
+### New machine (recommended)
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 ```
+
+This clones to `~/.local/share/agentfiles-src/`, installs the `af` CLI via `uv tool`,
+then runs `install.sh --global` for skills. After this, the `af` command is available.
+
+### From a local clone
+
+```bash
+git clone https://github.com/EdwardAstill/agentfiles ~/.local/share/agentfiles-src
+cd ~/.local/share/agentfiles-src
+uv tool install --force -e tools/python/    # install af CLI
+./install.sh --global                        # install skills
+```
+
+### Project-level install
+
+```bash
+./install.sh --local /path/to/project
+```
+
+Symlinks skills into `<project>/.claude/skills/` and `<project>/.gemini/skills/`, and adds `.agentfiles/` to `.gitignore`.
+
+### Update
+
+Re-run `bootstrap.sh` — it pulls the latest and re-installs.
 
 ---
 
@@ -173,40 +203,6 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | `codebase-explainer` | "How does this codebase work?" |
 | `note-taker` | Create notes or interactive lessons |
 | `test-taker` | Answer questions from reference material |
-
----
-
-## Install
-
-### New machine
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
-```
-
-Clones to `~/.local/share/agentfiles-src/`, installs the `af` CLI via `uv tool`,
-then runs `install.sh --global` for skills.
-
-### From a local clone
-
-```bash
-git clone https://github.com/EdwardAstill/agentfiles ~/.local/share/agentfiles-src
-cd ~/.local/share/agentfiles-src
-uv tool install --force -e tools/python/    # install af CLI
-./install.sh --global                        # install skills
-```
-
-### Project-level install
-
-```bash
-./install.sh --local /path/to/project
-```
-
-Symlinks skills into `<project>/.claude/skills/` and `<project>/.gemini/skills/`, and adds `.agentfiles/` to `.gitignore`.
-
-### Update
-
-Re-run `bootstrap.sh` — it pulls the latest and re-installs.
 
 ---
 
