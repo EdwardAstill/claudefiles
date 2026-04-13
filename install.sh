@@ -215,7 +215,7 @@ wire_gemini_hooks() {
         return
     fi
     
-    bash "$SCRIPT_DIR/hooks/install-gemini-hooks.sh" ${DRY_RUN:+--dry-run} --target "$target_skills"
+    bash "$SCRIPT_DIR/hooks/install-gemini-hooks.sh" --target "$target_skills"
 }
 
 # ── Install ───────────────────────────────────────────────────────────────────
@@ -257,8 +257,13 @@ install_all() {
     done
 
     if [[ "$MODE" == "user" ]]; then
-        bash "$SCRIPT_DIR/hooks/install-hooks.sh" ${DRY_RUN:+--dry-run}
-        wire_gemini_hooks
+        if "$DRY_RUN"; then
+            bash "$SCRIPT_DIR/hooks/install-hooks.sh" --dry-run
+            wire_gemini_hooks
+        else
+            bash "$SCRIPT_DIR/hooks/install-hooks.sh"
+            wire_gemini_hooks
+        fi
     fi
 
     # Gitignore
