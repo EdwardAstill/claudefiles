@@ -46,6 +46,39 @@ HOOKS_CONFIG=$(cat <<'EOF'
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/hooks/notify.py",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/hooks/notify.py",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/hooks/notify.py",
+            "async": true
+          }
+        ]
+      }
     ]
   }
 }

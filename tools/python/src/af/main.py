@@ -25,6 +25,7 @@ _SUBCOMMANDS = [
     ("screenshot", "screenshot"),
     ("browser", "browser"),
     ("test-skill", "test_skill"),
+    ("hub", "hub"),
 ]
 
 @app.callback(invoke_without_command=True)
