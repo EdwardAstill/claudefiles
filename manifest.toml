@@ -51,6 +51,10 @@ category = "coding/quality"
 tools = ["Read", "Write", "Bash"]
 category = "coding/quality"
 
+[skills.skill-tester]
+tools = ["Read", "Write", "Agent", "Bash", "Glob", "Grep", "WebSearch"]
+category = "coding/quality"
+
 [skills.regex-expert]
 tools = ["Bash", "Read"]
 cli = ["sd", "rg"]
