@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "run_id": "evolving-monolith-without_skill",
+  "expectations": [
+    {"text": "has_constraint_analysis", "passed": false, "evidence": "Jumps straight to 'Short Answer: Not yet.' Identifies the two problems (perf + contention) but doesn't systematically analyze constraints, scale targets, or optimization priorities before recommending."},
+    {"text": "has_architectural_style_recommendation", "passed": true, "evidence": "Clear recommendation against microservices, with modular monolith as alternative. Phased action plan with selective extraction."},
+    {"text": "has_alternatives_considered", "passed": true, "evidence": "Strong comparison table (monolith vs microservices across 7 dimensions). Discusses strangler fig, selective extraction candidates."},
+    {"text": "has_layer_structure", "passed": true, "evidence": "Modular monolith directory structure with service interfaces. Communication rules (signals, service imports)."},
+    {"text": "has_cross_cutting_concerns", "passed": false, "evidence": "Mentions caching and feature flags in passing within the action items, but no structured discussion of auth architecture, error handling strategy, or config management."},
+    {"text": "has_actionable_next_steps", "passed": true, "evidence": "Detailed phased action plan table with timelines and expected impact. 'When to Revisit' criteria. Very actionable."}
+  ]
+}

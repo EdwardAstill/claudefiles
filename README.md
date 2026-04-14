@@ -13,22 +13,28 @@ specialist. The `af` CLI provides context gathering, git workflows, and skill ma
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 ```
 
-This clones to `~/.local/share/agentfiles-src/`, installs the `af` CLI via `uv tool`,
-then runs `install.sh --global` for skills. After this, the `af` command is available.
+This clones to `~/.local/share/agentfiles-src/`, bootstraps the `af` CLI and the
+`agentfiles-manager` skill. After this, the `af` command is available.
+
+To install all skills and CLI tools globally:
+
+```bash
+af install
+```
 
 ### From a local clone
 
 ```bash
 git clone https://github.com/EdwardAstill/agentfiles ~/.local/share/agentfiles-src
 cd ~/.local/share/agentfiles-src
-uv tool install --force -e tools/python/    # install af CLI
-./install.sh --global                        # install skills
+./install.sh                                 # bootstrap: af CLI + agentfiles-manager
+af install                                   # install all skills + CLI tools
 ```
 
 ### Project-level install
 
 ```bash
-./install.sh --local /path/to/project
+af install --local /path/to/project
 ```
 
 Symlinks skills into `<project>/.claude/skills/` and `<project>/.gemini/skills/`, and adds `.agentfiles/` to `.gitignore`.
@@ -66,8 +72,8 @@ agentfiles/           skill hierarchy (4 categories)
 
 tools/python/          af CLI — Python/Typer package
 lib/                   shared shell utilities
-install.sh             skill installer (single source of truth)
-bootstrap.sh           new machine entry point
+install.sh             bootstrap: af CLI + agentfiles-manager
+bootstrap.sh           new machine entry point (clone + bootstrap)
 manifest.toml          per-skill tool requirements
 ```
 
@@ -126,12 +132,12 @@ af setup               # check tool dependencies for installed skills
 ### Install
 
 ```bash
-af install --global                      # full install (delegates to install.sh)
-af install --global --skill git-expert   # one skill
-af install --global --category research  # one category
+af install                               # full global install (default)
+af install --skill git-expert            # one skill globally
+af install --category research           # one category globally
 af install --local /path/to/project      # project-level install
-af install --global --remove             # uninstall
-af install --global --dry-run            # preview
+af install --remove                      # uninstall globally
+af install --dry-run                     # preview
 ```
 
 ### Git
@@ -142,7 +148,7 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 
 ---
 
-## Skills (39)
+## Skills (48)
 
 ### Management (11)
 
@@ -155,9 +161,10 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | `git-advisor` | Planning: what git strategy? |
 | `coordination-advisor` | Planning: parallel vs sequential agents? |
 | `using-agentfiles` | Session start (automatic) |
-| `skill-manager` | View, install, or remove skills |
+| `agentfiles-manager` | View, install, or remove skills |
 | `skills` | Display skill catalog |
 | `writing-skills` | Create or edit a SKILL.md |
+| `documentation-maintainer` | Sync docs after skill/CLI changes |
 
 ### Planning (2)
 
@@ -166,7 +173,7 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | `brainstorming` | Requirements unclear — idea to spec |
 | `writing-plans` | Spec to implementation plan |
 
-### Coding (21)
+### Coding (30)
 
 | Sub-category | Skill | Use when |
 |-------------|-------|----------|
@@ -174,19 +181,26 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | | `typescript-expert` | ts-language-server LSP, bun, biome |
 | | `rust-expert` | rust-analyzer LSP, cargo, clippy |
 | | `typst-expert` | tinymist LSP, typst compile |
+| | `ui-expert` | React, Tailwind, shadcn/ui |
+| | `tui-expert` | Terminal UIs (Textual, Ratatui, Ink) |
 | **Quality** | `tdd` | Writing new functionality — test first |
 | | `systematic-debugging` | Bug or unexpected behavior |
 | | `verification-before-completion` | Before marking any task done |
 | | `code-review` | Requesting or receiving review |
 | | `simplify` | Recently changed code is complex |
 | | `regex-expert` | Mass search and replace, refactoring |
+| | `skill-tester` | Benchmark skills with rubric grading |
 | | `security-review` | OWASP, CVEs, injection, auth |
 | | `performance-profiling` | Correct but slow |
 | | `refactoring-patterns` | Large-scale restructuring |
 | | `dependency-management` | Version bumps, CVE scanning |
 | | `observability` | Logging, tracing, metrics |
 | | `accessibility` | WCAG 2.1 AA, ARIA, a11y |
+| | `documentation` | READMEs, API docs, guides, changelogs |
+| **Architecture** | `system-architecture-expert` | Service boundaries, scaling, layering |
+| | `dsa-expert` | Data structures, algorithms, complexity |
 | **Data** | `database-expert` | Schema, migrations, queries |
+| | `file-converter` | PDF/image to markdown via cnv |
 | **Infrastructure** | `infrastructure-expert` | Docker, K8s, Terraform |
 | **Version control** | `git-expert` | Git operations beyond basics |
 | | `github-expert` | PRs, issues, Actions |
@@ -222,13 +236,51 @@ Run `af init` to bootstrap all files at once.
 
 ---
 
+## Logging and Skill Improvement
+
+Every session logs skill usage and tool calls automatically via hooks. Over time
+these logs reveal which skills are underused, which cause context churn, and what
+keeps breaking and getting fixed.
+
+### Review the logs
+
+```bash
+af log review --dry-run   # preview what it found (no changes)
+af log review             # save summary to observations.md, clear logs
+```
+
+This surfaces: low-usage skills (delete or merge?), escalation rate (routing
+broken?), skills loaded 3+ times in one session (context churn), and recovery
+patterns (recurring failures).
+
+### Act on the findings
+
+Tell Claude to improve skills based on what the review found:
+
+> "Review the observations in ~/.claude/logs/observations.md and improve the
+> skills that are causing problems"
+
+Or be specific:
+
+> "The systematic-debugging skill is getting loaded 3 times per session — figure
+> out why and fix it"
+
+> "dsa-expert has only been used once — should we merge it into another skill?"
+
+### Full reference
+
+See [docs/reference/logging.md](docs/reference/logging.md) for JSON schemas,
+thresholds, manual review steps, and all `af log` subcommands.
+
+---
+
 ## Adding a Skill
 
 1. Create `agentfiles/<category>/[sub/]<skill-name>/SKILL.md` with frontmatter
 2. Add entry to `manifest.toml` under `[skills.<skill-name>]`
 3. Add entry to the category's `REGION.md`
 4. Run `af check` to verify
-5. Run `./install.sh --global` to pick up the new skill
+5. Run `af install` to pick up the new skill
 
 ```yaml
 ---
@@ -252,4 +304,5 @@ description: >
 | [docs/reference/orchestration.md](docs/reference/orchestration.md) | Routing architecture deep-dive |
 | [docs/reference/skills.md](docs/reference/skills.md) | Complete skill catalog with invocation names |
 | [docs/reference/workflows.md](docs/reference/workflows.md) | End-to-end workflow traces |
+| [docs/reference/logging.md](docs/reference/logging.md) | Logging system, review cycle, `af log` reference |
 | [docs/reference/agent-orchestration-patterns.md](docs/reference/agent-orchestration-patterns.md) | Research: agent routing, scaling, failure modes |

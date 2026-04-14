@@ -26,7 +26,13 @@ or "you already know the codebase" is not valid — context reveals assumptions 
 
 ## Step 1: Orient and assess
 
-Run af context and af status, then ask one question:
+Run af context and af status. Then check for in-progress work artifacts:
+
+- **`docs/specs/*-design.md`** — an existing spec means brainstorming already happened. Don't re-brainstorm; ask if the user wants to resume from the spec.
+- **`docs/plans/*.md`** — an existing plan means planning already happened. Offer to execute it (via subagent-driven-development or executing-plans).
+- **Feature branch with uncommitted work** — `af status` shows this. Ask if the user wants to continue where they left off.
+
+If none of these exist, this is a fresh task. Ask one question:
 
 > **Does this task need multiple agents working in parallel on separate domains?**
 

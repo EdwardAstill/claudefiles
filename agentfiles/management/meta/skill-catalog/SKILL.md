@@ -1,5 +1,5 @@
 ---
-name: skills
+name: skill-catalog
 description: >
   Use when the user wants to see all available agentfiles skills. Lists the full
   skill catalog grouped by category with invocation names and use cases.
@@ -17,9 +17,9 @@ Invoke any skill with `/agentfiles:<name>` or via the Skill tool.
 | `agentfiles:manager` | Genuinely parallel multi-agent work |
 | `agentfiles:subagent-driven-development` | Sequential plan execution with per-task review gates |
 | `agentfiles:using-agentfiles` | Session start (fires automatically) |
-| `agentfiles:skill-manager` | View, install, or remove skills |
+| `agentfiles:agentfiles-manager` | View, install, or remove skills |
 | `agentfiles:writing-skills` | Create or edit a skill |
-| `agentfiles:skills` | This catalog |
+| `agentfiles:skill-catalog` | This catalog |
 
 ### Planning advisors (loaded inline by manager)
 
@@ -72,5 +72,5 @@ Invoke any skill with `/agentfiles:<name>` or via the Skill tool.
 | `agentfiles:docs-agent` | Library docs, API reference, versioned examples |
 | `agentfiles:research-agent` | Trade-offs, risks, consensus across sources |
 | `agentfiles:codebase-explainer` | Unfamiliar codebase — execution paths, architecture |
-| `agentfiles:note-taker` | Writing structured notes or interactive lessons |
+| `agentfiles:note-taker` | Notes for humans (readrun interactive code) or LLMs (dense, structured reference) |
 | `agentfiles:test-taker` | Answering questions from reference material |

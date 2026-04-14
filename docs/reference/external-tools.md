@@ -20,6 +20,7 @@ This registry lists external CLI tools and services that `agentfiles` uses for i
 | Tool | Purpose | Install | Documentation |
 |------|---------|---------|---------------|
 | `mks` | Markdown indexing and search | `cargo install markstore` | [GitHub](https://github.com/EdwardAstill/markstore) |
+| `cnv` | PDF to AI markdown/RAG extraction | `cargo install --path ~/projects/convert2` | [GitHub](https://github.com/EdwardAstill/convert2) |
 | `Ollama` | Local LLM for vector embeddings | [Download](https://ollama.ai) | [Website](https://ollama.ai) |
 | `jq` | JSON processing | `bun install -g jq` | [Website](https://jqlang.github.io/jq/) |
 | `rg` | ripgrep — fast recursive search | `cargo install ripgrep` | [GitHub](https://github.com/BurntSushi/ripgrep) |

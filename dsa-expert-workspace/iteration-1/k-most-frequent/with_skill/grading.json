@@ -1,0 +1,12 @@
+{
+  "eval_id": 0,
+  "run_id": "k-most-frequent-with_skill",
+  "expectations": [
+    {"text": "has_constraint_summary", "passed": true, "evidence": "Clear 'Step 1: Constraint Summary' section identifying operations, frequency/size, hard constraints, and existing state"},
+    {"text": "has_tradeoff_table", "passed": true, "evidence": "Full comparison table with 3 options (HashMap+MinHeap, HashMap+Quickselect, HashMap+FrequencyBuckets) across 8 criteria"},
+    {"text": "has_complexity_analysis", "passed": true, "evidence": "Detailed complexity proof section explaining O(1) amortized insert with per-operation breakdown, O(k+F) query with worst-case discussion"},
+    {"text": "has_pseudocode", "passed": true, "evidence": "Clean pseudocode for FreqTracker structure with record_event and top_k functions"},
+    {"text": "has_edge_cases", "passed": true, "evidence": "9 edge cases: first occurrence, k>distinct, k=0, single event type, tie-breaking, integer overflow, sparse gaps, thread safety, approximate alternative"},
+    {"text": "has_language_handoff_notes", "passed": true, "evidence": "Dedicated Python, Rust, TypeScript sections with specific stdlib/crate/library recommendations"}
+  ]
+}

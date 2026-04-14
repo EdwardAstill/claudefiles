@@ -25,9 +25,9 @@ Skills for documentation lookup and research.
 - **Chains into:** (terminal)
 
 ### note-taker
-- **Purpose:** Create markdown notes, lessons, or interactive tutorials — plain or readrun-compatible with runnable code blocks
-- **Use when:** "Make notes on X", "create a lesson", "write a readrun page", "interactive tutorial for X"
-- **Produces:** `.md` note(s) + `.readrun/scripts/` files (if readrun mode), verified for broken references
+- **Purpose:** Create markdown notes in two modes: human-readable (with readrun interactive code) or LLM-optimized (dense, structured reference for AI/RAG consumption)
+- **Use when:** "Make notes on X", "create a lesson", "write a readrun page", "LLM notes on Y", "add reference docs for Z to the knowledge base"
+- **Produces:** Human mode: `.md` note(s) + `.readrun/scripts/` (if readrun). LLM mode: `.md` with YAML frontmatter, wikilinks, semantic headers.
 - **Chains into:** (terminal)
 
 ### codebase-explainer

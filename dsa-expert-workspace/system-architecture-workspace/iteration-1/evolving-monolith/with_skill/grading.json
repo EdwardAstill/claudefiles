@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "run_id": "evolving-monolith-with_skill",
+  "expectations": [
+    {"text": "has_constraint_analysis", "passed": true, "evidence": "Full Step 1 with 5 numbered assumptions, constraint summary table, and explicit optimization priorities (team autonomy, reliability, dev velocity)."},
+    {"text": "has_architectural_style_recommendation", "passed": true, "evidence": "3-phase recommendation: modular monolith first, selective extraction via strangler fig, then evaluate. Clear reasoning tied to the dual problems."},
+    {"text": "has_alternatives_considered", "passed": true, "evidence": "Table explaining why microservices are premature across 5 dimensions (perf, contention, ops cost, data consistency, risk). Discusses what to extract and what not to."},
+    {"text": "has_layer_structure", "passed": true, "evidence": "Backend layering diagram, communication patterns table, frontend considerations, data layer strategy with read replicas and Elasticsearch."},
+    {"text": "has_cross_cutting_concerns", "passed": true, "evidence": "Auth (Django middleware, session-based), error handling (standardized format, circuit breakers), caching architecture (4-layer with CDN/Redis/read replicas + specific TTL guidance), config/secrets (env vars, feature flags)."},
+    {"text": "has_actionable_next_steps", "passed": true, "evidence": "6 prioritized action items, 3 ADRs, 2 Mermaid diagrams (Phase 1 and Phase 2), and handoff notes to 4 specialist skills."}
+  ]
+}

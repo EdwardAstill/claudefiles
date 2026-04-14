@@ -1,67 +1,73 @@
 # Install Reference
 
-## Two Ways to Use agentfiles
+## Two-Step Install
 
-### Mode A — Install everything globally
+### Step 1 — Bootstrap (`install.sh`)
 
-All skills available in every Claude Code session, on every project. No per-project setup.
+The bootstrap is minimal. It installs two things:
+1. The `af` CLI (via `uv tool install`)
+2. The `agentfiles-manager` skill globally (symlinked into `~/.claude/skills/` and `~/.gemini/skills/`)
 
 ```bash
-# New machine (clone + full install in one step):
+# New machine (clone + bootstrap in one step):
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 
 # Existing clone:
-./install.sh --global
+./install.sh
 ```
 
-What this installs:
-- All 39 skills → `~/.claude/skills/`
-- `af` CLI → available on PATH via uv
-- Hook scripts → `~/.claude/skills/hooks/`
-- Hooks wired into `~/.claude/settings.json` (safety gate + skill logger)
+### Step 2 — Install skills (`af install`)
+
+After bootstrap, use `af install` for everything else.
+
+```bash
+# Install all skills + CLI tools globally:
+af install
+
+# Install skills into the current project:
+af install --local
+```
 
 ---
 
-### Mode B — skill-manager only globally, everything else per-project
+## Two Modes
 
-Install one skill globally. Then in each project, say "set up this project" and
-skill-manager asks what the project does, selects relevant skills, and installs them
+### Mode A — Install everything globally
+
+All skills available in every Claude Code session, on every project.
+
+```bash
+./install.sh && af install
+```
+
+What `af install` adds:
+- All skills → `~/.claude/skills/` and `~/.gemini/skills/`
+- Hook scripts wired into settings
+- All missing CLI tools from `manifest.toml`
+
+### Mode B — agentfiles-manager only, everything else per-project
+
+Bootstrap installs `agentfiles-manager` globally. Then in each project, say
+"set up this project" and the manager selects and installs the relevant skills
 locally to `.claude/skills/`. Projects get only what they actually need.
 
 ```bash
-# New machine:
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash -- --skill skill-manager
-
-# Existing clone:
-./install.sh --global --skill skill-manager
+./install.sh
+# That's it — agentfiles-manager is already installed globally.
+# Then inside any project:
+#   you: set up this project
 ```
-
-Then inside any project:
-
-```
-you: set up this project
-```
-
-skill-manager fingerprints the project, asks one question, proposes a skill set,
-and installs on confirmation. See [skill-manager](../../agentfiles/management/meta/skill-manager/SKILL.md)
-for the full workflow.
-
-What this installs globally:
-- `skill-manager` → `~/.claude/skills/`
-- `af` CLI → available on PATH via uv
-- Hook scripts → `~/.claude/skills/hooks/`
-- Hooks wired into `~/.claude/settings.json`
 
 ---
 
 ## Which mode should I use?
 
-| | Mode A (global all) | Mode B (skill-manager only) |
+| | Mode A (global all) | Mode B (manager only) |
 |---|---|---|
-| Setup effort | One command, done | One command + per-project `/setup` |
+| Setup effort | Two commands, done | Bootstrap + per-project `/setup` |
 | Skills available | Everywhere, always | Only what each project needs |
 | Project isolation | None | Each project has its own skill set |
-| Best for | Personal machines, solo dev | Teams, or if you care about keeping things lean |
+| Best for | Personal machines, solo dev | Teams, or keeping things lean |
 
 For a personal machine, **Mode A is simpler**. Mode B makes more sense if you want
 to keep track of which skills are actually relevant per project.
@@ -70,36 +76,35 @@ to keep track of which skills are actually relevant per project.
 
 ## Updating
 
-Re-run the same command. `install.sh` is idempotent — symlinks that exist are skipped,
-new ones are added, the af CLI is reinstalled with `--force`.
+Re-run the same commands. Both `install.sh` and `af install` are idempotent —
+existing symlinks are replaced, new ones are added.
 
 ```bash
 # If installed from GitHub via bootstrap:
 bash ~/.local/share/agentfiles-src/bootstrap.sh
 
 # If working from a local clone:
-git pull && ./install.sh --global
+git pull && ./install.sh && af install
 ```
 
 ---
 
-## install.sh reference
+## `af install` reference
 
-**Single source of truth for all install logic.** `bootstrap.sh` and `af install`
-both delegate to this script.
+The main installer. Handles skills, hooks, and CLI tools.
 
 ### Scope flags
 
 | Flag | Installs to |
 |------|-------------|
-| `--global` (or `--user`) | `~/.claude/skills/` + hooks + af CLI |
-| `--local [path]` (or `--project`) | `<project>/.claude/skills/` |
+| `--global` (default) | `~/.claude/skills/` + `~/.gemini/skills/` + hooks + CLI tools |
+| `--local [path]` (or `--project`) | `<project>/.claude/skills/` + `<project>/.gemini/skills/` |
 
 ### Granularity flags
 
 | Flag | What gets installed |
 |------|---------------------|
-| (none) | All skills as individual symlinks |
+| (none) | All skills |
 | `--category <name>` | One category (management, coding, planning, research) |
 | `--skill <name>` | One skill by its SKILL.md `name` field |
 
@@ -107,7 +112,7 @@ both delegate to this script.
 
 | Flag | Source |
 |------|--------|
-| (none) | Local repo (where install.sh lives) |
+| (none) | Auto-detected repo root |
 | `--from github:owner/repo` | Clones to `~/.local/share/agentfiles-src/`, installs from there |
 
 ### Other flags
@@ -121,38 +126,48 @@ both delegate to this script.
 ### Examples
 
 ```bash
-./install.sh --global                          # full global install
-./install.sh --global --skill skill-manager    # Mode B: skill-manager only
-./install.sh --global --category research      # one category globally
-./install.sh --local /path/to/project          # project-level install
-./install.sh --global --remove                 # uninstall
-./install.sh --global --dry-run                # preview
+af install                                  # full global install (default)
+af install --local                          # install all skills to current project
+af install --local --skill python-expert    # one skill to current project
+af install --local --category research      # one category to current project
+af install --global --remove                # uninstall globally
+af install --dry-run                        # preview
+af install --list-categories                # show categories
 ```
 
 ---
 
-## bootstrap.sh
+## `install.sh` reference
 
-Thin shim for new-machine setup from GitHub. Clones (or pulls) the repo to
-`~/.local/share/agentfiles-src/`, then hands off to `install.sh --global`.
+Minimal bootstrap script. Only installs `af` CLI + `agentfiles-manager` skill.
 
 ```bash
-# Full install:
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
+./install.sh              # bootstrap
+./install.sh --dry-run    # preview
+./install.sh --remove     # remove bootstrap
+```
 
-# skill-manager only (Mode B):
-curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash -s -- --skill skill-manager
+---
+
+## `bootstrap.sh`
+
+Thin shim for new-machine setup from GitHub. Clones (or pulls) the repo to
+`~/.local/share/agentfiles-src/`, then runs `install.sh`.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
 ```
 
 ---
 
 ## Design notes
 
-**Symlinks, not copies.** Changes to skill files are live on the next Claude Code
-session — no re-install needed after editing a SKILL.md.
+**Symlinks, not copies.** Changes to skill files are live on the next session —
+no re-install needed after editing a SKILL.md.
 
-**One installer.** All install logic lives in `install.sh`. `af install` and
-`bootstrap.sh` both delegate to it.
+**Two-step install.** `install.sh` is a minimal shell bootstrap (no Python needed
+beyond uv). `af install` is the full installer written in Python with proper
+argument parsing, manifest reading, and CLI tool installation.
 
-**Individual skill symlinks.** Each skill gets its own symlink rather than one
-directory symlink. This is what enables `/skill-name` slash commands in Claude Code.
+**Individual skill symlinks.** Each skill gets its own symlink. This enables
+`/skill-name` slash commands in Claude Code.

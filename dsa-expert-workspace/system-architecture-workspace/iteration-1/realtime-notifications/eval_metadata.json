@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "realtime-notifications",
+  "prompt": "I need to add real-time notifications to our app. Users should see updates when someone comments on their task, assigns them something, etc. Currently we have a REST API backend and React frontend. What's the right architecture for this?",
+  "assertions": [
+    {"name": "has_constraint_analysis", "description": "Analyzes the existing system constraints and notification requirements before recommending"},
+    {"name": "has_architectural_style_recommendation", "description": "Recommends a specific real-time approach (WebSocket, SSE, polling) with reasoning"},
+    {"name": "has_alternatives_considered", "description": "Compares at least 2 real-time delivery approaches with trade-offs"},
+    {"name": "has_layer_structure", "description": "Describes how the notification system integrates with existing REST API and React frontend"},
+    {"name": "has_cross_cutting_concerns", "description": "Addresses at least 2 of: auth for persistent connections, error/reconnection handling, scaling WebSocket/SSE connections"},
+    {"name": "has_actionable_next_steps", "description": "Provides concrete implementation steps or component breakdown"}
+  ]
+}

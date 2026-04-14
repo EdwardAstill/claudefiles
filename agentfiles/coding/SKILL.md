@@ -26,6 +26,8 @@ Routes to the right coding skill based on the task.
 | `github-expert` | GitHub — PRs, issues, browsing external repos |
 | `github-actions-expert` | GitHub Actions workflows — write, debug, fix permissions/cache/matrix |
 | `api-architect` | Designing or reviewing API contracts |
+| `system-architecture-expert` | Application structure, service boundaries, layer design, scaling strategy |
+| `dsa-expert` | Data structure/algorithm selection, complexity analysis, low-level design |
 | `python-expert` | Python implementation, type checking, toolchain |
 | `typescript-expert` | TypeScript/JS implementation, strict types |
 | `rust-expert` | Rust implementation, ownership, cargo |

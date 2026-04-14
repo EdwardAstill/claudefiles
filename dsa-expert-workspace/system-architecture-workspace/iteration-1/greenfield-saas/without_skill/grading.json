@@ -1,0 +1,12 @@
+{
+  "eval_id": 0,
+  "run_id": "greenfield-saas-without_skill",
+  "expectations": [
+    {"text": "has_constraint_analysis", "passed": false, "evidence": "Brief 3-line 'Context' section but no structured constraint analysis. Doesn't explicitly identify optimization priorities or trade-offs before recommending."},
+    {"text": "has_architectural_style_recommendation", "passed": true, "evidence": "Recommends Next.js monolith with clear 'Why a Monolith, Not Microservices' section tied to team size."},
+    {"text": "has_alternatives_considered", "passed": false, "evidence": "Mentions microservices briefly as what NOT to do, but doesn't compare alternative architectural styles (serverless, modular monolith patterns, etc.) with trade-offs."},
+    {"text": "has_layer_structure", "passed": true, "evidence": "Full project structure, data model, and frontend architecture described. Good detail on component organization."},
+    {"text": "has_cross_cutting_concerns", "passed": false, "evidence": "Auth mentioned as a tech choice (NextAuth/Clerk) but not as an architectural decision. No error handling strategy. Monitoring gets one bullet point. No config management discussion."},
+    {"text": "has_actionable_next_steps", "passed": true, "evidence": "Detailed 3-month timeline with week-by-week breakdown and work division strategy. Very actionable."}
+  ]
+}

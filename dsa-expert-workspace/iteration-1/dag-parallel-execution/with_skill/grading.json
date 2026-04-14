@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "run_id": "dag-parallel-execution-with_skill",
+  "expectations": [
+    {"text": "has_constraint_summary", "passed": true, "evidence": "Clear Step 1 identifying operations, DAG characteristics, hard constraints (must be DAG, minimize makespan), and unlimited vs bounded parallelism distinction"},
+    {"text": "has_tradeoff_table", "passed": true, "evidence": "Full comparison table: Topo Sort+CPM vs Heap-based List Scheduling vs BFS Level Scheduling across 7 criteria"},
+    {"text": "has_complexity_analysis", "passed": true, "evidence": "Detailed complexity proof: O(V+E) for topo+CPM, O(V log V + E) for full scheduling, with per-phase breakdown"},
+    {"text": "has_pseudocode", "passed": true, "evidence": "Extensive 4-phase pseudocode: build_graph, topological_sort, compute_critical_path_lengths, schedule_tasks"},
+    {"text": "has_edge_cases", "passed": true, "evidence": "11 edge cases: empty graph, single task, fully sequential, fully parallel, diamond deps, cycles, zero-duration, disconnected, fan-in/out, P=1, CPL ties"},
+    {"text": "has_language_handoff_notes", "passed": true, "evidence": "Dedicated Python (deque, heapq, graphlib.TopologicalSorter), Rust (BinaryHeap+Reverse, petgraph), TypeScript (external heap lib, Map) sections"}
+  ]
+}

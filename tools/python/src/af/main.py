@@ -52,7 +52,7 @@ _register()
 # Register install as a visible command (actual execution is intercepted in _run)
 @app.command()
 def install():
-    """Install agentfiles skills — delegates to install.sh."""
+    """Install agentfiles skills, hooks, and CLI tools."""
     pass  # Never reached; _run() intercepts first
 
 

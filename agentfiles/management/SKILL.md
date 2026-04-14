@@ -4,7 +4,7 @@ description: >
   Category dispatcher for orchestration and skill system tooling. Use when the
   task involves single-agent execution (executor), multi-agent coordination (manager),
   sequential plan execution with review gates (subagent-driven-development),
-  managing installed skills (skill-manager), or authoring a skill (writing-skills).
+  managing installed skills (agentfiles-manager), or authoring a skill (writing-skills).
   For design and implementation planning, use the planning category instead.
 ---
 
@@ -33,5 +33,5 @@ Routes to orchestration skills or skill system meta tooling.
 | Skill | Use when |
 |-------|----------|
 | `using-agentfiles` | Session start — establishes that executor is the default entry point |
-| `skill-manager` | Viewing, installing, or removing skills across scopes |
+| `agentfiles-manager` | Viewing, installing, or removing skills across scopes |
 | `writing-skills` | Creating or editing a skill |

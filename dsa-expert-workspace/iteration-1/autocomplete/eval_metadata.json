@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "autocomplete",
+  "prompt": "I'm building an autocomplete feature and need to match user input against ~100k strings as they type. Needs to feel instant (<50ms). What's the best approach?",
+  "assertions": [
+    {"name": "has_constraint_summary", "description": "Begins with understanding problem constraints before recommending"},
+    {"name": "has_tradeoff_table", "description": "Contains comparison table with at least 2 data structure/algorithm options"},
+    {"name": "has_complexity_analysis", "description": "States time and space complexity with justification, not just O() notation"},
+    {"name": "has_pseudocode", "description": "Includes pseudocode or structured algorithm steps"},
+    {"name": "has_edge_cases", "description": "Identifies at least 2 edge cases or correctness pitfalls"},
+    {"name": "has_language_handoff_notes", "description": "Mentions language-specific considerations for implementation"}
+  ]
+}

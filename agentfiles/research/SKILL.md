@@ -19,5 +19,5 @@ Routes to the right research skill based on the task.
 | `docs-agent` | "How do I use X?" — exact API, config option, working example |
 | `research-agent` | "Should I use X?" — trade-offs, risks, expert consensus |
 | `codebase-explainer` | "How does this codebase work?" — architecture map, execution paths, mental model |
-| `note-taker` | Create markdown notes or interactive lessons — plain or readrun-compatible with runnable code blocks |
+| `note-taker` | Create notes — human mode (readrun interactive code) or LLM mode (dense reference for AI/RAG) |
 | `test-taker` | Answer a question set using reference material — rough-guide / strong-guide / only-information strictness, calculations get Python scripts |

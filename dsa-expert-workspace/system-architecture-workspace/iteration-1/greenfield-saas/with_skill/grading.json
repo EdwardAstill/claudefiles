@@ -1,0 +1,12 @@
+{
+  "eval_id": 0,
+  "run_id": "greenfield-saas-with_skill",
+  "expectations": [
+    {"text": "has_constraint_analysis", "passed": true, "evidence": "Dedicated Step 1 with assumptions table, optimization priorities, and explicit 'NOT optimizing for' section. Constraint summary table with all dimensions."},
+    {"text": "has_architectural_style_recommendation", "passed": true, "evidence": "Recommends modular monolith with reasoning tied to 2-dev team and 3-month timeline. Includes tech stack table."},
+    {"text": "has_alternatives_considered", "passed": true, "evidence": "Explicitly explains why NOT microservices and why NOT serverless with specific reasoning for each."},
+    {"text": "has_layer_structure", "passed": true, "evidence": "Full backend module structure, frontend state management strategy, data entity relationships, multi-tenancy approach. Clear layer separation rules."},
+    {"text": "has_cross_cutting_concerns", "passed": true, "evidence": "Covers auth (hosted provider + JWT + RBAC), error handling (consistent shape + custom classes + global handler), caching (browser + CDN + DB indexing), config (env vars + feature flags), and observability (structured logging + Sentry)."},
+    {"text": "has_actionable_next_steps", "passed": true, "evidence": "3-month build plan broken into monthly milestones, 5 ADRs, Mermaid diagram, and specific handoff notes to api-architect, database-expert, infrastructure-expert, dsa-expert."}
+  ]
+}

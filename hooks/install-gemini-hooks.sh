@@ -51,6 +51,18 @@ HOOKS_CONFIG=$(cat <<EOF
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "name": "skill-logger",
+            "type": "command",
+            "command": "$HOOK_BASE/skill-logger.py"
+          }
+        ]
+      }
     ]
   }
 }

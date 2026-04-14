@@ -23,3 +23,4 @@ Routes to the right code quality skill based on the situation.
 | `requesting-code-review` | After implementation, before merging |
 | `receiving-code-review` | When acting on review feedback |
 | `simplify` | After implementation — clean up and refine |
+| `documentation` | Writing or updating READMEs, API docs, guides, changelogs |

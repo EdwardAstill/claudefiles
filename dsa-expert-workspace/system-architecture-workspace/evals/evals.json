@@ -1,0 +1,23 @@
+{
+  "skill_name": "system-architecture-expert",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I'm building a SaaS project management tool like a simplified Jira. It's just me and one other dev. We want to ship an MVP in 3 months. How should we architect this?",
+      "expected_output": "Constraint-driven recommendation favoring simplicity (modular monolith), layer structure, tech stack guidance",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "We have a Django monolith handling our e-commerce platform. It's getting slow under load (~500 req/s) and the team has grown to 12 devs stepping on each other. Should we move to microservices?",
+      "expected_output": "Analysis of whether microservices actually solve the problems, alternative approaches (caching, read replicas, modular monolith), migration strategy if warranted",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need to add real-time notifications to our app. Users should see updates when someone comments on their task, assigns them something, etc. Currently we have a REST API backend and React frontend. What's the right architecture for this?",
+      "expected_output": "Comparison of approaches (WebSockets, SSE, polling), integration with existing REST architecture, backend event propagation pattern",
+      "files": []
+    }
+  ]
+}

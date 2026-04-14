@@ -37,7 +37,7 @@ Leave these alone unless you know what you're doing.
 
 | Path | What it is | Managed by | Doc |
 |------|------------|------------|-----|
-| `skills/` | Installed skills → symlink into dotfiles | `install.sh` | [install](../install.md) |
+| `skills/` | Installed skills → symlink into dotfiles | `af install` | [install](../install.md) |
 | `logs/agentfiles.jsonl` | Skill invocation log (automated) | `hooks/skill-logger.py` | [logging](../logging.md) |
 | `logs/observations.md` | Qualitative notes — patterns, routing misses | manual | [logging](../logging.md) |
 | `logs/backlog.md` | Actionable improvement items | manual | [logging](../logging.md) |

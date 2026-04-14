@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "run_id": "autocomplete-without_skill",
+  "expectations": [
+    {"text": "has_constraint_summary", "passed": false, "evidence": "Jumps straight to 'Recommended Approach: Trie' with no structured constraint analysis first"},
+    {"text": "has_tradeoff_table", "passed": false, "evidence": "Has alternatives section but no structured comparison table. Alternatives are listed narratively, not compared side-by-side"},
+    {"text": "has_complexity_analysis", "passed": true, "evidence": "Has complexity table and performance budget breakdown"},
+    {"text": "has_pseudocode", "passed": true, "evidence": "Full Python implementation of Trie with autocomplete and ranked variant"},
+    {"text": "has_edge_cases", "passed": false, "evidence": "No dedicated edge cases section"},
+    {"text": "has_language_handoff_notes", "passed": false, "evidence": "Mentions JavaScript/V8 optimization in frontend section but no structured language-specific handoff"}
+  ]
+}

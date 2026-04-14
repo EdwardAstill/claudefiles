@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "run_id": "realtime-notifications-without_skill",
+  "expectations": [
+    {"text": "has_constraint_analysis", "passed": false, "evidence": "No constraint analysis. Jumps directly to 'Recommended Approach: WebSockets via Socket.IO'."},
+    {"text": "has_architectural_style_recommendation", "passed": true, "evidence": "Clear recommendation for Socket.IO WebSockets with Redis adapter. Well-reasoned."},
+    {"text": "has_alternatives_considered", "passed": true, "evidence": "Comparison table with WebSockets, SSE, long polling, and polling including pros/cons."},
+    {"text": "has_layer_structure", "passed": true, "evidence": "High-level architecture diagram, notification service file structure, full code examples for backend and frontend integration."},
+    {"text": "has_cross_cutting_concerns", "passed": false, "evidence": "Auth mentioned briefly in Socket.IO setup (JWT validation). No structured error handling strategy, no caching discussion, no config management."},
+    {"text": "has_actionable_next_steps", "passed": true, "evidence": "Summary table of decisions, scaling progression (single server → multi-instance → large scale). Code examples are directly implementable."}
+  ]
+}

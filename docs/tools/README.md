@@ -17,7 +17,8 @@ Documentation for every `af` subcommand and the external tools they depend on.
 ### Skill & Tool Management
 
 - [agents](agents.md) — Skill/MCP server inventory
-- [log](log.md) — Skill invocation log viewer
+- [log](log.md) — Skill invocation log, session traces, and review
+- [test-skill](test-skill.md) — Scaffold skill test workspace for benchmarking
 - [check](check.md) — Verify REGION.md sync with skills
 - [setup](setup.md) — Check skill dependencies
 - [tools](tools.md) — List available tools

@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "run_id": "autocomplete-with_skill",
+  "expectations": [
+    {"text": "has_constraint_summary", "passed": true, "evidence": "Clear 'Step 1: Constraint Summary' identifying prefix lookup as primary op, read-heavy workload, <50ms hard constraint, memory budget"},
+    {"text": "has_tradeoff_table", "passed": true, "evidence": "Full comparison table: Trie vs Sorted Array+Binary Search vs Hash Map across 8 criteria"},
+    {"text": "has_complexity_analysis", "passed": true, "evidence": "Detailed analysis: O(N*L) build, O(m+K) query for basic, O(S) worst case for ranked variant, space analysis with practical estimates"},
+    {"text": "has_pseudocode", "passed": true, "evidence": "Two pseudocode variants: basic DFS collection and ranked top-K with min-heap"},
+    {"text": "has_edge_cases", "passed": true, "evidence": "Table of 8 edge cases: empty prefix, single char, no matches, exact match, case sensitivity, unicode, long strings, duplicates, concurrent updates"},
+    {"text": "has_language_handoff_notes", "passed": true, "evidence": "Dedicated Python (pygtrie, bisect, heapq, sortedcontainers), Rust (BTreeMap, fst, trie-rs, arena), TypeScript (Map-based, debounce, Web Workers) sections"}
+  ]
+}

@@ -64,9 +64,13 @@ def _parse_manifest(manifest_path: Path) -> tuple[dict, dict]:
             elif current_section == "cli" and current_key and "=" in line:
                 key, _, val = line.partition("=")
                 key = key.strip()
-                val = val.strip().strip('"')
-                if key in ("manager", "package", "description", "install"):
-                    cli_data[current_key][key] = val
+                val = val.strip()
+                if key == "install" and val.startswith("["):
+                    # Parse as array — use first entry for display
+                    items = [v.strip().strip('"') for v in val.lstrip("[").rstrip("]").split(",") if v.strip().strip('"')]
+                    cli_data[current_key]["install"] = items[0] if items else ""
+                elif key in ("manager", "package", "description", "install"):
+                    cli_data[current_key][key] = val.strip('"')
     except Exception as e:
         import sys
         print(f"Warning: failed to parse manifest {manifest_path}: {e}", file=sys.stderr)

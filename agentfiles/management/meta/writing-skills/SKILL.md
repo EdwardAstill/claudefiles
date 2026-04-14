@@ -44,6 +44,10 @@ A **skill** is a reference guide for proven techniques, patterns, or tools. Skil
 
 The entire skill creation process follows RED-GREEN-REFACTOR.
 
+## Before You Start
+
+Run `af log review --dry-run` before creating or editing a skill. It surfaces accumulated patterns from real sessions — skills loaded repeatedly (context churn), recovery patterns (recurring fixes), and low-usage skills (merge candidates). Let these inform what you build or change.
+
 ## When to Create a Skill
 
 **Create when:**

@@ -1,28 +1,28 @@
 ---
-name: skill-manager
+name: agentfiles-manager
 description: >
   Use when the user wants to set up skills for a project, see what is installed,
   install or remove skills, or understand their Claude Code skill setup. Also
   the entry point for new projects — invoke with "set up this project" or /setup.
 ---
 
-# Skill Manager
+# Agentfiles Manager
 
-The only skill installed globally. Everything else is installed per-project based
-on what the project actually needs. Use `af agents` to inspect current state,
-`install.sh` to install skills, and `af setup` to check tool dependencies.
+The only skill installed by the bootstrap (`install.sh`). Everything else is
+installed via `af install`. Use `af agents` to inspect current state,
+`af install` to install skills, and `af setup` to check tool dependencies.
 
 ## Scopes
 
 | Scope | Location | When active |
 |-------|----------|-------------|
 | Plugin | `~/.claude/plugins/` | All sessions, managed by plugin marketplace |
-| Global | `~/.claude/skills/` | All sessions — only skill-manager lives here |
+| Global | `~/.claude/skills/` | All sessions — only agentfiles-manager lives here after bootstrap |
 | Project | `.claude/skills/` | This project only — skills installed per-project |
 
 ## Skill Hierarchy
 
-All skills live in `~/.local/share/agentfiles-src/agentfiles/` (the home agentfiles install).
+All skills live in the agentfiles repo (cloned to `~/.local/share/agentfiles-src/` or your local checkout).
 To see the full tree:
 
 ```bash
@@ -51,7 +51,7 @@ Four categories:
 5. Wait for confirmation
 6. Install each selected skill:
    ```bash
-   ~/.local/share/agentfiles-src/install.sh --local --skill <name>
+   af install --local --skill <name>
    ```
 7. Run `af setup --write` to check tool dependencies and write `.agentfiles/deps.md`
 8. If anything is missing, show the install commands prominently
@@ -93,23 +93,29 @@ Install these 4 skills? (yes / adjust)
 ```bash
 af agents              # full overview — plugins, global, project, available, CLI deps
 af agents --tree       # skill hierarchy tree
-af agents --available  # what's in ~/.local/share/agentfiles-src but not installed here
+af agents --available  # what's in the agentfiles repo but not installed here
 ```
 
 ## Installing and Removing Skills
 
 ```bash
-# Install a skill into the current project
-~/.local/share/agentfiles-src/install.sh --local --skill <name>
+# Install all skills globally
+af install
+
+# Install a single skill to current project
+af install --local --skill <name>
 
 # Install a whole category
-~/.local/share/agentfiles-src/install.sh --local --category research
+af install --local --category research
 
 # Remove
-~/.local/share/agentfiles-src/install.sh --local --remove --skill <name>
+af install --local --remove --skill <name>
 
 # Preview
-~/.local/share/agentfiles-src/install.sh --local --skill <name> --dry-run
+af install --local --skill <name> --dry-run
+
+# See all options
+af install --help
 ```
 
 ## Checking Tool Dependencies
@@ -121,40 +127,26 @@ af setup           # check deps for all locally installed skills, print report
 af setup --write   # also save report to .agentfiles/deps.md
 ```
 
-If `bun` or `uv` is missing and skills require them, flag this prominently:
-
-> "**mks is not installed** and is required by docs-agent and research-agent.
-> Install it: `cargo install --path ~/projects/markstore`"
+If a tool is missing, `af setup` shows the exact install command.
 
 ## CLI Tool Dependencies
 
 Skills declare external CLI tool dependencies in `manifest.toml` under `[cli.<name>]`.
-
-### Package managers
-
-```bash
-# bun — JavaScript runtime and package manager
-curl -fsSL https://bun.sh/install | bash
-
-# uv — Python package manager and tool runner
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# cargo / rustup — Rust toolchain and package manager
-curl https://sh.rustup.rs -sSf | sh
-```
+Running `af install` globally installs all missing CLI tools automatically.
 
 ### Declaring a new CLI dependency
 
 ```toml
 [cli.tool-name]
-manager = "bun"           # or "uv"
+manager = "bun"           # or "cargo", "rustup", "uv"
 package = "package-name"
+install = "bun install -g package-name"
 description = "One-line description"
 ```
 
 Then add `cli = ["tool-name"]` to the relevant `[skills.<name>]` entry.
 
-## What Skill Manager Does NOT Do
+## What Agentfiles Manager Does NOT Do
 
 - Does not manage marketplace plugins — those are managed via Claude Code's plugin system
-- Does not create or edit skills — edit SKILL.md files directly in `~/.local/share/agentfiles-src/agentfiles/`
+- Does not create or edit skills — use the `writing-skills` skill for that

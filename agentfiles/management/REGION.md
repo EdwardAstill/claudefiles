@@ -46,7 +46,7 @@ Skills for orchestration, coordination, and skill system tooling.
 - **Produces:** Committed, reviewed implementation
 - **Chains into:** git-worktree-workflow (finish), code-review
 
-### skill-manager
+### agentfiles-manager
 - **Purpose:** View, install, and remove skills across global and project scopes
 - **Use when:** User wants to see what skills are installed, install new ones, or remove old ones
 - **Produces:** Installed/removed skills; listing of current skill state
@@ -56,7 +56,7 @@ Skills for orchestration, coordination, and skill system tooling.
 - **Purpose:** Create or edit SKILL.md files following the agentfiles format
 - **Use when:** User wants to author a new skill or edit an existing one
 - **Produces:** New or updated SKILL.md with valid frontmatter and structured body
-- **Chains into:** skill-manager (install after writing)
+- **Chains into:** agentfiles-manager (install after writing)
 
 ### skills
 - **Purpose:** Display the full agentfiles skill catalog grouped by category

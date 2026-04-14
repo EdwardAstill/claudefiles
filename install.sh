@@ -1,174 +1,50 @@
 #!/usr/bin/env bash
-# install.sh — install agentfiles skills and bin tools for both Claude and Gemini
+# install.sh — minimal bootstrap for agentfiles
+#
+# Installs two things:
+#   1. The `af` CLI (via uv tool install)
+#   2. The `agentfiles-manager` skill globally (symlinked into ~/.claude/skills/ and ~/.gemini/skills/)
+#
+# Everything else — full skill installation, CLI tool dependencies, per-project
+# setup — is handled by `af install`. Run `af install --help` after bootstrap.
 #
 # Usage:
-#   ./install.sh --global                              # install full agentfiles + bin globally
-#   ./install.sh --global --category coding           # install one category globally
-#   ./install.sh --global --skill agent-manager       # install one skill globally (bootstrap)
-#   ./install.sh --local                              # install to current project
-#   ./install.sh --local /path/to/project             # install to specific project
-#   ./install.sh --local --category research          # install one category to current project
-#   ./install.sh --from github:owner/repo --global    # clone from GitHub then install
-#   ./install.sh --dry-run                            # preview without changes
-#   ./install.sh --remove                             # remove installed symlinks
-#   ./install.sh --list-categories                    # show available categories
+#   ./install.sh                # bootstrap af CLI + agentfiles-manager
+#   ./install.sh --dry-run      # preview without changes
+#   ./install.sh --remove       # remove installed symlinks and af CLI
+#
+# After bootstrap:
+#   af install --global         # install all skills + CLI tools globally
+#   af install --local          # install skills into current project
+#   af install --help           # see all options
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MANIFEST="$SCRIPT_DIR/manifest.toml"
 AGENTFILES="$SCRIPT_DIR/agentfiles"
 
-MODE=""           # user | project
-SOURCE="local"    # local | github
-GITHUB_REPO=""
-PROJECT_PATH=""
-CATEGORY="all"    # all | <category-name>
-SKILL_NAME=""     # empty = category/all mode; set = single-skill mode
 DRY_RUN=false
 REMOVE=false
-LIST_CATS=false
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
 
-i=0
-args=("$@")
-while [[ $i -lt ${#args[@]} ]]; do
-    arg="${args[$i]}"
+for arg in "$@"; do
     case "$arg" in
-        --global|--user)    MODE="user" ;;
-        --local|--project)  MODE="project" ;;
-        --dry-run)          DRY_RUN=true ;;
-        --remove)           REMOVE=true ;;
-        --list-categories)  LIST_CATS=true ;;
-        --from)
-            i=$((i+1))
-            FROM_VAL="${args[$i]}"
-            if [[ "$FROM_VAL" == github:* ]]; then
-                SOURCE="github"
-                GITHUB_REPO="${FROM_VAL#github:}"
-            else
-                echo "Error: unknown --from value '$FROM_VAL'. Expected: github:<owner>/<repo>" >&2
-                exit 1
-            fi
+        --dry-run)  DRY_RUN=true ;;
+        --remove)   REMOVE=true ;;
+        --help|-h)
+            echo "Usage: ./install.sh [--dry-run] [--remove]"
+            echo ""
+            echo "Bootstrap agentfiles: installs af CLI + agentfiles-manager skill."
+            echo "After bootstrap, use 'af install' for everything else."
+            exit 0
             ;;
-        --category)
-            i=$((i+1))
-            CATEGORY="${args[$i]}"
-            ;;
-        --skill)
-            i=$((i+1))
-            SKILL_NAME="${args[$i]}"
-            ;;
-        /*)   PROJECT_PATH="$arg" ;;
-        ./*)  PROJECT_PATH="$(realpath "$arg")" ;;
-        .)    PROJECT_PATH="$(realpath "$arg")" ;;
         *)
-            if [[ "$MODE" == "project" && -z "$PROJECT_PATH" ]]; then
-                PROJECT_PATH="$(realpath "$arg")"
-            fi
+            echo "Error: unknown argument '$arg'. Use --help for usage." >&2
+            exit 1
             ;;
     esac
-    i=$((i+1))
 done
-
-# ── Resolve GitHub source ─────────────────────────────────────────────────────
-
-if [[ "$SOURCE" == "github" ]]; then
-    REPO_DIR="$HOME/.agentfiles"
-
-    if [[ -d "$REPO_DIR/.git" ]]; then
-        echo "  Updating cached repo from github.com/$GITHUB_REPO ..."
-        git -C "$REPO_DIR" pull --ff-only --quiet
-        echo "  Up to date: $REPO_DIR"
-    else
-        echo "  Cloning github.com/$GITHUB_REPO → $REPO_DIR ..."
-        mkdir -p "$(dirname "$REPO_DIR")"
-        git clone --quiet "https://github.com/$GITHUB_REPO" "$REPO_DIR"
-        echo "  Cloned."
-    fi
-
-    # Override all source paths to use the cached copy
-    AGENTFILES="$REPO_DIR/agentfiles"
-    BIN_DIR="$REPO_DIR/bin"
-    MANIFEST="$REPO_DIR/manifest.toml"
-fi
-
-# ── List categories ───────────────────────────────────────────────────────────
-
-if "$LIST_CATS"; then
-    echo "Available categories:"
-    echo "  all         — install the full agentfiles (default)"
-    for d in "$AGENTFILES"/*/; do
-        [[ -f "$d/SKILL.md" ]] && echo "  $(basename "$d")"
-    done
-    exit 0
-fi
-
-if [[ -z "$MODE" ]]; then
-    echo "Error: specify --global (or --local <path>)" >&2
-    exit 1
-fi
-
-if [[ "$MODE" == "project" && -z "$PROJECT_PATH" ]]; then
-    PROJECT_PATH="$(pwd)"
-fi
-
-# ── Resolve install targets ───────────────────────────────────────────────────
-
-TARGETS=()
-if [[ "$MODE" == "user" ]]; then
-    TARGETS+=("$HOME/.claude/skills")
-    TARGETS+=("$HOME/.gemini/skills")
-else
-    TARGETS+=("$PROJECT_PATH/.claude/skills")
-    TARGETS+=("$PROJECT_PATH/.gemini/skills")
-fi
-
-# ── Resolve skill source ──────────────────────────────────────────────────────
-
-SKILL_SRC=""
-SKILL_LINK_NAME=""
-
-if [[ -n "$SKILL_NAME" ]]; then
-    while IFS= read -r skill_md; do
-        found_name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
-        if [[ "$found_name" == "$SKILL_NAME" ]]; then
-            SKILL_SRC="$(dirname "$skill_md")"
-            SKILL_LINK_NAME="$SKILL_NAME"
-            break
-        fi
-    done < <(find "$AGENTFILES" -name "SKILL.md" 2>/dev/null)
-
-    if [[ -z "$SKILL_SRC" ]]; then
-        echo "Error: skill '$SKILL_NAME' not found in agentfiles" >&2
-        exit 1
-    fi
-
-elif [[ "$CATEGORY" == "all" ]]; then
-    SKILLS_FLAT="$SCRIPT_DIR/skills"
-    mkdir -p "$SKILLS_FLAT"
-    while IFS= read -r link; do
-        name="$(basename "$link")"
-        if ! find "$AGENTFILES" -name "SKILL.md" | xargs grep -l "^name: $name$" &>/dev/null; then
-            rm "$link"
-        fi
-    done < <(find "$SKILLS_FLAT" -maxdepth 1 -type l 2>/dev/null)
-
-    while IFS= read -r skill_md; do
-        dir="$(dirname "$skill_md")"
-        sub_skills=$(find "$dir" -mindepth 2 -name "SKILL.md" 2>/dev/null | wc -l)
-        if [[ "$sub_skills" -eq 0 ]]; then
-            name=$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md")
-            rel="$(python3 -c "import os; print(os.path.relpath('$dir', '$SKILLS_FLAT'))")"
-            ln -sf "$rel" "$SKILLS_FLAT/$name"
-        fi
-    done < <(find "$AGENTFILES" -name "SKILL.md")
-    SKILL_SRC="$SKILLS_FLAT"
-else
-    SKILL_SRC="$AGENTFILES/$CATEGORY"
-    SKILL_LINK_NAME="af-$CATEGORY"
-fi
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -198,110 +74,85 @@ do_remove() {
     fi
 }
 
-wire_gemini_hooks() {
-    local gemini_settings
-    local target_skills
-    if [[ "$MODE" == "user" ]]; then
-        gemini_settings="$HOME/.gemini/settings.json"
-        target_skills="$HOME/.gemini"
-    else
-        gemini_settings="$PROJECT_PATH/.gemini/settings.json"
-        target_skills="$PROJECT_PATH/.gemini"
-    fi
-    
-    echo "Gemini Hooks:"
-    if "$DRY_RUN"; then
-        echo "  [dry-run] would configure Gemini hooks in $gemini_settings"
-        return
-    fi
-    
-    bash "$SCRIPT_DIR/hooks/install-gemini-hooks.sh" --target "$target_skills"
+# ── Find the agentfiles-manager skill directory ─────────────────────────────
+
+find_skill_dir() {
+    local skill_md
+    while IFS= read -r skill_md; do
+        local found_name
+        found_name="$(awk '/^name:/ { gsub(/^name: */, ""); print; exit }' "$skill_md" 2>/dev/null)"
+        if [[ "$found_name" == "agentfiles-manager" ]]; then
+            dirname "$skill_md"
+            return
+        fi
+    done < <(find "$AGENTFILES" -name "SKILL.md" 2>/dev/null)
+    echo ""
 }
 
-# ── Install ───────────────────────────────────────────────────────────────────
+MANAGER_DIR="$(find_skill_dir)"
+if [[ -z "$MANAGER_DIR" ]]; then
+    echo "Error: agentfiles-manager skill not found in $AGENTFILES" >&2
+    exit 1
+fi
 
-install_all() {
-    echo "Installing agentfiles"
-    
-    # Install CLI for global mode
-    if [[ "$MODE" == "user" ]]; then
-        if "$DRY_RUN"; then
-            echo "  [dry-run] uv tool install -e $SCRIPT_DIR/tools/python/"
-        else
-            uv tool install --force -e "$SCRIPT_DIR/tools/python/" --quiet
-            echo "  [ok] af CLI installed"
-        fi
-    fi
+# ── Install targets ──────────────────────────────────────────────────────────
 
-    for target in "${TARGETS[@]}"; do
-        echo "Target: $target"
-        # If the target is a dangling symlink, remove it so mkdir -p can succeed
-        if [[ -L "$target" && ! -d "$target" ]]; then
-            rm "$target"
-        fi
-        mkdir -p "$target"
-        if [[ -z "$SKILL_LINK_NAME" ]]; then
-            while IFS= read -r skill_dir; do
-                name="$(basename "$skill_dir")"
-                do_symlink "$(realpath "$skill_dir")" "$target/$name"
-            done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
-        else
-            do_symlink "$SKILL_SRC" "$target/$SKILL_LINK_NAME"
-        fi
-        
-        # Link hooks specifically for Claude convention
-        if [[ "$target" == *".claude/skills" ]]; then
-            local hooks_src="$SCRIPT_DIR/hooks"
-            do_symlink "$hooks_src" "$target/hooks"
-        fi
-        # Link hooks for Gemini as well (convention-over-config is easier)
-        if [[ "$target" == *".gemini/skills" ]]; then
-            local hooks_src="$SCRIPT_DIR/hooks"
-            do_symlink "$hooks_src" "$target/hooks"
-        fi
-    done
+CLAUDE_SKILLS="$HOME/.claude/skills"
+GEMINI_SKILLS="$HOME/.gemini/skills"
 
-    if [[ "$MODE" == "user" ]]; then
-        if "$DRY_RUN"; then
-            bash "$SCRIPT_DIR/hooks/install-hooks.sh" --dry-run
-            wire_gemini_hooks
-        else
-            bash "$SCRIPT_DIR/hooks/install-hooks.sh"
-            wire_gemini_hooks
-        fi
-    fi
-
-    # Gitignore
-    if [[ "$MODE" == "project" ]]; then
-        local ignore="$PROJECT_PATH/.gitignore"
-        if "$DRY_RUN"; then
-            echo "  [dry-run] add .agentfiles/ to $ignore"
-        elif ! grep -qxF '.agentfiles/' "$ignore" 2>/dev/null; then
-            echo '.agentfiles/' >> "$ignore"
-        fi
-    fi
-}
-
-remove_all() {
-    for target in "${TARGETS[@]}"; do
-        echo "Removing from: $target"
-        if [[ -z "$SKILL_LINK_NAME" ]]; then
-            while IFS= read -r skill_dir; do
-                name="$(basename "$skill_dir")"
-                do_remove "$target/$name"
-            done < <(find "$SKILL_SRC" -maxdepth 1 -mindepth 1 -type l | sort)
-        else
-            do_remove "$target/$SKILL_LINK_NAME"
-        fi
-        # Remove hooks link
-        if [[ "$target" == *".claude/skills" || "$target" == *".gemini/skills" ]]; then
-            do_remove "$target/hooks"
-        fi
-    done
-}
+# ── Remove ───────────────────────────────────────────────────────────────────
 
 if "$REMOVE"; then
-    remove_all
-else
-    install_all
+    echo "Removing agentfiles bootstrap..."
+    do_remove "$CLAUDE_SKILLS/agentfiles-manager"
+    do_remove "$CLAUDE_SKILLS/hooks"
+    do_remove "$GEMINI_SKILLS/agentfiles-manager"
+    do_remove "$GEMINI_SKILLS/hooks"
+    if "$DRY_RUN"; then
+        echo "  [dry-run] uv tool uninstall af"
+    else
+        uv tool uninstall af 2>/dev/null && echo "  [ok] af CLI removed" || echo "  [skip] af CLI not installed"
+    fi
+    exit 0
 fi
+
+# ── Install ──────────────────────────────────────────────────────────────────
+
+echo "Bootstrapping agentfiles..."
+
+# 1. Install af CLI
+if "$DRY_RUN"; then
+    echo "  [dry-run] uv tool install -e $SCRIPT_DIR/tools/python/"
+else
+    uv tool install --force -e "$SCRIPT_DIR/tools/python/" --quiet
+    echo "  [ok] af CLI installed"
+fi
+
+# 2. Symlink agentfiles-manager skill
+for target in "$CLAUDE_SKILLS" "$GEMINI_SKILLS"; do
+    if [[ -L "$target" && ! -d "$target" ]]; then
+        rm "$target"
+    fi
+    mkdir -p "$target"
+    do_symlink "$MANAGER_DIR" "$target/agentfiles-manager"
+done
+
+# 3. Symlink hooks
+HOOKS_SRC="$SCRIPT_DIR/hooks"
+do_symlink "$HOOKS_SRC" "$CLAUDE_SKILLS/hooks"
+do_symlink "$HOOKS_SRC" "$GEMINI_SKILLS/hooks"
+
+# 4. Wire hooks into settings
+if "$DRY_RUN"; then
+    bash "$SCRIPT_DIR/hooks/install-hooks.sh" --dry-run
+    echo "  [dry-run] would configure Gemini hooks"
+else
+    bash "$SCRIPT_DIR/hooks/install-hooks.sh"
+    bash "$SCRIPT_DIR/hooks/install-gemini-hooks.sh" --target "$HOME/.gemini"
+fi
+
+echo ""
+echo "Bootstrap complete. Next steps:"
+echo "  af install              # install all skills + CLI tools globally"
+echo "  af install --local      # install skills into current project"
+echo "  af install --help       # see all options"

@@ -38,7 +38,7 @@ HOOKS_CONFIG=$(cat <<'EOF'
     ],
     "PostToolUse": [
       {
-        "matcher": "Read",
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
@@ -95,4 +95,4 @@ PYEOF
 fi
 
 echo "  Done. Hook scripts expected at ~/.claude/skills/hooks/"
-echo "  Run: ./install.sh --global  to install hook scripts to that location."
+echo "  Run: af install  to install hook scripts to that location."

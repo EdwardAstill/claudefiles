@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "run_id": "dag-parallel-execution-without_skill",
+  "expectations": [
+    {"text": "has_constraint_summary", "passed": false, "evidence": "Jumps straight to 'Key Insight' and algorithm without analyzing problem constraints first"},
+    {"text": "has_tradeoff_table", "passed": false, "evidence": "No comparison table between approaches. Presents CPM as the singular solution, mentions alternatives only briefly in 'Limited Parallelism' section"},
+    {"text": "has_complexity_analysis", "passed": true, "evidence": "Has complexity analysis table with O(V+E) breakdown per phase"},
+    {"text": "has_pseudocode", "passed": true, "evidence": "Full Python implementation with worked example and output"},
+    {"text": "has_edge_cases", "passed": false, "evidence": "No dedicated edge cases section. Brief practical considerations but no correctness pitfall analysis"},
+    {"text": "has_language_handoff_notes", "passed": false, "evidence": "Mentions Bazel/Ninja/Make and OR-Tools but no language-specific implementation guidance"}
+  ]
+}

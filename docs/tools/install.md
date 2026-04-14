@@ -1,18 +1,21 @@
 # af install
 
-Install agentfiles skills. Thin wrapper that delegates to `install.sh`.
+Install agentfiles skills, hooks, and CLI tools.
 
 **Source:** `tools/python/src/af/install.py`
 
 ## Usage
 
 ```bash
-af install --global                      # full install
-af install --global --skill git-expert   # one skill
-af install --global --category research  # one category
+af install                               # full global install (default)
+af install --local                       # install to current project
+af install --skill git-expert            # one skill globally
+af install --category research           # one category globally
 af install --local /path/to/project      # project install
-af install --global --remove             # uninstall
-af install --global --dry-run            # preview
+af install --remove                      # uninstall globally
+af install --dry-run                     # preview
+af install --list-categories             # show categories
+af install --from github:owner/repo      # install from GitHub
 ```
 
-All arguments pass through verbatim to `install.sh` at the repo root.
+Global install includes all skills, hooks, and missing CLI tools from `manifest.toml`.

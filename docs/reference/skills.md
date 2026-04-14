@@ -1,6 +1,6 @@
 # Skills Reference
 
-39 leaf skills across four categories. Run `af agents --tree` to see the live hierarchy.
+48 leaf skills across four categories. Run `af agents --tree` to see the live hierarchy.
 
 ---
 
@@ -27,9 +27,10 @@
 | Skill | Use when |
 |-------|----------|
 | `using-agentfiles` | Session start (automatic) |
-| `skill-manager` | View, install, or remove skills |
-| `skills` | Display the full skill catalog |
+| `agentfiles-manager` | View, install, or remove skills |
+| `skill-catalog` | Display the full skill catalog |
 | `writing-skills` | Create or edit a SKILL.md |
+| `documentation-maintainer` | Sync docs after skill/CLI changes |
 
 ---
 
@@ -42,7 +43,7 @@
 
 ---
 
-## coding/ — writing, reviewing, and shipping code (21 skills)
+## coding/ — writing, reviewing, and shipping code (30 skills)
 
 ### Quality
 
@@ -59,12 +60,23 @@
 | `dependency-management` | Version bumps, CVE scanning, breaking change analysis |
 | `observability` | Structured logging, distributed tracing, metrics instrumentation |
 | `accessibility` | WCAG 2.1 AA, semantic HTML, ARIA, keyboard navigation |
+| `documentation` | READMEs, API docs, guides, changelogs, migration guides, ADRs |
+| `regex-expert` | Mass search and replace, symbol renaming with sd/rg |
+| `skill-tester` | Benchmark skills against hard questions with rubric grading |
+
+### Architecture
+
+| Skill | Use when |
+|-------|----------|
+| `system-architecture-expert` | Service boundaries, monolith vs microservices, scaling strategy |
+| `dsa-expert` | Data structure/algorithm selection, complexity analysis |
 
 ### Data
 
 | Skill | Use when |
 |-------|----------|
 | `database-expert` | Schema design, migrations, query optimization, ORM patterns |
+| `file-converter` | PDF/image to markdown via cnv (convert2) |
 
 ### Infrastructure
 
@@ -100,6 +112,8 @@
 | `typescript-expert` | typescript-language-server LSP, bun, biome — toolchain integration |
 | `rust-expert` | rust-analyzer LSP, cargo, clippy, rustfmt — toolchain integration |
 | `typst-expert` | tinymist LSP, typst compile/watch — document authoring |
+| `ui-expert` | React, Tailwind, shadcn/ui — design spec and visual verification |
+| `tui-expert` | Terminal UIs — Textual, Ratatui, Ink, Bubbletea |
 
 ---
 
@@ -136,7 +150,7 @@ needs parallel domain work.
 2. Add entry to `manifest.toml` under `[skills.<skill-name>]`
 3. Add entry to the category's `REGION.md`
 4. Run `af check` to verify
-5. Run `./install.sh --global` to pick up the new skill
+5. Run `af install` to pick up the new skill
 
 ```yaml
 ---

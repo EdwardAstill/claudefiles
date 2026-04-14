@@ -98,21 +98,34 @@ af agents --mcp        # MCP servers only
 
 ### af log
 
-View the skill invocation log. Skills are recorded automatically by the
-`hooks/skill-logger.py` PostToolUse hook whenever a `SKILL.md` is read.
+View skill invocation logs, session traces, and run periodic reviews.
 
 ```bash
-af log                 # last 20 invocations
-af log --tail 50       # last 50 entries
-af log --skill tdd     # filter to one skill
-af log --stats         # frequency table + escalation count
-af log --escalations   # only sessions where executor handed off to manager
+af log                    # last 20 invocations
+af log --tail 50          # last 50 entries
+af log --skill tdd        # filter to one skill
+af log --stats            # frequency table + escalation count
+af log --escalations      # only sessions where executor handed off to manager
+af log session            # timeline of latest session's tool calls
+af log session --id XYZ   # timeline of specific session
+af log analyze            # recovery pattern analysis of latest session
+af log review --dry-run   # preview accumulated insights
+af log review             # review, save to observations.md, clear logs
+af log review --keep-stats  # clear sessions only, keep skill stats
 ```
 
-Each entry records the skill name, session ID, the skill that was active before it
-(`parent_skill`), and whether the session included an executor→manager escalation.
+See [logging reference](logging.md) for JSON schemas, file locations, and the review cycle.
 
-Log file: `~/.claude/logs/agentfiles.jsonl` — see [logging reference](logging.md) for the full system.
+### af test-skill
+
+Scaffold a skill test workspace for benchmarking with the `skill-tester` skill.
+
+```bash
+af test-skill <name>    # first run: create evals.json template
+                        # second run: create iteration workspace
+```
+
+See [docs/tools/test-skill.md](../tools/test-skill.md) for the full workflow.
 
 ### af check
 
@@ -232,15 +245,15 @@ Run `mks embed` after indexing to enable vector search. Requires [Ollama](https:
 
 ## Install
 
-Delegates to `install.sh` — all args pass through verbatim.
+Full installer for skills, hooks, and CLI tools.
 
 ```bash
-af install --global                      # full install
-af install --global --skill git-expert   # one skill
-af install --global --category research  # one category
+af install                               # full global install (default)
+af install --skill git-expert            # one skill globally
+af install --category research           # one category globally
 af install --local /path/to/project      # project install
-af install --global --remove             # uninstall
-af install --global --dry-run            # preview
+af install --remove                      # uninstall globally
+af install --dry-run                     # preview
 ```
 
 ---

@@ -1,0 +1,12 @@
+{
+  "eval_id": 0,
+  "run_id": "k-most-frequent-without_skill",
+  "expectations": [
+    {"text": "has_constraint_summary", "passed": false, "evidence": "Has a brief 'Problem Summary' but does not systematically identify operations, size characteristics, or hard constraints before recommending"},
+    {"text": "has_tradeoff_table", "passed": true, "evidence": "Has a 'Recommendation Summary' table mapping scenarios to approaches, plus an 'Alternatives Considered' section"},
+    {"text": "has_complexity_analysis", "passed": true, "evidence": "Has a complexity table with time/space per operation"},
+    {"text": "has_pseudocode", "passed": true, "evidence": "Python-like pseudocode with TopKTracker class implementing lazy deletion heap"},
+    {"text": "has_edge_cases", "passed": false, "evidence": "No dedicated edge cases section. Mentions lazy deletion as a note but does not systematically identify correctness pitfalls"},
+    {"text": "has_language_handoff_notes", "passed": false, "evidence": "Brief mention of 'C++, Java, or Rust' in closing sentence but no structured language-specific guidance"}
+  ]
+}

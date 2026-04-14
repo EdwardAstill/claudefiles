@@ -15,7 +15,7 @@ curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootst
 |------|-------------|--------|
 | Clone | Clones repo to `~/.local/share/agentfiles-src/` | Local clone |
 | Install CLI | `uv tool install --force -e tools/python/` | `af` command on PATH |
-| Install skills | `install.sh --global` — builds flat symlinks, installs each skill | 39 skills in `~/.claude/skills/` |
+| Install skills | `af install` — builds flat symlinks, installs each skill and CLI tool | All skills in `~/.claude/skills/` |
 
 All 39 skills active globally. Changes to skill files in the repo are live on the next
 session — no reinstall needed.

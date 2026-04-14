@@ -19,11 +19,11 @@ category = "planning"
 tools = ["Read", "Agent"]
 category = "management/orchestration"
 
-[skills.skill-manager]
+[skills.agentfiles-manager]
 tools = ["Bash", "Read"]
 category = "management/meta"
 
-[skills.skills]
+[skills.skill-catalog]
 tools = []
 category = "management/meta"
 
@@ -194,8 +194,20 @@ category = "coding/quality"
 [cli.mks]
 manager = "cargo"
 package = "markstore"
-install = "cargo install --path ~/projects/markstore"
+install = ["cargo install --path ~/projects/markstore", "cargo install --git https://github.com/EdwardAstill/markstore"]
 description = "Local markdown store — BM25 full-text search, semantic vector search, knowledge graph"
+
+[cli.cnv]
+manager = "cargo"
+package = "convert2"
+install = ["cargo install --path ~/projects/convert2", "cargo install --git https://github.com/EdwardAstill/convert2"]
+description = "PDF to AI-friendly markdown, RAG, and Knowledge Graph converter"
+
+[cli.pk]
+manager = "bun"
+package = "pdfkit"
+install = ["cd ~/projects/pdfkit && bun install && bun link", "bun install -g github:EdwardAstill/pdfkit"]
+description = "PDF operations CLI — extract, combine, rotate, split, impose, booklet"
 
 [cli.pyright]
 manager = "bun"
@@ -217,7 +229,7 @@ description = "Rust language server"
 [cli.tinymist]
 manager = "cargo"
 package = "tinymist"
-install = "cargo install tinymist"
+install = ["curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Myriad-Dreamin/tinymist/releases/latest/download/tinymist-installer.sh | sh", "cargo install --git https://github.com/Myriad-Dreamin/tinymist tinymist-cli"]
 description = "Typst language server"
 
 [cli.sd]

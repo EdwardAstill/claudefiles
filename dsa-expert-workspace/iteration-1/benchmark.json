@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "skill_name": "dsa-expert",
+    "skill_path": "/home/eastill/projects/agentfiles/agentfiles/coding/dsa/SKILL.md",
+    "timestamp": "2026-04-14T00:10:00Z",
+    "evals_run": ["k-most-frequent", "autocomplete", "dag-parallel-execution"],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "configuration": "with_skill",
+      "pass_rate": "1.00",
+      "pass_rate_stddev": "0.00",
+      "time_seconds": "105.4",
+      "time_stddev": "6.5",
+      "tokens": "16443",
+      "tokens_stddev": "447",
+      "per_eval": [
+        {"eval_name": "k-most-frequent", "pass_rate": "1.00", "time_seconds": "103.2", "tokens": "16254", "passed": ["has_constraint_summary","has_tradeoff_table","has_complexity_analysis","has_pseudocode","has_edge_cases","has_language_handoff_notes"], "failed": []},
+        {"eval_name": "autocomplete", "pass_rate": "1.00", "time_seconds": "98.9", "tokens": "16007", "passed": ["has_constraint_summary","has_tradeoff_table","has_complexity_analysis","has_pseudocode","has_edge_cases","has_language_handoff_notes"], "failed": []},
+        {"eval_name": "dag-parallel-execution", "pass_rate": "1.00", "time_seconds": "114.6", "tokens": "17068", "passed": ["has_constraint_summary","has_tradeoff_table","has_complexity_analysis","has_pseudocode","has_edge_cases","has_language_handoff_notes"], "failed": []}
+      ]
+    },
+    {
+      "configuration": "without_skill",
+      "pass_rate": "0.44",
+      "pass_rate_stddev": "0.10",
+      "time_seconds": "62.4",
+      "time_stddev": "2.1",
+      "tokens": "12349",
+      "tokens_stddev": "231",
+      "per_eval": [
+        {"eval_name": "k-most-frequent", "pass_rate": "0.50", "time_seconds": "64.9", "tokens": "12235", "passed": ["has_tradeoff_table","has_complexity_analysis","has_pseudocode"], "failed": ["has_constraint_summary","has_edge_cases","has_language_handoff_notes"]},
+        {"eval_name": "autocomplete", "pass_rate": "0.33", "time_seconds": "59.9", "tokens": "12133", "passed": ["has_complexity_analysis","has_pseudocode"], "failed": ["has_constraint_summary","has_tradeoff_table","has_edge_cases","has_language_handoff_notes"]},
+        {"eval_name": "dag-parallel-execution", "pass_rate": "0.33", "time_seconds": "62.3", "tokens": "12679", "passed": ["has_complexity_analysis","has_pseudocode"], "failed": ["has_constraint_summary","has_tradeoff_table","has_edge_cases","has_language_handoff_notes"]}
+      ]
+    }
+  ],
+  "run_summary": {
+    "delta": {
+      "pass_rate": "+0.56",
+      "time_seconds": "+43.0",
+      "tokens": "+4094"
+    }
+  },
+  "notes": [
+    "has_complexity_analysis and has_pseudocode pass in both configurations — these are non-discriminating assertions (the model does this naturally)",
+    "The skill adds the most value in: constraint analysis, structured trade-off comparison, edge case identification, and language-specific handoff notes",
+    "With-skill runs use ~33% more tokens and ~69% more time, but produce significantly more structured and comprehensive output",
+    "The without-skill baseline still produces good technical content, just less structured and missing systematic edge case coverage"
+  ]
+}

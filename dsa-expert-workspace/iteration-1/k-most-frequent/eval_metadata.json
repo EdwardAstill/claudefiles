@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "k-most-frequent",
+  "prompt": "I need to efficiently find the k most frequent elements in a stream of events. Events come in at ~10k/sec and I need to query the top-k at any point. What data structure and algorithm should I use?",
+  "assertions": [
+    {"name": "has_constraint_summary", "description": "Begins with understanding problem constraints before recommending"},
+    {"name": "has_tradeoff_table", "description": "Contains comparison table with at least 2 data structure/algorithm options"},
+    {"name": "has_complexity_analysis", "description": "States time and space complexity with justification, not just O() notation"},
+    {"name": "has_pseudocode", "description": "Includes pseudocode or structured algorithm steps"},
+    {"name": "has_edge_cases", "description": "Identifies at least 2 edge cases or correctness pitfalls"},
+    {"name": "has_language_handoff_notes", "description": "Mentions language-specific considerations for implementation"}
+  ]
+}

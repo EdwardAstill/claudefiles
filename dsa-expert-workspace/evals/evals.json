@@ -1,0 +1,23 @@
+{
+  "skill_name": "dsa-expert",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I need to efficiently find the k most frequent elements in a stream of events. Events come in at ~10k/sec and I need to query the top-k at any point. What data structure and algorithm should I use?",
+      "expected_output": "Analysis of heap vs counting approaches with trade-off table, pseudocode, complexity analysis",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "I'm building an autocomplete feature and need to match user input against ~100k strings as they type. Needs to feel instant (<50ms). What's the best approach?",
+      "expected_output": "Data structure comparison (trie vs alternatives), pseudocode for the chosen approach, complexity analysis",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I have a DAG of build tasks with dependencies and need to find the optimal parallel execution order to minimize total build time. Each task has a known duration.",
+      "expected_output": "Topological sort + critical path analysis, pseudocode, complexity proof",
+      "files": []
+    }
+  ]
+}

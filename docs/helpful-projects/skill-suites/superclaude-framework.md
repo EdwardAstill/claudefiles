@@ -39,4 +39,4 @@ The most architecturally ambitious comparable project. A full "meta-programming 
 | **Behavioral modes** | A `mode: token-efficient` or `mode: deep-research` concept in agentfiles that changes executor's verbosity, source depth, and verification thoroughness — separate from skill routing |
 | **Documentation-driven project state** | `af init` already seeds `.agentfiles/`. Could add a `PLANNING.md` convention for executor to read/write during multi-step tasks |
 | **Agent model preferences in manifest** | `manifest.toml` could include `model = "opus"` per skill, and `af setup` could warn if the current session model doesn't match heavy-weight skills |
-| **PyPI-style distribution** | `af install` already delegates to `install.sh`. A `pip install agentfiles` or `brew install agentfiles` shim would reduce the bootstrap friction further |
+| **PyPI-style distribution** | A `pip install agentfiles` or `brew install agentfiles` shim would reduce the bootstrap friction (currently requires `./bootstrap.sh` then `af install`) |

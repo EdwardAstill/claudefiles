@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "run_id": "realtime-notifications-with_skill",
+  "expectations": [
+    {"text": "has_constraint_analysis", "passed": true, "evidence": "Full Step 1 with 5 assumptions, constraint summary table, explicit optimization priorities and scale projections (hundreds now, tens of thousands in 12mo)."},
+    {"text": "has_architectural_style_recommendation", "passed": true, "evidence": "Recommends Monolith + WebSocket Sidecar with Redis Pub/Sub. Clear reasoning table mapping each factor to the decision."},
+    {"text": "has_alternatives_considered", "passed": true, "evidence": "Table comparing SSE, polling, full event-driven (Kafka/RabbitMQ), third-party services, and microservice extraction with specific reasons for rejection."},
+    {"text": "has_layer_structure", "passed": true, "evidence": "Full data flow diagram, backend layering with NotificationService, frontend state management table (React Query + Zustand + WebSocket), notifications table schema with indexes."},
+    {"text": "has_cross_cutting_concerns", "passed": true, "evidence": "WebSocket auth (JWT on handshake, token expiry handling), error handling table (4 scenarios with specific handling), caching strategy table (Redis counts, React Query, no CDN), config management table."},
+    {"text": "has_actionable_next_steps", "passed": true, "evidence": "3 ADRs, Mermaid component diagram, and detailed handoff notes to api-architect (with specific endpoints), database-expert (indexing, partitioning), infrastructure-expert (Redis, sticky sessions), dsa-expert (fan-out optimization)."}
+  ]
+}

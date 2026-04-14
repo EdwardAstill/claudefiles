@@ -20,4 +20,4 @@ else
     git clone https://github.com/EdwardAstill/agentfiles "$CLONE_DIR"
 fi
 
-exec bash "$CLONE_DIR/install.sh" --global "$@"
+exec bash "$CLONE_DIR/install.sh" "$@"

@@ -2,7 +2,7 @@
 
 This repo is the source of truth for a personal Claude Code skill suite (39 skills).
 Skills are symlinked into `~/.claude/skills/` (user-level) or `.claude/skills/`
-(project-level) via `install.sh`.
+(project-level) via `af install`.
 
 ## Slash Commands
 
@@ -47,7 +47,7 @@ session start and the system routes through executor automatically.
 - **Each category has a dispatcher** at `agentfiles/<category>/SKILL.md` that routes to the right leaf skill
 - **Run `af agents --tree`** to see the full live hierarchy
 - **Regional docs** at `agentfiles/<category>/REGION.md` — the manager reads these during planning
-- **Install:** `./install.sh --global` or `./bootstrap.sh` for new machines
+- **Install:** `./install.sh` (bootstrap), then `af install` (full install). Or `./bootstrap.sh` for new machines.
 - **CLI:** `af <subcommand>` — Python CLI at `tools/python/src/af/`, installed via `uv tool`
 
 ## Skill File Format
@@ -95,7 +95,7 @@ mcp = ["context7"]         # MCP server names (optional)
 - [ ] Add `scripts/` folder if the skill needs helper scripts
 - [ ] Add entry to `manifest.toml` under `[skills.<skill-name>]`
 - [ ] Add entry to the category's `agentfiles/<category>/REGION.md` under `### skill-name`
-- [ ] Run `./install.sh --global` (symlink picks it up on next session)
+- [ ] Run `af install` (symlink picks it up on next session)
 
 ## Architecture Notes
 
@@ -111,25 +111,17 @@ mcp = ["context7"]         # MCP server names (optional)
 
 ## Install
 
+**Two-step install:**
+
+1. **Bootstrap** (`./install.sh`): installs the `af` CLI and the `agentfiles-manager` skill globally. Minimal — no skill selection, no CLI tools.
+2. **Full install** (`af install`): installs all skills, hooks, and CLI tools. Supports `--global` (default), `--local`, `--skill`, `--category`, `--remove`, `--dry-run`.
+
 **Two modes:**
 
-- **Mode A — global everything:** `./install.sh --global` installs all skills to `~/.claude/skills/`, wires hooks, installs the af CLI. Works across every project with no per-project setup.
-- **Mode B — skill-manager only:** `./install.sh --global --skill skill-manager` installs one skill globally. Then in each project, say "set up this project" and skill-manager selects and installs the relevant skills locally to `.claude/skills/`.
+- **Mode A — global everything:** `./install.sh && af install` installs all skills globally. Works across every project with no per-project setup.
+- **Mode B — manager only:** `./install.sh` installs just the manager. Then in each project, say "set up this project" and agentfiles-manager selects and installs the relevant skills locally to `.claude/skills/`.
 
-**Single source of truth:** `install.sh` handles all install logic. Both `bootstrap.sh` and `af install` delegate to it.
-
-`install.sh` uses symlinks, not copies. Changes to skill files are immediately
-reflected on the next Claude Code session — no re-install needed.
-
-**Scopes:** `--global` installs to `~/.claude/skills/` (also installs hooks + af CLI). `--local [path]`
-installs to `<project>/.claude/skills/`. (`--project` is accepted as an alias for `--local`.)
-
-**Granularity:** `--skill <name>` finds a skill by its SKILL.md `name` field.
-`--category <name>` installs one top-level category. No flag installs all skills
-as individual symlinks (for slash command support).
-
-**Other flags:** `--from github:owner/repo` clones from GitHub. `--dry-run` previews.
-`--remove` uninstalls. `--list-categories` shows available categories.
+Uses symlinks, not copies. Changes to skill files are immediately reflected — no re-install needed.
 
 The manifest TOML parser is a simple awk/grep pipeline — keep manifest.toml clean and
 avoid unusual formatting (inline comments on value lines, multi-line arrays, etc.).

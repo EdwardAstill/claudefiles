@@ -13,9 +13,10 @@ agentfiles/
 │   │   └── coordination-advisor
 │   └── meta/
 │       ├── using-agentfiles     ← session-start skill
-│       ├── skill-manager
+│       ├── agentfiles-manager
 │       ├── skills
-│       └── writing-skills
+│       ├── writing-skills
+│       └── documentation-maintainer  ← docs consistency checks
 │
 ├── planning/
 │   ├── brainstorming             ← idea → spec
@@ -26,7 +27,9 @@ agentfiles/
 │   │   ├── python-expert         ← pyright LSP, uv, ruff, pytest
 │   │   ├── typescript-expert     ← ts-language-server LSP, bun, biome
 │   │   ├── rust-expert           ← rust-analyzer LSP, cargo, clippy
-│   │   └── typst-expert          ← tinymist LSP, typst compile
+│   │   ├── typst-expert          ← tinymist LSP, typst compile
+│   │   ├── ui-expert             ← React, Tailwind, shadcn/ui
+│   │   └── tui-expert            ← terminal UIs (Textual, Ratatui, Ink)
 │   ├── quality/
 │   │   ├── tdd
 │   │   ├── systematic-debugging
@@ -38,9 +41,17 @@ agentfiles/
 │   │   ├── refactoring-patterns  ← large-scale restructuring        [NEW]
 │   │   ├── dependency-management ← version bumps, CVE scanning      [NEW]
 │   │   ├── observability         ← logging, tracing, metrics        [NEW]
-│   │   └── accessibility         ← WCAG 2.1 AA, ARIA, a11y         [NEW]
+│   │   ├── accessibility         ← WCAG 2.1 AA, ARIA, a11y         [NEW]
+│   │   ├── regex-expert          ← mass search/replace with sd/rg
+│   │   ├── skill-tester          ← benchmark skills with rubric grading
+│   │   └── documentation         ← READMEs, API docs, guides, changelogs
+│   ├── architecture/
+│   │   └── system-architecture-expert ← service boundaries, scaling
+│   ├── dsa/
+│   │   └── dsa-expert            ← data structures, algorithms, complexity
 │   ├── data/
-│   │   └── database-expert       ← schema, migrations, queries      [NEW]
+│   │   ├── database-expert       ← schema, migrations, queries      [NEW]
+│   │   └── file-converter        ← PDF/image to markdown via cnv
 │   ├── infrastructure/
 │   │   └── infrastructure-expert ← Docker, K8s, Terraform, IaC      [NEW]
 │   ├── version-control/

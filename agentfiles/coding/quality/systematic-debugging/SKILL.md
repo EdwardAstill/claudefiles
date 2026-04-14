@@ -73,6 +73,7 @@ You MUST complete each phase before proceeding to the next.
    - Git diff, recent commits
    - New dependencies, config changes
    - Environmental differences
+   - If this broke during a previous session, run `af log session` to see the exact sequence of tool calls and edits that led to the failure
 
 4. **Gather Evidence in Multi-Component Systems**
 
