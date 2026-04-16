@@ -122,6 +122,20 @@ across separate domains, escalate. Include a **HANDOFF CONTEXT** block:
 
 This prevents context loss — the #1 failure mode in multi-agent systems.
 
+## Anti-loop rules
+
+When loading specialist skills inline, follow these constraints:
+
+1. **Never re-invoke the same skill you are currently inside.** If a skill didn't
+   resolve the task, don't reload it — either handle the work directly or escalate.
+2. **No backtracking.** Track which skills you've loaded this session. Never route
+   back to a skill already visited in the current chain.
+3. **Max chain depth: 3.** If you've loaded 3 specialist skills and still haven't
+   resolved the task, stop routing and either do the work directly or escalate to
+   manager with a HANDOFF CONTEXT block.
+4. **If stuck: do the work, don't route.** Routing is not progress. When no
+   specialist fits, use your general capabilities rather than hunting for a skill.
+
 ## Specialist skills (load inline with Skill tool)
 
 `python-expert` · `typescript-expert` · `rust-expert` · `typst-expert` ·

@@ -23,6 +23,11 @@ category = "management/orchestration"
 tools = ["Bash", "Read"]
 category = "management/meta"
 
+[skills.retrospective]
+tools = ["Read", "Edit", "Write", "Bash", "Glob", "Grep", "Agent"]
+cli = ["af"]
+category = "management/meta"
+
 [skills.skill-catalog]
 tools = []
 category = "management/meta"
@@ -92,12 +97,21 @@ category = "coding/ci-cd"
 tools = ["Bash", "Read", "Glob", "Grep"]
 category = "research"
 
+[skills.github-repo-researcher]
+tools = ["Bash", "Read", "Grep", "Glob"]
+cli = ["repomix"]
+category = "research"
+
 [skills.note-taker]
 tools = ["Bash", "Read", "Write"]
 category = "research"
 
 [skills.test-taker]
 tools = ["Bash", "Read", "Write"]
+category = "research"
+
+[skills.make-quiz]
+tools = ["Read", "Write", "Glob", "WebFetch"]
 category = "research"
 
 
@@ -186,10 +200,37 @@ category = "coding/quality"
 tools = ["Bash", "Read", "Grep", "WebFetch"]
 category = "coding/quality"
 
+[skills.caveman]
+tools = []
+category = "communication/caveman"
+
+[skills.repomix]
+tools = ["Bash"]
+category = "coding/quality"
+
+[skills.knowledge-base]
+tools = ["Bash", "Read"]
+cli = ["mks"]
+category = "research"
+
+[skills.browser-control]
+tools = ["Bash", "Read"]
+category = "research"
+
+[skills.sci-hub]
+tools = ["Bash"]
+category = "research"
+
 # ── CLI tool registry ─────────────────────────────────────────────────────────
 # Tools installed via bun, uv, cargo, or rustup.
 # af-agents checks PATH for each and flags missing ones.
 # Use 'install' to override the default install command.
+
+[cli.repomix]
+manager = "bun"
+package = "repomix"
+install = "bun install -g repomix"
+description = "Pack repo into single AI-friendly file — --compress cuts ~70% tokens via Tree-sitter, --remote for GitHub repos"
 
 [cli.mks]
 manager = "cargo"

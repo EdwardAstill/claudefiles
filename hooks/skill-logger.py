@@ -129,12 +129,20 @@ def main():
     _save_session_state(session_id, state)
     _cleanup_old_sessions()
 
+    # Detect self-loop: skill invoking itself
+    self_loop = skill_name == parent_skill
+
+    # Track chain depth
+    chain_depth = len(state["skills_seen"])
+
     entry = {
         "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "skill": skill_name,
         "session": session_id,
         "parent_skill": parent_skill,
         "escalated": escalated,
+        "self_loop": self_loop,
+        "chain_depth": chain_depth,
     }
 
     SKILL_LOG.parent.mkdir(parents=True, exist_ok=True)

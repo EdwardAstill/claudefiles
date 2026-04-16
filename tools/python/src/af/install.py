@@ -5,6 +5,7 @@ the af CLI and the agentfiles-manager skill. Everything else goes through here.
 """
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -232,6 +233,57 @@ def _wire_hooks(repo_root: Path, targets: list[Path], dry_run: bool) -> None:
             subprocess.run(["bash", str(gemini_hook_script), "--target", gemini_target])
 
 
+# ── Agent config (AGENT.md → CLAUDE.md / GEMINI.md) ─────────────────────────
+
+
+_MARKER_START = "# BEGIN agentfiles"
+_MARKER_END = "# END agentfiles"
+
+_AGENT_CONFIG_TARGETS = [
+    Path.home() / ".claude" / "CLAUDE.md",
+    Path.home() / ".gemini" / "GEMINI.md",
+]
+
+
+def _apply_agent_config(repo_root: Path, dry_run: bool) -> None:
+    """Append AGENT.md contents to ~/.claude/CLAUDE.md and ~/.gemini/GEMINI.md.
+
+    Uses markers to replace the block on reinstall instead of duplicating it.
+    """
+    agent_md = repo_root / "AGENT.md"
+    if not agent_md.is_file():
+        return
+
+    content = agent_md.read_text().strip()
+    block = f"{_MARKER_START}\n{content}\n{_MARKER_END}\n"
+
+    click.echo("\nAgent config (AGENT.md):")
+    for config_path in _AGENT_CONFIG_TARGETS:
+        if dry_run:
+            click.echo(f"  [dry-run] write to {config_path}")
+            continue
+
+        existing = config_path.read_text() if config_path.exists() else ""
+
+        if _MARKER_START in existing:
+            # Replace existing block in-place
+            new_text = re.sub(
+                rf"{re.escape(_MARKER_START)}.*?{re.escape(_MARKER_END)}\n?",
+                block,
+                existing,
+                flags=re.DOTALL,
+            )
+            config_path.write_text(new_text)
+            click.echo(f"  [updated] {config_path}")
+        else:
+            # Append with a blank line separator
+            config_path.parent.mkdir(parents=True, exist_ok=True)
+            sep = "\n" if existing and not existing.endswith("\n\n") else ""
+            with config_path.open("a") as f:
+                f.write(sep + block)
+            click.echo(f"  [appended] {config_path}")
+
+
 # ── GitHub source ────────────────────────────────────────────────────────────
 
 
@@ -363,6 +415,10 @@ def install_cmd(
     if global_mode:
         click.echo("\nHooks:")
         _wire_hooks(repo_root, targets, dry_run)
+
+    # Agent config — append AGENT.md to ~/.claude/CLAUDE.md etc.
+    if global_mode:
+        _apply_agent_config(repo_root, dry_run)
 
     # CLI tools (global only, full install only)
     if global_mode and not skill_name and not category:

@@ -30,10 +30,28 @@ Skills for documentation lookup and research.
 - **Produces:** Human mode: `.md` note(s) + `.readrun/scripts/` (if readrun). LLM mode: `.md` with YAML frontmatter, wikilinks, semantic headers.
 - **Chains into:** (terminal)
 
+### github-repo-researcher
+- **Purpose:** Investigate GitHub repos — search, analyze architecture, and produce concise technical breakdowns
+- **Use when:** User wants to understand a remote GitHub repo, find repos for a purpose, or compare repo options
+- **NOT for:** Local codebase analysis (codebase-explainer) or GitHub operations like PRs/issues (github-expert)
+- **Produces:** Technical breakdown: what it does, architecture, key patterns, tech stack, notable observations
+- **Chains into:** codebase-explainer (after cloning), research-agent (for trade-off evaluation)
+
 ### codebase-explainer
 - **Purpose:** Answers "how does this codebase work?" — maps architecture, traces execution, identifies abstractions
 - **Use when:** Entering unfamiliar codebase; onboarding; planning changes spanning multiple layers
 - **NOT for:** External library docs (docs-agent) or evaluating approaches (research-agent)
 - **Produces:** Architecture map, traced execution path, key abstractions summary, "where to look" guide
 - **Chains into:** brainstorming (informs design), writing-plans (informs task breakdown)
+
+### knowledge-base
+
+- **Purpose:** Retrieve and synthesise from the personal knowledge base (~3700 docs)
+- **Use when:** Answering questions about health, training, pharmacology, nutrition, supplements, hormones
+- **NOT for:** Building protocols (health-advisor) or auditing beliefs (kb-critic)
+- **Produces:** Synthesised answer grounded in personal KB notes
+- **Chains into:** health-advisor (turns retrieval into protocol), kb-critic (audits retrieved beliefs)
+
+> For action-oriented coaching or evidence critique, see `coaches/` region:
+> `health-advisor` (protocols) and `kb-critic` (evidence audit).
 

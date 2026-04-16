@@ -701,6 +701,234 @@ def type_text(
 
 
 # ---------------------------------------------------------------------------
+# Commands: key (named key press)
+# ---------------------------------------------------------------------------
+
+# Map friendly names → CDP key identifiers
+_KEY_MAP = {
+    "enter": "Return", "return": "Return",
+    "tab": "Tab", "escape": "Escape", "esc": "Escape",
+    "space": "Space", "backspace": "Backspace", "delete": "Delete",
+    "arrowup": "ArrowUp", "arrowdown": "ArrowDown",
+    "arrowleft": "ArrowLeft", "arrowright": "ArrowRight",
+    "home": "Home", "end": "End", "pageup": "PageUp", "pagedown": "PageDown",
+    "f1": "F1", "f2": "F2", "f3": "F3", "f4": "F4", "f5": "F5",
+    "f12": "F12",
+}
+
+
+@app.command()
+def key(
+    name: str = typer.Argument(..., help="Key name: enter, tab, escape, space, arrowdown, etc."),
+    selector: Optional[str] = typer.Option(None, "--focus", "-f", help="CSS selector to focus first"),
+):
+    """Press a named key (Enter, Tab, Escape, ArrowDown, etc.)."""
+    cdp = _connect()
+    try:
+        if selector:
+            focus_js = f"""
+            (() => {{
+                const el = document.querySelector({json.dumps(selector)});
+                if (!el) return false;
+                el.focus();
+                return true;
+            }})()
+            """
+            r = _eval_js(cdp, focus_js)
+            if not r.get("value"):
+                typer.echo(f"[browser] ERROR: element not found: {selector}", err=True)
+                raise typer.Exit(1)
+
+        canonical = _KEY_MAP.get(name.lower(), name)
+        cdp.send("Input.dispatchKeyEvent", {"type": "keyDown", "key": canonical})
+        cdp.send("Input.dispatchKeyEvent", {"type": "keyUp", "key": canonical})
+        typer.echo(f"[browser] key: {canonical}", err=True)
+    finally:
+        cdp.close()
+
+
+# ---------------------------------------------------------------------------
+# Commands: scroll
+# ---------------------------------------------------------------------------
+
+@app.command()
+def scroll(
+    selector: Optional[str] = typer.Argument(None, help="CSS selector to scroll into view (default: window)"),
+    x: int = typer.Option(0, "--x", help="Horizontal scroll delta (px)"),
+    y: int = typer.Option(300, "--y", help="Vertical scroll delta (px, positive = down)"),
+):
+    """Scroll the page or bring an element into view."""
+    cdp = _connect()
+    try:
+        if selector:
+            js = f"""
+            (() => {{
+                const el = document.querySelector({json.dumps(selector)});
+                if (!el) return false;
+                el.scrollIntoView({{behavior: 'instant', block: 'center'}});
+                return true;
+            }})()
+            """
+            r = _eval_js(cdp, js)
+            if not r.get("value"):
+                typer.echo(f"[browser] ERROR: element not found: {selector}", err=True)
+                raise typer.Exit(1)
+            typer.echo(f"[browser] scrolled {selector} into view", err=True)
+        else:
+            js = f"window.scrollBy({x}, {y})"
+            _eval_js(cdp, js)
+            typer.echo(f"[browser] scrolled ({x}, {y})", err=True)
+    finally:
+        cdp.close()
+
+
+# ---------------------------------------------------------------------------
+# Commands: select (dropdown)
+# ---------------------------------------------------------------------------
+
+@app.command("select")
+def select_option(
+    selector: str = typer.Argument(..., help="CSS selector of <select> element"),
+    value: str = typer.Argument(..., help="Option value or visible text to select"),
+):
+    """Select an option from a <select> dropdown by value or text."""
+    cdp = _connect()
+    try:
+        js = f"""
+        (() => {{
+            const el = document.querySelector({json.dumps(selector)});
+            if (!el) return {{found: false}};
+            // Try matching by value first, then by text
+            let matched = false;
+            for (const opt of el.options) {{
+                if (opt.value === {json.dumps(value)} || opt.text.trim() === {json.dumps(value)}) {{
+                    el.value = opt.value;
+                    matched = true;
+                    break;
+                }}
+            }}
+            if (!matched) return {{found: true, matched: false}};
+            el.dispatchEvent(new Event('change', {{bubbles: true}}));
+            return {{found: true, matched: true, selected: el.value}};
+        }})()
+        """
+        r = _eval_js(cdp, js)
+        val = r.get("value", {})
+        if not val.get("found"):
+            typer.echo(f"[browser] ERROR: element not found: {selector}", err=True)
+            raise typer.Exit(1)
+        if not val.get("matched"):
+            typer.echo(f"[browser] ERROR: no option matching '{value}' in {selector}", err=True)
+            raise typer.Exit(1)
+        typer.echo(f"[browser] selected '{val.get('selected')}' in {selector}", err=True)
+    finally:
+        cdp.close()
+
+
+# ---------------------------------------------------------------------------
+# Commands: hover
+# ---------------------------------------------------------------------------
+
+@app.command()
+def hover(
+    selector: str = typer.Argument(..., help="CSS selector to hover over"),
+):
+    """Hover over an element (triggers :hover, mouseover events)."""
+    cdp = _connect()
+    try:
+        js = f"""
+        (() => {{
+            const el = document.querySelector({json.dumps(selector)});
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return {{x: r.x + r.width/2, y: r.y + r.height/2, tag: el.tagName}};
+        }})()
+        """
+        r = _eval_js(cdp, js)
+        val = r.get("value")
+        if not val:
+            typer.echo(f"[browser] ERROR: element not found: {selector}", err=True)
+            raise typer.Exit(1)
+
+        x, y = val["x"], val["y"]
+        cdp.send("Input.dispatchMouseEvent", {"type": "mouseMoved", "x": x, "y": y})
+        typer.echo(f"[browser] hovered <{val['tag'].lower()}> at ({x:.0f}, {y:.0f})", err=True)
+    finally:
+        cdp.close()
+
+
+# ---------------------------------------------------------------------------
+# Commands: new-tab
+# ---------------------------------------------------------------------------
+
+@app.command("new-tab")
+def new_tab(
+    url: str = typer.Argument("about:blank", help="URL to open in new tab"),
+):
+    """Open a new browser tab."""
+    session = _require_session()
+    port = session["port"]
+    try:
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/json/new?{url}",
+            method="PUT",
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read())
+        target_id = data.get("id")
+        session["active_target"] = target_id
+        _save_session(session)
+        typer.echo(f"[browser] new tab: {data.get('url', url)}", err=True)
+    except Exception as e:
+        typer.echo(f"[browser] ERROR: could not open new tab: {e}", err=True)
+        raise typer.Exit(1)
+
+
+# ---------------------------------------------------------------------------
+# Commands: close-tab
+# ---------------------------------------------------------------------------
+
+@app.command("close-tab")
+def close_tab(
+    index: Optional[int] = typer.Argument(None, help="Tab index (default: active tab)"),
+):
+    """Close a browser tab."""
+    session = _require_session()
+    port = session["port"]
+    pages = _page_targets(port)
+
+    if not pages:
+        typer.echo("[browser] no tabs to close", err=True)
+        return
+
+    if index is not None:
+        if index < 0 or index >= len(pages):
+            typer.echo(f"[browser] ERROR: tab index {index} out of range", err=True)
+            raise typer.Exit(1)
+        target = pages[index]
+    else:
+        active_id = session.get("active_target")
+        target = next((p for p in pages if p["id"] == active_id), pages[0])
+
+    target_id = target["id"]
+    try:
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/json/close/{target_id}",
+            method="GET",
+        )
+        urllib.request.urlopen(req, timeout=5)
+    except Exception as e:
+        typer.echo(f"[browser] ERROR: {e}", err=True)
+        raise typer.Exit(1)
+
+    # Update active target
+    remaining = [p for p in pages if p["id"] != target_id]
+    session["active_target"] = remaining[0]["id"] if remaining else None
+    _save_session(session)
+    typer.echo(f"[browser] closed: {target.get('title', target_id)}", err=True)
+
+
+# ---------------------------------------------------------------------------
 # Commands: snap (screenshot)
 # ---------------------------------------------------------------------------
 
@@ -814,36 +1042,69 @@ def tab(
 # Commands: console
 # ---------------------------------------------------------------------------
 
+def _format_console_event(ev: dict) -> Optional[str]:
+    """Format a Runtime.consoleAPICalled event into a printable line."""
+    params = ev.get("params", {})
+    level = params.get("type", "log")
+    args = params.get("args", [])
+    parts = []
+    for arg in args:
+        if "value" in arg:
+            parts.append(str(arg["value"]))
+        elif "description" in arg:
+            parts.append(arg["description"])
+        else:
+            parts.append(str(arg))
+    text = " ".join(parts)
+    return f"[{level}] {text}"
+
+
 @app.command()
 def console(
-    duration: float = typer.Option(2.0, "--duration", "-d", help="Seconds to collect messages"),
+    duration: float = typer.Option(2.0, "--duration", "-d", help="Seconds to collect (ignored with --watch)"),
+    watch: bool = typer.Option(False, "--watch", "-w", help="Stream continuously until Ctrl+C"),
+    level: Optional[str] = typer.Option(None, "--level", "-l", help="Filter: log, warn, error, info, debug"),
 ):
-    """Dump console messages."""
+    """Dump console messages. Use --watch to stream continuously."""
     cdp = _connect()
     try:
         cdp.send("Runtime.enable")
-        events = cdp.collect_events(seconds=duration)
 
+        if watch:
+            typer.echo("[browser] streaming console — Ctrl+C to stop", err=True)
+            cdp._ws.settimeout(0.5)
+            try:
+                while True:
+                    try:
+                        raw = cdp._ws.recv()
+                        if not raw:
+                            continue
+                        data = json.loads(raw)
+                        if data.get("method") == "Runtime.consoleAPICalled":
+                            line = _format_console_event(data)
+                            if line:
+                                if level and not line.startswith(f"[{level}]"):
+                                    continue
+                                typer.echo(line)
+                    except Exception:
+                        pass
+            except KeyboardInterrupt:
+                typer.echo("\n[browser] stopped", err=True)
+            return
+
+        # One-shot mode
+        events = cdp.collect_events(seconds=duration)
         console_events = [e for e in events if e.get("method") == "Runtime.consoleAPICalled"]
         if not console_events:
             typer.echo("[browser] no console messages captured")
-            typer.echo(f"  (listened for {duration}s — try navigating first, then run this)")
+            typer.echo(f"  (listened {duration}s — navigate first, then run this)")
             return
-
         for ev in console_events:
-            params = ev.get("params", {})
-            level = params.get("type", "log")
-            args = params.get("args", [])
-            parts = []
-            for arg in args:
-                if "value" in arg:
-                    parts.append(str(arg["value"]))
-                elif "description" in arg:
-                    parts.append(arg["description"])
-                else:
-                    parts.append(str(arg))
-            text = " ".join(parts)
-            typer.echo(f"[{level}] {text}")
+            line = _format_console_event(ev)
+            if line:
+                if level and not line.startswith(f"[{level}]"):
+                    continue
+                typer.echo(line)
     finally:
         cdp.close()
 
@@ -852,53 +1113,161 @@ def console(
 # Commands: network
 # ---------------------------------------------------------------------------
 
+def _format_network_row(method: str, status: int, url: str, mime: str, size: int, ms: int) -> str:
+    status_str = str(status) if status else "---"
+    size_str = f"{size // 1024}KB" if size >= 1024 else f"{size}B"
+    short_url = url if len(url) <= 70 else url[:67] + "..."
+    return f"{method:<6} {status_str:<5} {ms:>6}ms {size_str:>8}  {mime:<22} {short_url}"
+
+
 @app.command()
 def network(
     filter_pattern: Optional[str] = typer.Option(None, "--filter", "-f", help="URL substring/regex filter"),
+    watch: bool = typer.Option(False, "--watch", "-w", help="Stream requests in real time until Ctrl+C"),
+    errors: bool = typer.Option(False, "--errors", "-e", help="Show only failed requests (4xx/5xx)"),
 ):
-    """List network requests (from performance API)."""
+    """List network requests via CDP. Use --watch to stream in real time."""
     cdp = _connect()
     try:
-        js = """
-        JSON.stringify(
-            performance.getEntriesByType('resource').map(e => ({
-                name: e.name,
-                type: e.initiatorType,
-                duration: Math.round(e.duration),
-                size: e.transferSize || 0,
-            }))
-        )
-        """
-        result = _eval_js(cdp, js)
-        if isinstance(result, dict) and "error" in result:
-            typer.echo(f"[browser] ERROR: {result['error'].get('message', result['error'])}", err=True)
-            raise typer.Exit(1)
+        cdp.send("Network.enable")
+        pat = re.compile(filter_pattern, re.IGNORECASE) if filter_pattern else None
 
-        raw = result.get("value", "[]")
-        try:
-            entries = json.loads(raw) if isinstance(raw, str) else raw
-        except json.JSONDecodeError:
-            entries = []
+        if watch:
+            typer.echo("[browser] streaming network — Ctrl+C to stop", err=True)
+            typer.echo(f"{'Method':<6} {'St':<5} {'Time':>6}   {'Size':>8}  {'MIME':<22} URL")
+            typer.echo("-" * 100)
 
-        if filter_pattern:
-            pat = re.compile(filter_pattern, re.IGNORECASE)
-            entries = [e for e in entries if pat.search(e.get("name", ""))]
+            # Track request metadata by requestId
+            pending: dict = {}
+            cdp._ws.settimeout(0.5)
+            try:
+                while True:
+                    try:
+                        raw = cdp._ws.recv()
+                        if not raw:
+                            continue
+                        data = json.loads(raw)
+                        method = data.get("method", "")
+                        params = data.get("params", {})
 
-        if not entries:
-            typer.echo("[browser] no network entries")
+                        if method == "Network.requestWillBeSent":
+                            req_id = params.get("requestId")
+                            req = params.get("request", {})
+                            pending[req_id] = {
+                                "method": req.get("method", "GET"),
+                                "url": req.get("url", ""),
+                                "ts": params.get("timestamp", 0),
+                            }
+
+                        elif method == "Network.responseReceived":
+                            req_id = params.get("requestId")
+                            resp = params.get("response", {})
+                            url = resp.get("url", "")
+                            status = resp.get("status", 0)
+                            mime = resp.get("mimeType", "")
+                            size = resp.get("encodedDataLength", 0)
+                            ts_now = params.get("timestamp", 0)
+                            info = pending.pop(req_id, {})
+                            http_method = info.get("method", "GET")
+                            ms = int((ts_now - info.get("ts", ts_now)) * 1000)
+
+                            if pat and not pat.search(url):
+                                continue
+                            if errors and status < 400:
+                                continue
+                            typer.echo(_format_network_row(http_method, status, url, mime, size, ms))
+
+                        elif method == "Network.loadingFailed":
+                            req_id = params.get("requestId")
+                            info = pending.pop(req_id, {})
+                            url = info.get("url", params.get("requestId", "?"))
+                            if pat and not pat.search(url):
+                                continue
+                            typer.echo(f"{'FAIL':<6} {'ERR':<5} {'':>6}   {'':>8}  {'':22} {url}  ({params.get('errorText','')})")
+
+                    except Exception:
+                        pass
+            except KeyboardInterrupt:
+                typer.echo("\n[browser] stopped", err=True)
             return
 
-        # Format as table
-        typer.echo(f"{'Type':<10} {'Duration':>8} {'Size':>10} URL")
-        typer.echo("-" * 80)
-        for e in entries:
-            name = e.get("name", "")
-            # Shorten URL for display
-            if len(name) > 60:
-                name = name[:57] + "..."
-            size = e.get("size", 0)
-            size_str = f"{size // 1024}KB" if size >= 1024 else f"{size}B"
-            typer.echo(f"{e.get('type', '?'):<10} {e.get('duration', 0):>6}ms {size_str:>10} {name}")
+        # One-shot: collect responses for a short window then display
+        # Enable and collect events over 1s (catches requests from previous navigation)
+        pending: dict = {}
+        responses: list = []
+
+        cdp._ws.settimeout(0.2)
+        deadline = time.time() + 1.5
+        while time.time() < deadline:
+            try:
+                raw = cdp._ws.recv()
+                if not raw:
+                    continue
+                data = json.loads(raw)
+                method = data.get("method", "")
+                params = data.get("params", {})
+                if method == "Network.requestWillBeSent":
+                    rid = params.get("requestId")
+                    req = params.get("request", {})
+                    pending[rid] = {"method": req.get("method","GET"), "url": req.get("url",""), "ts": params.get("timestamp",0)}
+                elif method == "Network.responseReceived":
+                    rid = params.get("requestId")
+                    resp = params.get("response", {})
+                    info = pending.get(rid, {})
+                    ts_now = params.get("timestamp", 0)
+                    responses.append({
+                        "method": info.get("method","GET"),
+                        "url": resp.get("url",""),
+                        "status": resp.get("status",0),
+                        "mime": resp.get("mimeType",""),
+                        "size": resp.get("encodedDataLength",0),
+                        "ms": int((ts_now - info.get("ts", ts_now)) * 1000),
+                    })
+            except Exception:
+                pass
+
+        if pat:
+            responses = [r for r in responses if pat.search(r["url"])]
+        if errors:
+            responses = [r for r in responses if r["status"] >= 400]
+
+        if not responses:
+            typer.echo("[browser] no network requests captured (try --watch after navigating)")
+            return
+
+        typer.echo(f"{'Method':<6} {'St':<5} {'Time':>6}   {'Size':>8}  {'MIME':<22} URL")
+        typer.echo("-" * 100)
+        for r in responses:
+            typer.echo(_format_network_row(r["method"], r["status"], r["url"], r["mime"], r["size"], r["ms"]))
+    finally:
+        cdp.close()
+
+
+# ---------------------------------------------------------------------------
+# Commands: wait-for-url
+# ---------------------------------------------------------------------------
+
+@app.command("wait-for-url")
+def wait_for_url(
+    pattern: str = typer.Argument(..., help="URL substring or regex to match"),
+    timeout: int = typer.Option(30000, "--timeout", "-t", help="Timeout in ms"),
+):
+    """Wait until the current page URL matches a pattern (useful for redirects, OAuth flows)."""
+    cdp = _connect()
+    try:
+        pat = re.compile(pattern, re.IGNORECASE)
+        deadline = time.time() + timeout / 1000
+        while time.time() < deadline:
+            result = _eval_js(cdp, "window.location.href")
+            current = result.get("value", "")
+            if pat.search(current):
+                typer.echo(current)
+                return
+            time.sleep(0.3)
+        typer.echo(f"[browser] ERROR: timeout waiting for URL matching '{pattern}'", err=True)
+        result = _eval_js(cdp, "window.location.href")
+        typer.echo(f"[browser] current URL: {result.get('value','?')}", err=True)
+        raise typer.Exit(1)
     finally:
         cdp.close()
 
