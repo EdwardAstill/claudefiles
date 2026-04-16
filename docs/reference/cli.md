@@ -324,25 +324,6 @@ automatically on first run (`playwright install firefox`).
 After capturing, Claude reads the PNG with the `Read` tool to visually verify
 the rendered output matches the design spec.
 
-### af browser
-
-Persistent browser automation via Chrome DevTools Protocol (CDP). No Playwright
-dependency. Supports Chrome, Chromium, and Firefox.
-
-```bash
-af browser start [--headed] [--firefox]
-af browser go <URL>
-af browser click <SELECTOR>
-af browser fill <SELECTOR> <TEXT>
-af browser wait <SELECTOR>
-af browser read [SELECTOR]
-af browser snap [SELECTOR] [--full-page]
-af browser status
-af browser stop
-```
-
-See [browser reference](browser.md) for the full command list and multi-step automation patterns.
-
 ## Agent Communication Bus
 
 `.agentfiles/` is gitignored session state shared between agents.

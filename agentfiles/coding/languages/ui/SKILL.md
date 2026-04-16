@@ -65,15 +65,13 @@ the design decisions so they can be replicated or adapted in the shadcn/ui stack
 
 1. **Screenshot the page** — get the visual ground truth
 
-```bash
-# firefox-devtools MCP (preferred — uses user's browser with real sessions)
-navigate_page(url="https://example.com")
-screenshot_page(saveTo="/tmp/site-analysis.png")
+```
+# foxpilot MCP — fullpage captures entire scroll height
+fullpage(path="/tmp/site-analysis.png")                    # headless
+fullpage(path="/tmp/site-analysis.png", mode="zen")        # user's browser (login-required sites)
 
-# or af browser
-af browser start
-af browser go https://example.com
-af browser snap --full-page --out /tmp/site-analysis.png
+# viewport-only screenshot
+screenshot(path="/tmp/site-viewport.png", mode="zen")
 ```
 
 Read the screenshot to see the actual rendered page.
@@ -81,66 +79,35 @@ Read the screenshot to see the actual rendered page.
 2. **Capture multiple viewports** — responsive behavior matters
 
 ```bash
-# Desktop
-set_viewport_size(width=1440, height=900)
-screenshot_page(saveTo="/tmp/site-desktop.png")
-
-# Tablet
-set_viewport_size(width=768, height=1024)
-screenshot_page(saveTo="/tmp/site-tablet.png")
-
-# Mobile
-set_viewport_size(width=375, height=812)
-screenshot_page(saveTo="/tmp/site-mobile.png")
+# af screenshot for local dev server viewport capture
+af screenshot http://localhost:3000 --width 1440 --height 900 --out /tmp/site-desktop.png
+af screenshot http://localhost:3000 --mobile --out /tmp/site-mobile.png
 ```
 
 3. **Inspect the DOM** — understand structure, not just appearance
 
-```bash
-# Get DOM structure with element UIDs
-take_snapshot(selector="main", maxLines=100)
-
-# Or with af browser
-af browser html "main"
-af browser read "main"
+```
+# foxpilot MCP
+html(selector="main")
+read(selector="main")
 ```
 
 4. **Extract computed styles** — get actual values, not guesses
 
-```bash
-# Via af browser eval — extract the real CSS values
-af browser eval "getComputedStyle(document.querySelector('h1')).fontSize"
-af browser eval "getComputedStyle(document.querySelector('h1')).fontWeight"
-af browser eval "getComputedStyle(document.querySelector('h1')).letterSpacing"
-af browser eval "getComputedStyle(document.querySelector('body')).backgroundColor"
-af browser eval "getComputedStyle(document.querySelector('body')).fontFamily"
 ```
-
-For bulk extraction:
-```bash
-af browser eval "
-  const el = document.querySelector('.card');
-  const s = getComputedStyle(el);
-  JSON.stringify({
-    bg: s.backgroundColor,
-    border: s.borderColor,
-    radius: s.borderRadius,
-    padding: s.padding,
-    shadow: s.boxShadow
-  })
-"
+# foxpilot MCP — styles() returns computed styles + CSS variables + full color palette
+styles(mode="zen")                    # body / global
+styles(selector=":root", mode="zen")  # all CSS custom properties (design tokens)
+styles(selector=".card", mode="zen")  # specific element
+assets(mode="zen")                    # fonts, images, stylesheets, favicon
 ```
 
 5. **Screenshot specific components** — isolate individual patterns
 
-```bash
-# firefox-devtools
-screenshot_by_uid(uid="1_42", saveTo="/tmp/component-nav.png")
-screenshot_by_uid(uid="1_85", saveTo="/tmp/component-card.png")
-
-# af browser
-af browser snap ".navbar" --out /tmp/component-nav.png
-af browser snap ".card" --out /tmp/component-card.png
+```
+# foxpilot MCP — screenshot with CSS selector
+screenshot(path="/tmp/component-nav.png", selector=".navbar")
+screenshot(path="/tmp/component-card.png", selector=".card")
 ```
 
 ### Output: Design Analysis
@@ -215,8 +182,8 @@ Screenshots: /tmp/site-desktop.png, /tmp/site-mobile.png
   "looks like 16px" — measure it.
 - **Multiple pages matter.** The homepage alone won't show you forms, empty states,
   error pages, or settings layouts. Ask the user which pages to analyze.
-- **Login-required sites.** Use `firefox-devtools` MCP — it connects to the user's
-  running browser with existing sessions and cookies.
+- **Login-required sites.** Use foxpilot with `mode="zen"` — connects to the user's
+  running Zen browser with existing sessions and cookies.
 - **Don't over-extract.** The goal is design patterns, not a pixel-perfect clone.
   Map to the nearest shadcn/ui equivalent rather than recreating custom CSS.
 

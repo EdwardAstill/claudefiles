@@ -26,9 +26,8 @@ Third-party CLI tools and services that agentfiles depends on.
 
 | Tool | Purpose | Install | Docs |
 |------|---------|---------|------|
-| `Chromium` / `Chrome` | Browser backend for `af browser` | `apt install chromium-browser` | [Project](https://www.chromium.org/) |
-| `Firefox` | Browser backend for `af screenshot` | `apt install firefox` | [Mozilla](https://www.mozilla.org/en-US/firefox/) |
-| `Puppeteer` | Auto-installs browsers for `af browser` | `npm install -g puppeteer` | [Website](https://pptr.dev/) |
+| `foxpilot` | Browser automation (all browser tasks) | `uv tool install /home/eastill/projects/foxpilot` | `~/projects/foxpilot` |
+| `geckodriver` | Firefox WebDriver bridge for foxpilot | `sudo pacman -S geckodriver` | [Mozilla](https://github.com/mozilla/geckodriver) |
 | `Playwright` | Backend for `af screenshot` | `npm install -g playwright` | [Website](https://playwright.dev/) |
 | `Tailwind CSS` | Utility-first CSS framework | — | [Website](https://tailwindcss.com/) |
 | `shadcn/ui` | Accessible component library | `npx shadcn@latest init` | [Website](https://ui.shadcn.com/) |

@@ -72,48 +72,20 @@ curl -L -A "Mozilla/5.0 ..." --retry 3 -o "/tmp/paper.pdf" "${PDF_URL}"
 
 ### Browser fallback (if curl blocked / captcha)
 
-```bash
-af browser start
-af browser go "https://sci-hub.st/${DOI}"
-af browser snap --out /tmp/scihub.png    # Read tool to see page state
+Use foxpilot MCP:
 
-PDF_URL=$(af browser eval "
+```
+go(url="https://sci-hub.st/{DOI}")
+screenshot(path="/tmp/scihub.png")   # Read tool to see page state
+
+pdf_url = js(expression="""
   document.querySelector('iframe#pdf')?.src ||
   document.querySelector('embed[type*=pdf]')?.src ||
   document.querySelector('a[href*=pdf]')?.href
-")
-
-# Protocol-relative URLs need https: prefix
-# PDF_URL="https:${PDF_URL}"   ← if URL starts with //
-
-curl -L -A "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0" \
-  --retry 3 -o "/tmp/paper.pdf" "${PDF_URL}"
-af browser stop
+""")
 ```
 
-### Playwright fallback (if page needs JS to render)
-
-```python
-# uv run --with playwright python3 scihub_download.py
-from playwright.sync_api import sync_playwright
-
-DOI = "10.1038/nature12345"
-
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
-    page = browser.new_page()
-    page.goto(f"https://sci-hub.st/{DOI}")
-    page.wait_for_load_state("networkidle")
-
-    # Get embedded PDF URL
-    pdf_url = page.evaluate("""
-        document.querySelector('iframe#pdf')?.src ||
-        document.querySelector('embed')?.src
-    """)
-    print(pdf_url)
-    browser.close()
-# Then curl the PDF URL
-```
+Then curl the PDF URL (prepend `https:` if protocol-relative `//...`).
 
 ---
 
