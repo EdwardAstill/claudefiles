@@ -175,7 +175,7 @@ Skills for implementation, quality, version control, and language-specific work.
 - **Chains into:** python-expert (Textual), rust-expert (Ratatui), typescript-expert (Ink), verification-before-completion
 
 ### ui-expert
-- **Purpose:** UI design intelligence — component specs (tokens, layout, states, a11y), visual iteration via preview server, project environment setup, handoff to typescript-expert for implementation
-- **Use when:** Building or iterating on UI; choosing between design options; specifying what something should look like before writing code; screenshot verification after implementation
-- **Produces:** Component Spec document (design tokens, layout, states, TypeScript interface, a11y requirements); scaffolded Next.js + shadcn/ui environment; IMPLEMENTATION HANDOFF for typescript-expert; screenshot verification
+- **Purpose:** UI design intelligence — analyze existing websites to extract design patterns; produce component specs (tokens, layout, states, a11y); visual iteration via preview server; project environment setup; handoff to typescript-expert for implementation
+- **Use when:** Building or iterating on UI; analyzing an existing website's design ("make it look like X"); choosing between design options; specifying what something should look like before writing code; screenshot verification after implementation
+- **Produces:** Design Analysis (from URL — extracted colors, typography, spacing, layout, component mapping); Component Spec document (design tokens, layout, states, TypeScript interface, a11y requirements); scaffolded Next.js + shadcn/ui environment; IMPLEMENTATION HANDOFF for typescript-expert; screenshot verification
 - **Chains into:** typescript-expert (implementation), accessibility, verification-before-completion

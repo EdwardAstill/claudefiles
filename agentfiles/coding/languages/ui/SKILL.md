@@ -3,9 +3,11 @@ name: ui-expert
 description: >
   Use when building, iterating on, or reviewing UI — React components, Tailwind
   styling, shadcn/ui primitives, responsive layouts, design alternatives, or
-  visual verification of what the browser actually renders. Covers two phases:
-  (1) design specification — produce a structured component spec using visual
-  mockups and the preview server for iteration; (2) implementation handoff —
+  visual verification of what the browser actually renders. Covers three modes:
+  (1) website analysis — point at a URL to extract design patterns, tokens,
+  layout structure, and component mapping from an existing site;
+  (2) design specification — produce a structured component spec using visual
+  mockups and the preview server for iteration; (3) implementation handoff —
   scaffold the project environment and produce a spec block that typescript-expert
   consumes to write the actual components. ui-expert owns what things should look
   like; typescript-expert owns the code. Also use for screenshot verification.
@@ -13,10 +15,11 @@ description: >
 
 # UI Expert
 
-Design intelligence for the React + Tailwind + shadcn/ui stack. Specifies what
-things should look like, sets up the environment, then hands off to
-`typescript-expert` for implementation. Visual iteration via a local preview
-server. Screenshot verification so Claude can see what the browser actually renders.
+Design intelligence for the React + Tailwind + shadcn/ui stack. Can analyze
+existing websites to extract design patterns, or specify new designs from
+scratch. Hands off to `typescript-expert` for implementation. Visual iteration
+via a local preview server. Screenshot verification so Claude can see what the
+browser actually renders.
 
 ## Stack
 
@@ -49,6 +52,173 @@ This gives you the ground truth. Key fields to check before anything else:
 | `components` | What's already installed — don't re-add, don't import what isn't there |
 | `packageManager` | Use this for all non-shadcn installs |
 | `framework` | Next.js App Router vs Vite SPA vs react-router — affects routing and file conventions |
+
+---
+
+## Website Analysis — "Make it look like X"
+
+When pointed at a URL, analyze the existing site and extract a structured design
+breakdown. This feeds directly into a Component Spec — you're reverse-engineering
+the design decisions so they can be replicated or adapted in the shadcn/ui stack.
+
+### Workflow
+
+1. **Screenshot the page** — get the visual ground truth
+
+```bash
+# firefox-devtools MCP (preferred — uses user's browser with real sessions)
+navigate_page(url="https://example.com")
+screenshot_page(saveTo="/tmp/site-analysis.png")
+
+# or af browser
+af browser start
+af browser go https://example.com
+af browser snap --full-page --out /tmp/site-analysis.png
+```
+
+Read the screenshot to see the actual rendered page.
+
+2. **Capture multiple viewports** — responsive behavior matters
+
+```bash
+# Desktop
+set_viewport_size(width=1440, height=900)
+screenshot_page(saveTo="/tmp/site-desktop.png")
+
+# Tablet
+set_viewport_size(width=768, height=1024)
+screenshot_page(saveTo="/tmp/site-tablet.png")
+
+# Mobile
+set_viewport_size(width=375, height=812)
+screenshot_page(saveTo="/tmp/site-mobile.png")
+```
+
+3. **Inspect the DOM** — understand structure, not just appearance
+
+```bash
+# Get DOM structure with element UIDs
+take_snapshot(selector="main", maxLines=100)
+
+# Or with af browser
+af browser html "main"
+af browser read "main"
+```
+
+4. **Extract computed styles** — get actual values, not guesses
+
+```bash
+# Via af browser eval — extract the real CSS values
+af browser eval "getComputedStyle(document.querySelector('h1')).fontSize"
+af browser eval "getComputedStyle(document.querySelector('h1')).fontWeight"
+af browser eval "getComputedStyle(document.querySelector('h1')).letterSpacing"
+af browser eval "getComputedStyle(document.querySelector('body')).backgroundColor"
+af browser eval "getComputedStyle(document.querySelector('body')).fontFamily"
+```
+
+For bulk extraction:
+```bash
+af browser eval "
+  const el = document.querySelector('.card');
+  const s = getComputedStyle(el);
+  JSON.stringify({
+    bg: s.backgroundColor,
+    border: s.borderColor,
+    radius: s.borderRadius,
+    padding: s.padding,
+    shadow: s.boxShadow
+  })
+"
+```
+
+5. **Screenshot specific components** — isolate individual patterns
+
+```bash
+# firefox-devtools
+screenshot_by_uid(uid="1_42", saveTo="/tmp/component-nav.png")
+screenshot_by_uid(uid="1_85", saveTo="/tmp/component-card.png")
+
+# af browser
+af browser snap ".navbar" --out /tmp/component-nav.png
+af browser snap ".card" --out /tmp/component-card.png
+```
+
+### Output: Design Analysis
+
+Produce a **DESIGN ANALYSIS** block that maps what you found to the shadcn/ui
+stack. This becomes the input for a Component Spec.
+
+```
+## DESIGN ANALYSIS: <Site Name / URL>
+
+### Source
+URL: https://example.com
+Screenshots: /tmp/site-desktop.png, /tmp/site-mobile.png
+
+### Color Palette (extracted → mapped to tokens)
+- Background: rgb(255,255,255) → bg-background
+- Surface/cards: rgb(249,250,251) → bg-card / bg-muted
+- Primary action: rgb(59,130,246) → define as --primary: oklch(...)
+- Text primary: rgb(17,24,39) → text-foreground
+- Text secondary: rgb(107,114,128) → text-muted-foreground
+- Border: rgb(229,231,235) → border-border
+- Destructive: rgb(239,68,68) → text-destructive
+
+### Typography
+- Headings: Inter, 700 weight, -0.02em tracking → font-bold tracking-tight
+- Body: Inter, 400 weight, 16px/1.5 → text-base leading-relaxed
+- Captions: 12px, 500 weight, +0.05em → text-xs font-medium tracking-wide
+- Monospace: JetBrains Mono → font-mono
+
+### Spacing Pattern
+- Page padding: 24px → px-6
+- Section gap: 64px → gap-16
+- Card padding: 24px → p-6
+- Card gap: 16px → gap-4
+- Inline element gap: 8px → gap-2
+
+### Layout Structure
+- Nav: fixed top, full width, h-16, border-b
+- Sidebar: 280px fixed left (desktop), Sheet (mobile)
+- Content: max-w-7xl mx-auto, responsive grid
+- Grid: 3 columns on lg:, 2 on md:, 1 on mobile
+
+### Component Mapping (what they built → shadcn equivalent)
+- Top nav bar → custom header with NavigationMenu
+- Sidebar nav → Sidebar component
+- Data cards → Card + CardHeader + CardContent
+- Action buttons → Button (default + outline variants)
+- Status pills → Badge (secondary + destructive variants)
+- Data table → Table with sortable headers
+- Search bar → InputGroup + InputGroupInput + InputGroupAddon
+- Modal dialogs → Dialog
+- Toast messages → sonner toast()
+- Loading states → Skeleton
+
+### Interactions Observed
+- Hover: subtle bg change on cards → hover:bg-muted/50
+- Transitions: 150ms color transitions → transition-colors duration-150
+- Active nav: left border accent → border-l-2 border-primary
+- Scroll behavior: sticky header → sticky top-0
+
+### What to replicate vs. adapt
+- Replicate: color palette, spacing rhythm, typography scale
+- Adapt: [specific components that don't map 1:1 to shadcn/ui]
+- Skip: [JS animations, custom widgets better handled differently]
+```
+
+### Tips
+
+- **Screenshot first, DOM second.** The visual tells you what matters; the DOM
+  tells you how it's built. Don't crawl the entire DOM — focus on what you saw.
+- **Extract real values.** `getComputedStyle()` gives you the truth. Don't eyeball
+  "looks like 16px" — measure it.
+- **Multiple pages matter.** The homepage alone won't show you forms, empty states,
+  error pages, or settings layouts. Ask the user which pages to analyze.
+- **Login-required sites.** Use `firefox-devtools` MCP — it connects to the user's
+  running browser with existing sessions and cookies.
+- **Don't over-extract.** The goal is design patterns, not a pixel-perfect clone.
+  Map to the nearest shadcn/ui equivalent rather than recreating custom CSS.
 
 ---
 
@@ -403,11 +573,11 @@ Same applies to: `DropdownMenuItem` → `DropdownMenuGroup`, `CommandItem` → `
 ## Workflow Overview
 
 ```
-Phase 0 — Context    →  Phase 1 — Specify   →  Phase 2 — Environment   →  Phase 3 — Handoff   →  Phase 4 — Verify
-npx shadcn info         Visual exploration      Scaffold or check           Component Spec          Screenshot after
-What's installed?       Preview server          project setup               for typescript-expert   implementation
-isRSC, iconLib,         Design tokens           (Next.js + shadcn)          TypeScript interfaces
-tailwindVersion         Component states        Quick, ui-expert owns       States, tokens, a11y
+Phase 0 — Context    →  (optional) Analyze  →  Phase 1 — Specify   →  Phase 2 — Environment   →  Phase 3 — Handoff   →  Phase 4 — Verify
+npx shadcn info         Point at a URL          Visual exploration      Scaffold or check           Component Spec          Screenshot after
+What's installed?       Extract design          Preview server          project setup               for typescript-expert   implementation
+isRSC, iconLib,         patterns, tokens        Design tokens           (Next.js + shadcn)          TypeScript interfaces
+tailwindVersion         → Design Analysis       Component states        Quick, ui-expert owns       States, tokens, a11y
 ```
 
 ---
@@ -754,6 +924,9 @@ grid gap-4 sm:grid-cols-2 lg:grid-cols-3
 | No mobile layout | Always add `sm:` / `md:` breakpoints in spec |
 | Skipping screenshot verification | Run `af screenshot` after implementation — trust your eyes |
 | Describing designs in text | Use preview server — visual beats verbal |
+| Guessing colors from a reference site | Use `getComputedStyle()` to extract actual values |
+| Analyzing only the homepage | Ask which pages to analyze — forms, settings, empty states differ |
+| Pixel-perfect cloning from URL | Map to nearest shadcn/ui equivalent — patterns, not pixels |
 
 ## Outputs
 
