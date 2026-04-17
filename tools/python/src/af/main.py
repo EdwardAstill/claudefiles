@@ -32,6 +32,7 @@ _SUBCOMMANDS = [
     ("webscraper", "webscraper"),
     ("archetype", "archetype"),
     ("lessons", "lessons"),
+    ("wiki", "wiki"),
 ]
 
 @app.callback(invoke_without_command=True)

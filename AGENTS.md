@@ -2,9 +2,24 @@
 
 This repo is a growth-oriented agent harness. Every task is an opportunity to improve
 the system itself — keep logs, capture lessons, enrich the wiki, cite sources. When you
-discover something worth remembering, write it into `wiki/lessons-learned/<slug>.md` or
-append with `af note`. The research skills exist so the system can teach itself — use
-them before falling back on guesses.
+discover something worth remembering, run `af lessons new "<title>"` or append with
+`af note`. The research skills exist so the system can teach itself — use them before
+falling back on guesses.
+
+## Before planning architectural changes, consult the wiki
+
+The wiki is the project's long-term memory. Before proposing changes to the harness,
+orchestration, or skill system, check what has already been researched:
+
+```bash
+af wiki list                         # index of research + lessons
+af wiki grep "<pattern>"             # search the wiki with context
+af wiki show research/<slug>         # print one page
+af archetype match "<user intent>"   # does this task match a known shape?
+```
+
+If a research page already covers the ground, build on it rather than re-discovering.
+If a lesson-learned contradicts what you're about to do, stop and reconcile.
 
 ---
 
