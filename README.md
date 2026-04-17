@@ -61,20 +61,6 @@ This keeps the context window clean while providing deep specialist knowledge wh
 
 ---
 
-## Recent Improvements (2026-04-17)
-
-**Hooks:** SessionStart now functional (was broken). Unified plugin-mode and af-install hook paths. Added UserPromptSubmit hook for persistent caveman re-injection.
-
-**Self-improvement:** Stop hook detects routing anomalies (self-loops, deep chains) and surfaces them at session start via `af log anomalies`. Log rotation: session traces 7 days, skill log rolling at 5 MB.
-
-**Caveman mode:** Rebuilt. 3 levels only (lite, full, actual-caveman). `af caveman` CLI controls it. Full mode is default, persists across turns. Indicator shows in statusline when active.
-
-**Statusline:** Moved from dotfiles into agentfiles. Shows caveman mode + context/usage bars + git state. Auto-installed by `af install`.
-
-**Docs aligned:** Generated skill-tree.md from filesystem (61 skills), fixed manifest drift, consolidated docs structure. See [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md) for details.
-
----
-
 ## Structure
 
 ```
