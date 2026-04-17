@@ -9,7 +9,7 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
-**Personal skills live in agent-specific directories (`~/.claude/skills` for Claude Code, `~/.agents/skills/` for Codex)** 
+**New skills belong in the agentfiles repo at `~/projects/agentfiles/skills/<skill-name>/SKILL.md`.** Do NOT write to `~/.claude/skills/` — that directory is only for the bootstrap `agentfiles-manager` skill. Skills written to `~/.claude/skills/` won't be tracked by git and won't be committed by `com-mains`.
 
 You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 
