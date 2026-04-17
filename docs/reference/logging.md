@@ -58,6 +58,27 @@ Tracks per-session state (last skill, skills seen, escalation flag). Cleaned up 
 
 ---
 
+### `anomalies.md` — Detected routing anomalies
+
+Written by `hooks/notify.py` when a session ends with routing problems:
+- Self-loops: skill called itself instead of escalating
+- Chain depth > 3: too many hops between skills
+- Wasted loads: same skill invoked ≥3× in one session
+
+Format:
+```
+## 2026-04-17 10:00 UTC  ·  ~/projects/myapp
+session: `abc-123`
+
+- self-loop: executor, python-expert
+- deep chain (4): executor → python-expert → tdd → simplify → python-expert
+- wasted loads (3×): skill-catalog
+```
+
+Desktop notification also fires with summary. Use `af log anomalies` to review.
+
+---
+
 ### `observations.md` — Qualitative notes
 
 A running log of patterns, routing misses, and things that felt off.
@@ -119,17 +140,28 @@ This single command does everything: reads skill stats and session traces, surfa
 
 ## Maintenance & Cleanup
 
-Session traces can grow large. The skill-logger automatically cleans up `.sessions/` state files older than 24 hours, but session traces in `sessions/` are kept until you delete them.
+Automatic rotation (no action needed):
+- `.sessions/` state files: deleted after 24 hours
+- `sessions/*.jsonl` traces: deleted after 7 days
+- `agentfiles.jsonl` skill log: rolls at 5 MB (keeps most recent half), throttled to once/hour
 
+Manual cleanup (optional):
 ```bash
-# Clear session traces (safe — stats log is separate)
+# Review pending anomalies, then clear
+af log anomalies
+af log anomalies --clear
+
+# Clear session traces manually
 rm ~/.claude/logs/sessions/*.jsonl
 
+# Clear anomalies log manually
+rm ~/.claude/logs/anomalies.md
+
 # Nuclear option — clear everything
-rm -rf ~/.claude/logs/sessions/ ~/.claude/logs/.sessions/
+rm -rf ~/.claude/logs/
 ```
 
-`agentfiles.jsonl` is append-only and small. Generally doesn't need clearing.
+Rotation runs on PostToolUse hook, not every call (throttled to ~1×/hour to avoid overhead).
 
 ---
 
@@ -141,6 +173,9 @@ af log --tail 50          # last 50 entries
 af log --skill tdd        # filter to one skill
 af log --stats            # frequency table + escalation count
 af log --escalations      # only sessions where executor → manager
+af log --loops            # only sessions with self-loops
+af log anomalies          # show detected routing anomalies from recent sessions
+af log anomalies --clear  # show anomalies and delete the log
 af log session            # timeline of latest session
 af log session --id XYZ   # timeline of specific session
 af log analyze            # recovery pattern analysis of latest session

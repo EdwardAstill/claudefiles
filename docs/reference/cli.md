@@ -324,6 +324,64 @@ automatically on first run (`playwright install firefox`).
 After capturing, Claude reads the PNG with the `Read` tool to visually verify
 the rendered output matches the design spec.
 
+## Logging & Analysis
+
+### af log
+
+Review skill invocations, session traces, and detected routing anomalies.
+
+```bash
+af log                    # last 20 invocations
+af log --tail 50          # last 50 entries
+af log --skill tdd        # filter to one skill
+af log --stats            # frequency table + escalation count
+af log --escalations      # sessions where executor → manager
+af log --loops            # sessions with self-loops (skill called itself)
+af log anomalies          # show detected routing anomalies
+af log anomalies --clear  # show and delete anomalies log
+af log session            # timeline of latest session
+af log analyze [--id XYZ] # recovery patterns from session
+af log review             # full review + append to observations.md
+af log review --dry-run   # preview without clearing
+```
+
+Anomalies (detected automatically on Stop event):
+- **self-loop**: skill invoking itself instead of escalating
+- **chain depth > 3**: too many hops between skills (context loss)
+- **wasted loads**: same skill invoked ≥3× in one session
+
+See [docs/reference/logging.md](logging.md) for details.
+
+---
+
+## Communication Modes
+
+### af caveman
+
+Toggle persistent caveman mode across all sessions. Three levels + off.
+
+```bash
+af caveman on [LEVEL]     # enable: lite, full (default), actual-caveman
+af caveman off            # disable
+af caveman [status]       # show current state
+
+# Examples:
+af caveman on full        # max token save (~60-70%), slight quality dip
+af caveman on lite        # light touch, no quality loss
+af caveman on actual-caveman  # grunt-style cave talk (novelty)
+af caveman                # show current mode
+```
+
+State file: `~/.claude/caveman-mode`. UserPromptSubmit hook re-injects level reminder every turn (no drift over long conversations).
+
+Modes:
+- **off** — normal prose
+- **lite** — drop filler, keep grammar (no quality loss)
+- **full** — drop articles too, fragments OK, ~60–70% token save
+- **actual-caveman** — grunt style with cave analogies (novelty only)
+
+---
+
 ## Agent Communication Bus
 
 `.agentfiles/` is gitignored session state shared between agents.
