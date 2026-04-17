@@ -27,6 +27,9 @@ _SUBCOMMANDS = [
     ("hub", "hub"),
     ("repo", "repo"),
     ("caveman", "caveman"),
+    ("youtube", "youtube"),
+    ("terminal", "terminal"),
+    ("webscraper", "webscraper"),
 ]
 
 @app.callback(invoke_without_command=True)
@@ -58,11 +61,22 @@ def install():
     pass  # Never reached; _run() intercepts first
 
 
+@app.command()
+def research():
+    """Scaffold a deep-research session (PROMPT.md + output dir)."""
+    pass  # Never reached; _run() intercepts first
+
+
 def _run():
-    """Entry point — intercepts 'install' before Typer to allow passthrough args."""
+    """Entry point — intercepts commands that need passthrough arg handling."""
     if len(sys.argv) > 1 and sys.argv[1] == "install":
         from af.install import install_cmd
         install_cmd(sys.argv[2:], standalone_mode=True)
+    elif len(sys.argv) > 1 and sys.argv[1] == "research":
+        # Intercepted because Typer treats a sub-typer-with-positional as a
+        # group expecting a COMMAND token. research uses argparse directly.
+        from af.research import cli as research_cli
+        research_cli(sys.argv[2:])
     else:
         app()
 
