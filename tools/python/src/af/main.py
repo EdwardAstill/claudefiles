@@ -33,6 +33,7 @@ _SUBCOMMANDS = [
     ("archetype", "archetype"),
     ("lessons", "lessons"),
     ("wiki", "wiki"),
+    ("session", "session"),
 ]
 
 @app.callback(invoke_without_command=True)
