@@ -30,6 +30,7 @@ _SUBCOMMANDS = [
     ("youtube", "youtube"),
     ("terminal", "terminal"),
     ("webscraper", "webscraper"),
+    ("archetype", "archetype"),
 ]
 
 @app.callback(invoke_without_command=True)

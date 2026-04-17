@@ -69,9 +69,16 @@ Announce the decision briefly:
 **Non-trivial:** State your approach in 2–4 lines before acting. Enough to avoid
 wrong turns — not a full decomposition. Think, then act.
 
-For larger shapes, check `docs/reference/task-archetypes.json` first — if the user's
-request matches an archetype's `signal_phrases`, lift the phase layout from there
-instead of redesigning it. The registry is opinion-encoded; use it.
+For larger shapes, consult the task-archetypes registry first. One command:
+
+```bash
+af archetype match "<the user's phrasing, quoted>"   # ranked candidates + phase layout
+af archetype show <id>                                # full layout for one archetype
+af archetype list                                     # all archetype ids
+```
+
+If a candidate scores well and fits, lift its phase layout instead of redesigning.
+The registry is opinion-encoded; use it.
 
 ## Step 3: Execute
 

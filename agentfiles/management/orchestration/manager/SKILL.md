@@ -37,12 +37,20 @@ cat agentfiles/research/REGION.md    # if research involved
 
 ### Check the task-archetypes registry
 
-Before planning from scratch, check `docs/reference/task-archetypes.json` (human-readable
-companion at `docs/reference/task-archetypes.md`). It maps common big-task shapes to agent
-group compositions — phases, which agents run per phase, parallel vs sequential, risks.
+Before planning from scratch, match the user's intent against the registry:
 
-- If the task matches an archetype's `signal_phrases`, start from that archetype's phase
-  layout rather than designing one from scratch. Adapt; don't copy blindly.
+```bash
+af archetype match "<quoted user intent>"   # ranked candidates + phase layout
+af archetype show <id>                      # full layout for one archetype
+```
+
+The registry lives at `docs/reference/task-archetypes.json` (human-readable
+companion at `docs/reference/task-archetypes.md`). It maps common big-task shapes to
+agent group compositions — phases, which agents run per phase, parallel vs sequential,
+risks.
+
+- If a candidate scores well, start from that archetype's phase layout rather than
+  designing one from scratch. Adapt; don't copy blindly.
 - If no archetype fits, proceed to the planning pass below. If the task looks like a
   recurring shape that isn't in the registry yet, add it after the work is done.
 
