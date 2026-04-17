@@ -1,7 +1,29 @@
 # agentfiles
 
-Personal Claude Code skill suite and CLI toolset. 61 skills route tasks to the right
-specialist. The `af` CLI provides context gathering, git workflows, and skill management.
+Personal Claude Code skill suite and CLI toolset. Routes tasks to the right specialist.
+The `af` CLI provides context gathering, git workflows, and skill management.
+
+---
+
+## Mission
+
+**Fully enhance human capability.** The goal is to make doing things as easy as giving
+instructions to a super-expert who predicts what would be ideal for the situation and
+hands it back to you. You describe intent; the system handles the rest — routing to the
+right specialists, pulling in the right context, remembering what worked.
+
+To do that, this system is about growth, learning, and continual self-improvement. Every
+session leaves artifacts behind: logs (`af log`), findings (`af note`), wiki entries
+(`wiki/`), downloaded references (`wiki/papers/`). The system reads its own history to
+get better over time.
+
+The research skills (`research-agent`, `docs-agent`, `web-scraper`, `sci-hub`,
+`youtube`, `github-repo-researcher`) are the engine of self-improvement — they bring
+outside knowledge in. The orchestration layer (executor + manager + advisors) routes
+tasks to the right agent combinations.
+
+Next step: a UI where the user and agents collaborate interactively — agents propose
+designs and ask clarifying questions instead of guessing.
 
 ---
 
@@ -148,9 +170,9 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 
 ---
 
-## Skills (48)
+## Skills
 
-### Management (11)
+### Management
 
 | Skill | Use when |
 |-------|----------|
@@ -166,14 +188,14 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | `writing-skills` | Create or edit a SKILL.md |
 | `documentation-maintainer` | Sync docs after skill/CLI changes |
 
-### Planning (2)
+### Planning
 
 | Skill | Use when |
 |-------|----------|
 | `brainstorming` | Requirements unclear — idea to spec |
 | `writing-plans` | Spec to implementation plan |
 
-### Coding (30)
+### Coding
 
 | Sub-category | Skill | Use when |
 |-------------|-------|----------|
@@ -208,7 +230,7 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | **CI/CD** | `github-actions-expert` | GitHub Actions workflows |
 | **API** | `api-architect` | API design and review |
 
-### Research (5)
+### Research
 
 | Skill | Use when |
 |-------|----------|
@@ -306,3 +328,4 @@ description: >
 | [docs/reference/workflows.md](docs/reference/workflows.md) | End-to-end workflow traces |
 | [docs/reference/logging.md](docs/reference/logging.md) | Logging system, review cycle, `af log` reference |
 | [docs/reference/agent-orchestration-patterns.md](docs/reference/agent-orchestration-patterns.md) | Research: agent routing, scaling, failure modes |
+| [wiki/README.md](wiki/README.md) | Long-term memory: research, papers, lessons learned |

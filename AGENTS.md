@@ -1,6 +1,16 @@
+# Mission (for agents)
+
+This repo is a growth-oriented agent harness. Every task is an opportunity to improve
+the system itself — keep logs, capture lessons, enrich the wiki, cite sources. When you
+discover something worth remembering, write it into `wiki/lessons-learned/<slug>.md` or
+append with `af note`. The research skills exist so the system can teach itself — use
+them before falling back on guesses.
+
+---
+
 # agentfiles — Claude Code Guidance
 
-This repo is the source of truth for a personal Claude Code skill suite (61 skills).
+This repo is the source of truth for a personal Claude Code skill suite.
 Skills are symlinked into `~/.claude/skills/` (user-level) or `.claude/skills/`
 (project-level) via `af install`.
 
