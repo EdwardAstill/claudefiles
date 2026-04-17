@@ -1,13 +1,26 @@
 #!/usr/bin/env bash
-# SessionStart hook — injects task-analyser into every Claude Code session
+# SessionStart hook — injects using-agentfiles into every Claude Code session
 
 set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-SKILL_FILE="$PLUGIN_ROOT/skills/management/orchestration/task-analyser/SKILL.md"
-[[ ! -f "$SKILL_FILE" ]] && SKILL_FILE="$PLUGIN_ROOT/dev-suite/management/orchestration/task-analyser/SKILL.md"
 
-if [[ ! -f "$SKILL_FILE" ]]; then
+# Search paths in preference order. First match wins.
+CANDIDATES=(
+    "$PLUGIN_ROOT/agentfiles/management/meta/using-agentfiles/SKILL.md"
+    "$PLUGIN_ROOT/skills/management/meta/using-agentfiles/SKILL.md"
+    "$HOME/.claude/skills/using-agentfiles/SKILL.md"
+)
+
+SKILL_FILE=""
+for candidate in "${CANDIDATES[@]}"; do
+    if [[ -f "$candidate" ]]; then
+        SKILL_FILE="$candidate"
+        break
+    fi
+done
+
+if [[ -z "$SKILL_FILE" ]]; then
     exit 0
 fi
 
@@ -23,7 +36,16 @@ escape_for_json() {
 
 content=$(cat "$SKILL_FILE")
 content_escaped=$(escape_for_json "$content")
-context="<EXTREMELY_IMPORTANT>\nYou must invoke task-analyser before starting any task.\n\n**Below is the full content of your 'task-analyser' skill:**\n\n${content_escaped}\n</EXTREMELY_IMPORTANT>"
+
+# If anomalies from recent sessions are unreviewed (file exists, non-empty), flag them.
+ANOMALIES_FILE="$HOME/.claude/logs/anomalies.md"
+anomaly_note=""
+if [[ -s "$ANOMALIES_FILE" ]]; then
+    count=$(grep -c '^## ' "$ANOMALIES_FILE" 2>/dev/null || echo 0)
+    anomaly_note="\n\n**Routing anomalies from recent sessions:** ${count} session(s) had self-loops, deep chains, or wasted skill loads. Review with \`af log review\` or clear with \`rm ${ANOMALIES_FILE}\`."
+fi
+
+context="<EXTREMELY_IMPORTANT>\nYou must invoke using-agentfiles before starting any task.\n\n**Below is the full content of your 'using-agentfiles' skill:**\n\n${content_escaped}${anomaly_note}\n</EXTREMELY_IMPORTANT>"
 
 printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$context"
 

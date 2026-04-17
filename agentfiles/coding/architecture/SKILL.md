@@ -1,21 +1,11 @@
 ---
 name: system-architecture-expert
 description: >
-  System and application architecture expert. Use when making decisions about
-  how an application or system is structured — monolith vs microservices,
-  frontend/backend separation, layering patterns, caching strategy, message
-  queues, service boundaries, or scaling approach. Covers both greenfield
-  design ("how should I structure this app?") and evolving existing systems
-  ("my monolith is getting slow, what should I do?"). Triggers on: "how
-  should I architect this", "should I use microservices", "how to structure
-  my app", "should I split this service", backend/frontend layering questions,
-  event-driven vs request-response decisions, caching architecture, or any
-  question about how the major pieces of a system fit together. Even if the
-  user doesn't say "architecture" — if the question is about how components,
-  services, or layers should be organized, use this skill. Does NOT cover:
-  low-level data structure choice (use dsa-expert), API contract design (use
-  api-architect), database schema design (use database-expert), or
-  infrastructure/deployment (use infrastructure-expert).
+  System architecture expert. Use for decisions about how an application or
+  system is structured: monolith vs microservices, layering, caching, message
+  queues, service boundaries, scaling. Covers greenfield and evolution of
+  existing systems. Not for: data structure choice (dsa-expert), API contracts
+  (api-architect), schema (database-expert), deployment (infrastructure-expert).
 ---
 
 # System Architecture Expert

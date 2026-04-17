@@ -1,17 +1,11 @@
 ---
 name: dsa-expert
 description: >
-  Data structures and algorithms expert for low-level design decisions and
-  implementation. Use when choosing between data structures (hash map vs trie,
-  BTree vs skip list, etc.), analyzing algorithmic complexity, designing
-  efficient solutions to computational problems, or implementing classic
-  algorithms. Triggers on: "what data structure should I use", "time/space
-  complexity", "efficient way to...", algorithm selection, competitive
-  programming problems, interview-style questions, or any situation where the
-  right choice of data structure or algorithm materially affects correctness or
-  performance. Even if the user doesn't explicitly say "algorithm", if the
-  problem is fundamentally about efficient computation, searching, sorting,
-  graph traversal, or similar — use this skill.
+  Data structures and algorithms expert. Use for choosing between data structures
+  (hash map vs trie, BTree vs skip list), analyzing complexity, designing efficient
+  solutions, or implementing classic algorithms. Triggers on complexity questions,
+  algorithm selection, search/sort/graph problems, or any situation where the right
+  choice materially affects correctness or performance.
 ---
 
 # Data Structures & Algorithms Expert

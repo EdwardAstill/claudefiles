@@ -12,6 +12,7 @@ app = typer.Typer(help="Show skill invocation log.")
 
 LOG_FILE = Path.home() / ".claude" / "logs" / "agentfiles.jsonl"
 SESSION_LOG_DIR = Path.home() / ".claude" / "logs" / "sessions"
+ANOMALIES_FILE = Path.home() / ".claude" / "logs" / "anomalies.md"
 
 
 def _read_entries(
@@ -199,6 +200,20 @@ def _find_wasted_skill_loads(history: list[dict]) -> list[str]:
     # and the session is long, it's probably fine. Flag duplicates (loaded multiple times).
     counts = Counter(loaded_skills)
     return [name for name, count in counts.items() if count >= 3]
+
+
+@app.command()
+def anomalies(
+    clear: bool = typer.Option(False, "--clear", help="Delete the anomalies file after reading."),
+):
+    """Show routing anomalies detected by the Stop hook (self-loops, deep chains, wasted loads)."""
+    if not ANOMALIES_FILE.exists() or ANOMALIES_FILE.stat().st_size == 0:
+        typer.echo("No anomalies recorded.")
+        return
+    typer.echo(ANOMALIES_FILE.read_text())
+    if clear:
+        ANOMALIES_FILE.unlink()
+        typer.echo(f"\nCleared {ANOMALIES_FILE}.")
 
 
 @app.command()

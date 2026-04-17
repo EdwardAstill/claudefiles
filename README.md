@@ -1,6 +1,6 @@
 # agentfiles
 
-Personal Claude Code skill suite and CLI toolset. 40 skills route tasks to the right
+Personal Claude Code skill suite and CLI toolset. 61 skills route tasks to the right
 specialist. The `af` CLI provides context gathering, git workflows, and skill management.
 
 ---

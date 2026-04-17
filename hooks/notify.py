@@ -23,6 +23,67 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 STATUS_DIR = Path.home() / ".claude" / "terminal-status"
+SKILL_LOG = Path.home() / ".claude" / "logs" / "agentfiles.jsonl"
+ANOMALIES_FILE = Path.home() / ".claude" / "logs" / "anomalies.md"
+
+
+def detect_session_anomalies(session_id: str) -> list[str]:
+    """Scan this session's skill log entries for routing anomalies."""
+    if not SKILL_LOG.exists():
+        return []
+    anomalies: list[str] = []
+    entries: list[dict] = []
+    try:
+        with SKILL_LOG.open() as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    e = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if e.get("session") == session_id:
+                    entries.append(e)
+    except OSError:
+        return []
+
+    if not entries:
+        return []
+
+    # Self-loops
+    loops = [e for e in entries if e.get("self_loop")]
+    if loops:
+        names = sorted({e.get("skill", "?") for e in loops})
+        anomalies.append(f"self-loop: {', '.join(names)}")
+
+    # Chain depth > 3
+    max_depth = max((e.get("chain_depth", 0) for e in entries), default=0)
+    if max_depth > 3:
+        chain = " → ".join(e.get("skill", "?") for e in entries[:max_depth + 1])
+        anomalies.append(f"deep chain ({max_depth}): {chain}")
+
+    # Wasted loads — same skill 3+ times
+    from collections import Counter
+    counts = Counter(e.get("skill") for e in entries)
+    wasted = [s for s, c in counts.items() if c >= 3 and s]
+    if wasted:
+        anomalies.append(f"wasted loads (≥3x): {', '.join(wasted)}")
+
+    return anomalies
+
+
+def record_anomalies(session_id: str, cwd: str, anomalies: list[str]) -> None:
+    """Append anomalies to a rolling markdown log for manual review."""
+    if not anomalies:
+        return
+    ANOMALIES_FILE.parent.mkdir(parents=True, exist_ok=True)
+    entry = [f"## {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}  ·  {cwd or '?'}",
+             f"session: `{session_id}`", ""]
+    entry += [f"- {a}" for a in anomalies]
+    entry.append("")
+    with ANOMALIES_FILE.open("a") as f:
+        f.write("\n".join(entry) + "\n")
 
 
 def notify(summary: str, body: str, urgency: str = "normal") -> None:
@@ -68,6 +129,14 @@ def main() -> None:
     if event == "Stop":
         write_status(session_id, "idle", cwd)
         notify("Claude Code", f"Done — {label}")
+        anomalies = detect_session_anomalies(session_id)
+        if anomalies:
+            record_anomalies(session_id, cwd, anomalies)
+            notify(
+                "Claude Code — routing anomalies",
+                " · ".join(anomalies)[:200],
+                urgency="low",
+            )
 
     elif event == "PermissionRequest":
         tool = data.get("tool_name", "unknown tool")

@@ -1,16 +1,11 @@
 ---
 name: ui-expert
 description: >
-  Use when building, iterating on, or reviewing UI — React components, Tailwind
-  styling, shadcn/ui primitives, responsive layouts, design alternatives, or
-  visual verification of what the browser actually renders. Covers three modes:
-  (1) website analysis — point at a URL to extract design patterns, tokens,
-  layout structure, and component mapping from an existing site;
-  (2) design specification — produce a structured component spec using visual
-  mockups and the preview server for iteration; (3) implementation handoff —
-  scaffold the project environment and produce a spec block that typescript-expert
-  consumes to write the actual components. ui-expert owns what things should look
-  like; typescript-expert owns the code. Also use for screenshot verification.
+  Use for building, iterating on, or reviewing UI — React, Tailwind, shadcn/ui,
+  responsive layouts, or visual verification. Three modes: (1) analyze a URL to
+  extract design patterns; (2) produce a component spec from mockups; (3) hand off
+  a spec to typescript-expert. ui-expert owns how it looks; typescript-expert owns
+  the code. Also for screenshot verification.
 ---
 
 # UI Expert

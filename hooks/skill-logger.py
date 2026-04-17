@@ -22,7 +22,11 @@ from pathlib import Path
 SKILL_LOG = Path.home() / ".claude" / "logs" / "agentfiles.jsonl"
 SESSION_LOG_DIR = Path.home() / ".claude" / "logs" / "sessions"
 SESSION_STATE_DIR = Path.home() / ".claude" / "logs" / ".sessions"
-SESSION_MAX_AGE_S = 60 * 60 * 24  # clean up session state older than 24 hours
+SESSION_STATE_MAX_AGE_S = 60 * 60 * 24           # state files: 24h
+SESSION_LOG_MAX_AGE_S = 60 * 60 * 24 * 7         # session JSONLs: 7 days
+SKILL_LOG_MAX_BYTES = 5 * 1024 * 1024            # agentfiles.jsonl: 5 MB rolling
+_CLEANUP_EVERY_N = 50                            # run rotation every ~50 invocations
+_CLEANUP_MARKER = SESSION_STATE_DIR / ".last_cleanup"
 
 
 def _truncate(data, max_len=1000):
@@ -52,16 +56,59 @@ def _save_session_state(session_id: str, state: dict) -> None:
     _session_state_file(session_id).write_text(json.dumps(state))
 
 
+def _should_run_cleanup() -> bool:
+    """Throttle cleanup: only run if marker is missing or >1h old."""
+    try:
+        if not _CLEANUP_MARKER.exists():
+            return True
+        return (time.time() - _CLEANUP_MARKER.stat().st_mtime) > 3600
+    except OSError:
+        return False
+
+
+def _touch_cleanup_marker() -> None:
+    try:
+        SESSION_STATE_DIR.mkdir(parents=True, exist_ok=True)
+        _CLEANUP_MARKER.touch()
+    except OSError:
+        pass
+
+
 def _cleanup_old_sessions() -> None:
-    if not SESSION_STATE_DIR.exists():
-        return
-    cutoff = time.time() - SESSION_MAX_AGE_S
-    for f in SESSION_STATE_DIR.glob("*.json"):
-        try:
-            if f.stat().st_mtime < cutoff:
-                f.unlink(missing_ok=True)
-        except OSError:
-            pass
+    """Prune session state files (24h), session JSONL logs (7 days), and
+    rotate the skill log if it exceeds SKILL_LOG_MAX_BYTES."""
+    now = time.time()
+
+    # 1. State files — 24h retention
+    if SESSION_STATE_DIR.exists():
+        state_cutoff = now - SESSION_STATE_MAX_AGE_S
+        for f in SESSION_STATE_DIR.glob("*.json"):
+            try:
+                if f.stat().st_mtime < state_cutoff:
+                    f.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+    # 2. Session JSONL logs — 7 day retention
+    if SESSION_LOG_DIR.exists():
+        log_cutoff = now - SESSION_LOG_MAX_AGE_S
+        for f in SESSION_LOG_DIR.glob("session-*.jsonl"):
+            try:
+                if f.stat().st_mtime < log_cutoff:
+                    f.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+    # 3. Skill log — size-based rotation, keep most recent half
+    try:
+        if SKILL_LOG.exists() and SKILL_LOG.stat().st_size > SKILL_LOG_MAX_BYTES:
+            lines = SKILL_LOG.read_text().splitlines()
+            keep = lines[len(lines) // 2:]
+            SKILL_LOG.write_text("\n".join(keep) + ("\n" if keep else ""))
+    except OSError:
+        pass
+
+    _touch_cleanup_marker()
 
 
 def main():
@@ -127,7 +174,8 @@ def main():
         state["skills_seen"].append(skill_name)
 
     _save_session_state(session_id, state)
-    _cleanup_old_sessions()
+    if _should_run_cleanup():
+        _cleanup_old_sessions()
 
     # Detect self-loop: skill invoking itself
     self_loop = skill_name == parent_skill

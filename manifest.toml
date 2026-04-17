@@ -114,10 +114,34 @@ category = "research"
 tools = ["Bash", "Read", "Write"]
 category = "research"
 
-[skills.make-quiz]
-tools = ["Read", "Write", "Glob", "WebFetch"]
-category = "research"
+[skills.dsa-expert]
+tools = ["Read"]
+category = "coding"
 
+[skills.system-architecture-expert]
+tools = ["Read"]
+category = "coding"
+
+[skills.documentation]
+tools = ["Read", "Write", "Edit"]
+category = "coding/quality"
+
+[skills.documentation-maintainer]
+tools = ["Read", "Write", "Edit", "Glob", "Grep"]
+category = "management/meta"
+
+[skills.file-converter]
+tools = ["Bash", "Read"]
+cli = ["cnv"]
+category = "coding/data"
+
+[skills.health-advisor]
+tools = ["Read"]
+category = "coaches"
+
+[skills.kb-critic]
+tools = ["Read"]
+category = "coaches"
 
 [skills.git-expert]
 tools = ["Bash", "Read", "Glob"]

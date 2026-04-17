@@ -1,8 +1,13 @@
-# file-converter
+---
+name: file-converter
+description: >
+  File format conversion and extraction expert. Use for converting PDFs, images,
+  or other complex file types into AI-friendly markdown or structured formats using
+  `cnv` (convert2). Covers text extraction, layout recovery, chunking for RAG, and
+  knowledge graph generation from documents.
+---
 
-<description>
-File format conversion and extraction expert. Use when you need to convert PDF documents, images, or other complex file types into AI-friendly markdown or structured formats using `cnv` (convert2). Covers text extraction, layout recovery, chunking for RAG, and knowledge graph generation from documents.
-</description>
+# file-converter
 
 <capabilities>
 - Extracting text, tables, and images from PDFs.

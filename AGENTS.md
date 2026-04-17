@@ -1,6 +1,6 @@
 # agentfiles — Claude Code Guidance
 
-This repo is the source of truth for a personal Claude Code skill suite (39 skills).
+This repo is the source of truth for a personal Claude Code skill suite (61 skills).
 Skills are symlinked into `~/.claude/skills/` (user-level) or `.claude/skills/`
 (project-level) via `af install`.
 

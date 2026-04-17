@@ -26,6 +26,7 @@ _SUBCOMMANDS = [
     ("test-skill", "test_skill"),
     ("hub", "hub"),
     ("repo", "repo"),
+    ("caveman", "caveman"),
 ]
 
 @app.callback(invoke_without_command=True)

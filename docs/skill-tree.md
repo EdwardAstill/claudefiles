@@ -1,137 +1,87 @@
 # Skill Tree
 
+Auto-generated from `agentfiles/`. Do not edit by hand — run `af tree --regenerate` (or `python hooks/tools/gen-skill-tree.py`).
+
 ```
 agentfiles/
-├── management/
-│   ├── orchestration/
-│   │   ├── executor              ← default entry point for every task
-│   │   ├── manager               ← multi-agent coordinator (escalation only)
-│   │   └── subagent-driven-development
-│   ├── consultants/              (loaded inline by manager during planning)
-│   │   ├── design-advisor
-│   │   ├── git-advisor
-│   │   └── coordination-advisor
-│   └── meta/
-│       ├── using-agentfiles     ← session-start skill
-│       ├── agentfiles-manager
-│       ├── skills
-│       ├── writing-skills
-│       └── documentation-maintainer  ← docs consistency checks
-│
-├── planning/
-│   ├── brainstorming             ← idea → spec
-│   └── writing-plans             ← spec → implementation plan
-│
+├── coaches/
+│   ├── health-advisor     ← Integrated health coach for diet, exercise, and biochemistry/medication questions.
+│   ├── kb-critic     ← Critical thinking analyst for the personal knowledge base.
 ├── coding/
-│   ├── languages/                (toolchain + conventions specialists)
-│   │   ├── python-expert         ← pyright LSP, uv, ruff, pytest
-│   │   ├── typescript-expert     ← ts-language-server LSP, bun, biome
-│   │   ├── rust-expert           ← rust-analyzer LSP, cargo, clippy
-│   │   ├── typst-expert          ← tinymist LSP, typst compile
-│   │   ├── ui-expert             ← React, Tailwind, shadcn/ui
-│   │   └── tui-expert            ← terminal UIs (Textual, Ratatui, Ink)
-│   ├── quality/
-│   │   ├── tdd
-│   │   ├── systematic-debugging
-│   │   ├── verification-before-completion  ← mandatory executor exit gate
-│   │   ├── code-review
-│   │   ├── simplify              ← recently changed code
-│   │   ├── security-review       ← OWASP, CVEs, injection, auth    [NEW]
-│   │   ├── performance-profiling ← "correct but slow"               [NEW]
-│   │   ├── refactoring-patterns  ← large-scale restructuring        [NEW]
-│   │   ├── dependency-management ← version bumps, CVE scanning      [NEW]
-│   │   ├── observability         ← logging, tracing, metrics        [NEW]
-│   │   ├── accessibility         ← WCAG 2.1 AA, ARIA, a11y         [NEW]
-│   │   ├── regex-expert          ← mass search/replace with sd/rg
-│   │   ├── skill-tester          ← benchmark skills with rubric grading
-│   │   └── documentation         ← READMEs, API docs, guides, changelogs
-│   ├── architecture/
-│   │   └── system-architecture-expert ← service boundaries, scaling
-│   ├── dsa/
-│   │   └── dsa-expert            ← data structures, algorithms, complexity
-│   ├── data/
-│   │   ├── database-expert       ← schema, migrations, queries      [NEW]
-│   │   └── file-converter        ← PDF/image to markdown via cnv
-│   ├── infrastructure/
-│   │   └── infrastructure-expert ← Docker, K8s, Terraform, IaC      [NEW]
-│   ├── version-control/
-│   │   ├── git-expert
-│   │   ├── github-expert
-│   │   └── git-worktree-workflow
+│   ├── architecture     ← System architecture expert.
+│   ├── dsa     ← Data structures and algorithms expert.
+│   ├── quality     ← Sub-category dispatcher for code quality.
+│   ├── api/
+│   │   ├── api-architect     ← API design and review specialist.
 │   ├── ci-cd/
-│   │   └── github-actions-expert
-│   └── api/
-│       └── api-architect
-│
-└── research/
-    ├── docs-agent                ← "how do I use X?"
-    ├── research-agent            ← "should I use X?"
-    ├── codebase-explainer        ← "how does this codebase work?"
-    ├── note-taker
-    └── test-taker
+│   │   ├── github-actions-expert     ← Use when writing, debugging, or reviewing GitHub Actions workflows.
+│   ├── data/
+│   │   ├── database-expert     ← Use when designing database schemas, writing migrations, optimizing queries, choosing indexing st...
+│   │   ├── file-converter     ← File format conversion and extraction expert.
+│   ├── infrastructure/
+│   │   ├── infrastructure-expert     ← Use when writing Dockerfiles, docker-compose configs, Kubernetes manifests, Terraform or Pulumi I...
+│   ├── languages/
+│   │   ├── python     ← Python toolchain and conventions specialist.
+│   │   ├── rust     ← Rust toolchain and conventions specialist.
+│   │   ├── storm-tui     ← Use when building TUI apps with @orchetron/storm — a React-based compositor-driven terminal UI fr...
+│   │   ├── tui     ← Use when building, iterating on, or reviewing terminal user interfaces (TUIs).
+│   │   ├── typescript     ← TypeScript toolchain and conventions specialist.
+│   │   ├── typst     ← Typst document expert.
+│   │   ├── ui     ← Use for building, iterating on, or reviewing UI — React, Tailwind, shadcn/ui, responsive layouts,...
+│   ├── quality/
+│   │   ├── accessibility     ← Use when building or reviewing web UI for accessibility compliance.
+│   │   ├── code-review     ← Use when requesting a code review of completed work, or when receiving and processing code review...
+│   │   ├── dependency-management     ← Use when bumping dependency versions, analyzing breaking changes, scanning for CVEs, managing loc...
+│   │   ├── documentation     ← Use when writing, updating, or reviewing project documentation — READMEs, API docs, architecture ...
+│   │   ├── observability     ← Use when adding structured logging, distributed tracing (OpenTelemetry), metrics instrumentation,...
+│   │   ├── performance-profiling     ← Use when code is correct but slow, or when optimizing for latency, throughput, or memory usage.
+│   │   ├── refactoring-patterns     ← Use when restructuring existing code at scale — not quick cleanups of recent changes (that's simp...
+│   │   ├── regex-expert     ← High-performance codebase manipulation using regex.
+│   │   ├── repomix     ← Pack a repo or directory into a single AI-friendly file for LLM context.
+│   │   ├── security-review     ← Use when reviewing code for security vulnerabilities, hardening an application, or before deployi...
+│   │   ├── simplify     ← Use when implementation is working and tests pass, to review recently changed code for unnecessar...
+│   │   ├── skill-tester     ← Tests and evaluates agentfiles skills by running them against hard benchmark questions and gradin...
+│   │   ├── systematic-debugging     ← Use when encountering any bug, test failure, or unexpected behavior — before proposing fixes.
+│   │   ├── tdd     ← Use when implementing any feature or bugfix, before writing implementation code.
+│   │   ├── verification-before-completion     ← Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - ...
+│   ├── version-control/
+│   │   ├── git-expert     ← Version control context manager.
+│   │   ├── git-worktree-workflow     ← Use when starting isolated feature work (creates a git worktree with safety verification and a cl...
+│   │   ├── github-expert     ← GitHub and gh CLI specialist.
+├── communication/
+│   ├── caveman     ← Ultra-compressed communication mode.
+├── management/
+│   ├── meta     ← Sub-category dispatcher for skill system tooling.
+│   ├── consultants/
+│   │   ├── coordination-advisor     ← Use when manager needs to decide how to structure agent teams: which tasks run in parallel vs seq...
+│   │   ├── design-advisor     ← Use when manager needs to decide whether a task requires a design or spec phase before implementa...
+│   │   ├── git-advisor     ← Use when manager needs to decide git strategy for multi-agent work: whether to use worktrees, bra...
+│   ├── meta/
+│   │   ├── audit     ← Use when verifying the agentfiles manifest is consistent — ensure every skill on disk is in manif...
+│   │   ├── documentation-maintainer     ← Use when adding, removing, or renaming skills, when docs feel stale, when the user asks to update...
+│   │   ├── retrospective     ← Use when reviewing session logs to find routing failures, self-loops, wasted skill loads, and rec...
+│   │   ├── skill-catalog     ← Use when the user wants to see all available agentfiles skills.
+│   │   ├── skill-manager     ← Use when the user wants to set up skills for a project, see what is installed, install or remove ...
+│   │   ├── using-agentfiles     ← Use when starting any conversation — establishes how skills work, the default routing rule (execu...
+│   │   ├── writing-skills     ← Use when creating new skills, editing existing skills, or verifying skills work before deployment.
+│   ├── orchestration/
+│   │   ├── executor     ← Use when starting any new task.
+│   │   ├── manager     ← Use when executor escalates here — genuinely multi-agent work: parallel domains, or scale so larg...
+│   │   ├── subagent-driven-development     ← Use when executing implementation plans with independent tasks in the current session.
+├── planning/
+│   ├── brainstorming     ← Use when creating features, adding functionality, building components, or modifying behavior — be...
+│   ├── writing-plans     ← Use when you have a spec or requirements for a multi-step task, before touching code.
+├── research/
+│   ├── browser-control     ← Use when automating a browser — navigating pages, clicking, filling forms, selecting dropdowns, s...
+│   ├── codebase-explainer     ← Codebase mental-model builder.
+│   ├── docs-agent     ← Technical reference lookup specialist.
+│   ├── github-repo-researcher     ← Investigate GitHub repos — search for repos by topic, analyze how a repo works, break down its ar...
+│   ├── knowledge-base     ← Use when answering questions about health, training, enhancement, pharmacology, nutrition, exerci...
+│   ├── note-taker     ← Use when creating markdown notes, lessons, study material, or interactive tutorials.
+│   ├── research-agent     ← Trade-off and risk analysis specialist.
+│   ├── sci-hub     ← Use when downloading academic papers, journal articles, or research papers by title, DOI, or URL.
+│   ├── test-taker     ← Use when given a set of questions to answer using provided reference material.
 ```
 
-## Routing
+**Total: 61 skills across 6 top-level categories.**
 
-```
-user message
-  │
-  ▼
-using-agentfiles (session start)
-  │
-  ▼
-executor (every new task)
-  │
-  ├─ work ──────────────► handles end-to-end
-  │                         loads specialists inline
-  │                         MANDATORY verification before completion
-  │                         passes HANDOFF CONTEXT on escalation
-  │
-  └─ parallel/multi-domain ──► manager
-                                 │
-                                 ├─ Phase 1: Plan
-                                 │   reads HANDOFF CONTEXT from executor
-                                 │   reads REGION.md files
-                                 │   inline advisors (if non-obvious):
-                                 │   ├── design-advisor
-                                 │   ├── git-advisor
-                                 │   └── coordination-advisor
-                                 │
-                                 ├─ Phase 2: Execute
-                                 │   ├── Parallel agents
-                                 │   ├── Sequential (subagent-driven-dev)
-                                 │   └── Individual specialist
-                                 │
-                                 └─ Phase 3: Review + Replan
-                                     check conflicts, run tests
-                                     adaptive replan if agents fail
-```
-
-## Research Skill Routing
-
-```
-"how do I use X?"          → docs-agent          (API lookup)
-"should I use X?"          → research-agent       (trade-off analysis)
-"how does this code work?" → codebase-explainer   (architecture mapping)
-```
-
-## Quality Gate Chain
-
-```
-tdd (before code)
-  → implementation
-  → systematic-debugging (if broken)
-  → security-review (if handles user input/auth)
-  → verification-before-completion (MANDATORY before claiming done)
-  → code-review (before merge)
-  → simplify (after merge, if needed)
-```
-
-## Lifecycle
-
-```
-brainstorming → writing-plans → subagent-driven-development
-     │                │                    │
-  produces:       produces:            executes:
-  spec doc     implementation plan    task-by-task with review gates
-```

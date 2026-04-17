@@ -36,6 +36,16 @@ HOOKS_CONFIG=$(cat <<'EOF'
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/hooks/caveman-mode.py"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": ".*",
@@ -129,3 +139,24 @@ fi
 
 echo "  Done. Hook scripts expected at ~/.claude/skills/hooks/"
 echo "  Run: af install  to install hook scripts to that location."
+
+# ── statusLine: point at agentfiles/hooks/statusline.sh ───────────────────────
+STATUSLINE_CMD="$HOME/.claude/skills/hooks/statusline.sh"
+if command -v jq &>/dev/null; then
+    TMP_SETTINGS=$(mktemp)
+    jq --arg cmd "$STATUSLINE_CMD" \
+       '.statusLine = { "type": "command", "command": $cmd }' \
+       "$SETTINGS" > "$TMP_SETTINGS" && mv "$TMP_SETTINGS" "$SETTINGS"
+    echo "  [updated] statusLine → $STATUSLINE_CMD"
+else
+    python3 - "$SETTINGS" "$STATUSLINE_CMD" <<'PYEOF'
+import json, sys
+settings_path, cmd = sys.argv[1], sys.argv[2]
+with open(settings_path) as f:
+    s = json.load(f)
+s["statusLine"] = {"type": "command", "command": cmd}
+with open(settings_path, "w") as f:
+    json.dump(s, f, indent=2); f.write("\n")
+PYEOF
+    echo "  [updated] statusLine → $STATUSLINE_CMD"
+fi
