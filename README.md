@@ -25,6 +25,12 @@ tasks to the right agent combinations.
 Next step: a UI where the user and agents collaborate interactively — agents propose
 designs and ask clarifying questions instead of guessing.
 
+**Anti-bloat rule.** Nothing lands in this repo unless it absolutely serves a purpose
+and is the best way to serve it. No wrappers over existing commands. No docs that
+restate other docs. No CLIs where `rg`, `cat`, `touch`, or a plain skill edit already
+suffice. Growth means *capability*, not *surface area* — every addition must clear
+this bar.
+
 ---
 
 ## Install

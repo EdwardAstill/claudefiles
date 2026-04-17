@@ -1,10 +1,15 @@
 # Mission (for agents)
 
 This repo is a growth-oriented agent harness. Every task is an opportunity to improve
-the system itself — keep logs, capture lessons, enrich the wiki, cite sources. When you
-discover something worth remembering, run `af lessons new "<title>"` or append with
-`af note`. The research skills exist so the system can teach itself — use them before
-falling back on guesses.
+the system itself — but **only add something if it absolutely serves a purpose and is
+the best way to serve it**. Bloat is a first-order failure: wrappers over existing
+commands, docs that restate other docs, CLIs with one reasonable caller. Before adding
+anything new, ask: does this capability already exist? Is a plain `rg` / `cat` / `touch`
+enough? If yes, do not add.
+
+When you discover something worth remembering, append with `af note` or create a
+file directly in `wiki/lessons-learned/`. The research skills exist so the system can
+teach itself — use them before falling back on guesses.
 
 ## Before planning architectural changes, consult the wiki
 
@@ -13,8 +18,8 @@ orchestration, or skill system, check what has already been researched:
 
 ```bash
 af wiki list                         # index of research + lessons
-af wiki grep "<pattern>"             # search the wiki with context
-af wiki show research/<slug>         # print one page
+rg "<pattern>" wiki/                 # full-text search
+cat wiki/research/<slug>.md          # read one page
 af archetype match "<user intent>"   # does this task match a known shape?
 ```
 

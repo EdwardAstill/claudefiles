@@ -26,9 +26,9 @@ or "you already know the codebase" is not valid — context reveals assumptions 
 
 ## Step 1: Orient and assess
 
-Run `af session orient` — it runs `af context`, `af status`, and (if a wiki/
-exists) `af wiki list` in one command. Use the fallback sequence only if that
-command is unavailable. Then check for in-progress work artifacts:
+Run `af context` and `af status`. If a `wiki/` exists at the repo root, also
+`af wiki list` — it prints the research pages and lessons that might already
+cover the work. Then check for in-progress work artifacts:
 
 - **`docs/specs/*-design.md`** — an existing spec means brainstorming already happened. Don't re-brainstorm; ask if the user wants to resume from the spec.
 - **`docs/plans/*.md`** — an existing plan means planning already happened. Offer to execute it (via subagent-driven-development or executing-plans).
