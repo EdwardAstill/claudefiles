@@ -133,6 +133,16 @@ across separate domains, escalate. Include a **HANDOFF CONTEXT** block:
 
 This prevents context loss — the #1 failure mode in multi-agent systems.
 
+### Handoff is not just for escalation
+
+Every subagent dispatch — not only executor→manager — loses conversation state.
+When you dispatch *any* subagent via the Agent tool, open the prompt with a
+compact **CONTEXT** block covering the same structure (task, relevant files,
+constraints, files the agent must NOT touch, expected output format). A
+subagent with full context produces targeted work; one without it re-explores
+from scratch. MAST research attributes ~40% of multi-agent failures to context
+loss at handoff boundaries — the mitigation is structural, not optional.
+
 ## Anti-loop rules
 
 When loading specialist skills inline, follow these constraints:

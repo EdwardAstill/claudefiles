@@ -31,6 +31,7 @@ _SUBCOMMANDS = [
     ("terminal", "terminal"),
     ("webscraper", "webscraper"),
     ("archetype", "archetype"),
+    ("lessons", "lessons"),
 ]
 
 @app.callback(invoke_without_command=True)
