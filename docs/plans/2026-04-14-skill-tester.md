@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python (Typer CLI), Markdown (SKILL.md, reports)
 
-**Spec:** `docs/superpowers/specs/2026-04-14-skill-tester-design.md`
+**Spec:** `docs/specs/2026-04-14-skill-tester-design.md`
 
 ---
 
