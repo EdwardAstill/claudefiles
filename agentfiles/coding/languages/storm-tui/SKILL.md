@@ -259,6 +259,25 @@ return (
 );
 ```
 
+**Warning:** The built-in `<Tabs>` registers its own `useInput` handler for arrow
+keys. In multi-pane apps where arrows should only affect the *focused* pane, it
+will intercept keys regardless of which pane has focus. Replace with a custom
+display-only tab bar in that case:
+
+```tsx
+<Box flexDirection="row" gap={1}>
+  {tabs.map((t, i) => (
+    <Text
+      key={t.key}
+      bold={activeTab === t.key}
+      dim={activeTab !== t.key}
+      backgroundColor={activeTab === t.key ? "#2E2E32" : undefined}
+    >{` ${i + 1} ${t.label} `}</Text>
+  ))}
+</Box>
+// Then route tab cycling through your own useInput
+```
+
 ### High-frequency animation (imperative)
 
 ```tsx
@@ -302,6 +321,255 @@ fireEvent.pressKey(input, { key: "return" });
 | `setInterval` leaking | `useCleanup(() => clearInterval(...))` |
 | Not handling resize | `const { width, height } = useTerminal()` |
 | `useEffect` for timers | `useTick(ms, fn)` |
+| `<Box style={{...}}>` | Not supported — use individual props (`color`, `backgroundColor`, `width`, etc.) |
+| `<Box onClick={...}>`, `<Text onClick={...}>` | Not supported — handle via `useInput` + focus state |
+| `<Box borderBottomStyle="single">` | Use boolean shortcuts `borderBottom`, `borderRight`, `borderLeft`, `borderTop` OR full `borderStyle` |
+| `overflowY="auto"` | Not a valid value — use `<ScrollView>` for scrollable regions |
+| Recursive `<TreeView>` render + flat list map | Double-renders children. Pick one: flat list with `flattenVisible()` helper OR recursive render with single root |
+| Search/input `<Box>` with slash on line 1, text on line 2 | Box defaults to `flexDirection="column"` — add `flexDirection="row"` for inline inputs |
+| Relying on key-up / CapsLock events | Terminals don't reliably emit these. Use a named key (`r`, `Ctrl+Space`) as toggle instead of hold-modifiers |
+| `<Tabs>` swallows arrow keys in multi-pane apps | Built-in tab component has its own `useInput` — replace with custom tab bar for pane-scoped arrow routing |
+| `<Modal>` renders inline below main content | Storm Modal may flow in document order — use absolute-positioned `<Box position="absolute" top={...} left={...}>` for true overlays |
+
+---
+
+## Multi-Pane Layouts with Focus Management
+
+Storm has no automatic focus system for Box-based panes. Roll your own with
+state, a pane-cycle key (Tab), and conditional border colors.
+
+```tsx
+type Pane = "tree" | "top" | "bottom";
+const [activePane, setActivePane] = useState<Pane>("tree");
+
+useInput((e) => {
+  if (e.key === "tab") {
+    setActivePane(p => p === "tree" ? "top" : p === "top" ? "bottom" : "tree");
+    return;
+  }
+  // Route arrow keys based on active pane
+  if (activePane === "tree") {
+    if (e.key === "j" || e.key === "down") navigateTree("down");
+    // ...
+  } else if (activePane === "top") {
+    if (e.key === "h" || e.key === "left") cycleTab(-1);
+    // ...
+  }
+});
+
+// Visual focus: bright border on active pane, dim on inactive
+<Box
+  borderStyle="round"
+  borderColor={activePane === "tree" ? "#FFFFFF" : "#525252"}
+>...</Box>
+```
+
+**Three-pane layout (tree left, top-right, bottom-right):**
+
+```tsx
+<Box flex={1} flexDirection="row">
+  <Box width={treePixels} borderStyle="round" .../>  {/* Tree */}
+  <Box flexDirection="column" flex={1}>
+    <Box flexGrow={topHeight} flexShrink={1} flexBasis={0} ... />    {/* Top */}
+    <Box flexGrow={100 - topHeight} flexShrink={1} flexBasis={0} .../> {/* Bottom */}
+  </Box>
+</Box>
+```
+
+Use `flexGrow` with integer ratios (`55` / `45`) and `flexShrink={1} flexBasis={0}`
+to make vertical splits resize fluidly.
+
+### Resize mode pattern
+
+Terminals can't detect modifier-hold reliably. Use a mode toggle instead:
+
+```tsx
+const [resizeMode, setResizeMode] = useState(false);
+
+useInput((e) => {
+  if (resizeMode) {
+    if (e.key === "escape" || e.key === "r") { setResizeMode(false); return; }
+    // Arrows grow/shrink the active pane in arrow direction
+    if (activePane === "tree") {
+      if (e.key === "right") setTreeWidth(w => Math.min(75, w + 3));
+      if (e.key === "left")  setTreeWidth(w => Math.max(15, w - 3));
+    }
+    return;
+  }
+  if (e.key === "r") { setResizeMode(true); return; }
+  // ... normal navigation
+});
+```
+
+Show resize-mode indicator in footer/status so user sees they're in a different mode.
+
+### Hint mode (Alfred-style shortcut overlay)
+
+```tsx
+const [hintMode, setHintMode] = useState(false);
+useInput((e) => {
+  if (e.ctrl && (e.key === "space" || e.char === " ")) {
+    setHintMode(h => !h);
+    return;
+  }
+  // Digit keys: in hint mode jump to tree item N; otherwise to tab N
+  if (e.char && /[1-9]/.test(e.char)) {
+    const n = parseInt(e.char) - 1;
+    if (hintMode && activePane === "tree") setFocusedId(filteredTree[n]?.node.id);
+    else setActiveTab(TABS[n]);
+    setHintMode(false);
+  }
+});
+
+// Render hints conditionally
+{hintMode && <Text bold>{` [${i + 1}] ${label} `}</Text>}
+```
+
+### Tree navigation (flatten-visible pattern)
+
+Don't recurse in render — flatten to a linear list, then map. This keeps
+navigation indexes aligned with what's on screen.
+
+```tsx
+type FlatItem = { node: TreeNode; level: number };
+
+function flattenVisible(nodes: TreeNode[], expandedIds: Set<string>, level = 0): FlatItem[] {
+  const out: FlatItem[] = [];
+  for (const node of nodes) {
+    out.push({ node, level });
+    if (expandedIds.has(node.id) && node.children) {
+      out.push(...flattenVisible(node.children, expandedIds, level + 1));
+    }
+  }
+  return out;
+}
+
+// Render as flat list — single <TreeRow> component, no recursion
+{flatTree.map(({ node, level }, i) => (
+  <TreeRow
+    key={node.id}
+    node={node}
+    level={level}
+    isFocused={node.id === focusedId}
+  />
+))}
+```
+
+---
+
+## Overlays & Floating Panels
+
+Storm's `<Modal>` component may render inline in document flow rather than
+as a true overlay. For reliable floating panels, use absolute-positioned Box:
+
+```tsx
+{showFloating && (
+  <Box
+    position="absolute"
+    top={Math.floor(height / 2) - 10}
+    left={Math.floor(width / 2) - 22}
+    width={44}
+    flexDirection="column"
+    borderStyle="double"
+    borderColor="#FFFFFF"
+    backgroundColor="#0B0B0D"
+    paddingX={2}
+    paddingY={1}
+  >
+    <Text bold>✦ Quick Panel</Text>
+    {/* ... content */}
+  </Box>
+)}
+```
+
+Key requirements for a proper overlay:
+1. `position="absolute"` — lifts out of flow
+2. Explicit `top` / `left` / `width` — compute from `useTerminal()` dimensions
+3. `backgroundColor` — opaque bg hides content beneath
+4. Thicker/brighter border — visual distinction from main UI
+5. Render last in the tree — higher stacking order
+
+---
+
+## useInput Event Details
+
+```ts
+{ key: string, char: string, ctrl: boolean, shift: boolean, meta: boolean }
+```
+
+- `e.key` — named keys: `"up"`, `"down"`, `"left"`, `"right"`, `"tab"`, `"return"`, `"escape"`, `"backspace"`, `"space"`, plus letter keys (`"q"`, `"j"`, etc.)
+- `e.char` — actual character typed (respects shift/layout). Use for text input and symbol keys like `[`, `]`, `<`, `>`
+- `e.ctrl` / `e.shift` / `e.meta` — modifier booleans
+
+**Common gotchas:**
+- `Ctrl+Space` detection: `e.ctrl && (e.key === "space" || e.char === " ")`
+- Symbol keys vary by terminal — check both `e.key` and `e.char` (`e.key === "[" || e.char === "["`)
+- Shift+Arrow: `e.shift && e.key === "left"` — not all terminals distinguish this
+- `Ctrl+Tab`: may be swallowed by terminal multiplexer (tmux/screen)
+- No `e.type === "keyup"` — only keydown events fire
+
+---
+
+## Recipe: Feature-Rich Multi-Pane Explorer
+
+Combines all patterns: tree + tabs + focus management + resize mode + hints + overlay.
+
+```tsx
+function Explorer() {
+  const { width, height } = useTerminal();
+  const [activePane, setActivePane] = useState<"tree" | "top" | "bottom">("tree");
+  const [treeWidth, setTreeWidth] = useState(25);
+  const [topHeight, setTopHeight] = useState(55);
+  const [resizeMode, setResizeMode] = useState(false);
+  const [hintMode, setHintMode] = useState(false);
+  const [showFloat, setShowFloat] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [focusedId, setFocusedId] = useState(initialId);
+  const [expandedIds, setExpandedIds] = useState(new Set<string>());
+
+  const flatTree = useMemo(
+    () => flattenVisible(TREE_DATA, expandedIds),
+    [expandedIds]
+  );
+
+  useInput((e) => {
+    // Modal layers first (floating, help, search) — return early
+    if (showFloat) { /* handle then return */ }
+    if (resizeMode) { /* handle then return */ }
+
+    // Globals: quit, help, search, float toggle, hint toggle
+    if (e.key === "q") exit();
+    if (e.key === "f") setShowFloat(v => !v);
+    if (e.ctrl && e.char === " ") setHintMode(h => !h);
+
+    // Pane cycle
+    if (e.key === "tab") setActivePane(p => /* cycle */);
+
+    // Pane-specific routing
+    if (activePane === "tree") navigateTree(e);
+    else if (activePane === "top") cycleTab(e);
+  });
+
+  return (
+    <Box flexDirection="column" width={width} height={height}>
+      <Header />
+      <Box flex={1} flexDirection="row">
+        <TreePane width={Math.floor((width * treeWidth) / 100)} focused={activePane === "tree"} />
+        <Box flexDirection="column" flex={1}>
+          <TopPane flexGrow={topHeight} focused={activePane === "top"} />
+          <BottomPane flexGrow={100 - topHeight} focused={activePane === "bottom"} />
+        </Box>
+      </Box>
+      <Footer bindings={resizeMode ? resizeBindings : normalBindings} />
+      {showFloat && <FloatingPane />}  {/* absolute-positioned, renders last */}
+    </Box>
+  );
+}
+```
+
+This recipe handles: 3-focusable-panes, fluid resize, search/filter, keyboard-only
+navigation, shortcut hints, and floating overlays. Drop in custom tree/tabs
+components instead of Storm's built-ins if you need precise arrow-key routing.
 
 ---
 
