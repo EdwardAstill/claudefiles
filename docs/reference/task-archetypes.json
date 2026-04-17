@@ -1,0 +1,578 @@
+{
+  "version": 1,
+  "updated": "2026-04-18",
+  "description": "Canonical registry of big-task archetypes mapped to agent compositions. Used by the manager and executor skills to plan smart agent distribution. Each archetype lists ordered phases with the agents to invoke, what that phase produces, and whether the agents in that phase run in parallel. The | character within an agents entry denotes an OR — pick the agent that matches the stack.",
+  "archetypes": [
+    {
+      "id": "new-feature-full-stack",
+      "name": "Build a new full-stack feature",
+      "signal_phrases": [
+        "build a feature",
+        "implement X end-to-end",
+        "add a new page that talks to the API",
+        "full-stack feature",
+        "new endpoint + UI",
+        "ship a feature across UI, API, and DB"
+      ],
+      "typical_scale": "medium-large",
+      "phases": [
+        {
+          "phase": "design",
+          "agents": ["brainstorming", "api-architect", "database-expert", "ui-expert"],
+          "produces": "approved spec + API contract + schema sketch + component spec",
+          "parallel": false,
+          "coordination": "sequential handoff"
+        },
+        {
+          "phase": "plan",
+          "agents": ["writing-plans", "coordination-advisor", "git-advisor"],
+          "produces": "implementation plan with task breakdown + coordination + git strategy",
+          "parallel": false
+        },
+        {
+          "phase": "implement",
+          "agents": ["database-expert", "python-expert|typescript-expert|rust-expert", "ui-expert", "typescript-expert"],
+          "produces": "working code + unit tests across DB, API, UI",
+          "parallel": true,
+          "coordination": "subagent-driven-development with git-worktree-workflow isolation"
+        },
+        {
+          "phase": "verify",
+          "agents": ["tdd", "verification-before-completion", "code-review", "accessibility"],
+          "produces": "tested, reviewed, a11y-checked change ready to merge",
+          "parallel": false
+        }
+      ],
+      "risks": ["scope creep", "cross-layer coupling", "schema drift from contract"],
+      "notes": "Use git-worktree-workflow when parallel implementation could collide. Manager should escalate here if three+ layers change in parallel."
+    },
+    {
+      "id": "bug-investigation-and-fix",
+      "name": "Diagnose and fix a bug with a regression test",
+      "signal_phrases": [
+        "there's a bug",
+        "X is broken",
+        "unexpected behaviour",
+        "tests are failing",
+        "fix the crash",
+        "investigate this error"
+      ],
+      "typical_scale": "small-medium",
+      "phases": [
+        {
+          "phase": "reproduce",
+          "agents": ["systematic-debugging", "terminal-read"],
+          "produces": "reliable reproduction + captured error output",
+          "parallel": false
+        },
+        {
+          "phase": "diagnose",
+          "agents": ["systematic-debugging", "codebase-explainer"],
+          "produces": "root cause + affected surface area",
+          "parallel": false
+        },
+        {
+          "phase": "fix",
+          "agents": ["tdd", "python-expert|typescript-expert|rust-expert"],
+          "produces": "failing regression test, then passing fix",
+          "parallel": false
+        },
+        {
+          "phase": "verify",
+          "agents": ["verification-before-completion", "code-review"],
+          "produces": "verified fix + reviewed change",
+          "parallel": false
+        }
+      ],
+      "risks": ["fixing the symptom not the cause", "missing regression test", "over-scoping the fix"],
+      "notes": "Always write the failing test before the fix. Do not skip systematic-debugging even if the cause looks obvious."
+    },
+    {
+      "id": "refactor-at-scale",
+      "name": "Large-scale structural refactor",
+      "signal_phrases": [
+        "refactor this module",
+        "restructure the codebase",
+        "split this monolith",
+        "extract a package",
+        "rename across the repo",
+        "migrate to new pattern"
+      ],
+      "typical_scale": "large",
+      "phases": [
+        {
+          "phase": "map",
+          "agents": ["codebase-explainer", "system-architecture-expert"],
+          "produces": "map of current structure + pain points",
+          "parallel": false
+        },
+        {
+          "phase": "plan",
+          "agents": ["refactoring-patterns", "writing-plans", "git-advisor"],
+          "produces": "pattern choice (strangler fig, extract method, etc.) + step plan + git strategy",
+          "parallel": false
+        },
+        {
+          "phase": "execute",
+          "agents": ["refactoring-patterns", "regex-expert", "python-expert|typescript-expert|rust-expert"],
+          "produces": "refactored code, tests green at every step",
+          "parallel": false,
+          "coordination": "subagent-driven-development"
+        },
+        {
+          "phase": "verify",
+          "agents": ["tdd", "verification-before-completion", "simplify", "code-review"],
+          "produces": "tests green + simpler surface + review sign-off",
+          "parallel": false
+        }
+      ],
+      "risks": ["big-bang rewrite", "test coverage gaps", "merge conflicts with in-flight work"],
+      "notes": "Always use git-worktree-workflow. Strangler fig beats big bang. Tests green at every step is non-negotiable."
+    },
+    {
+      "id": "security-hardening",
+      "name": "Security audit, fix, and verification pass",
+      "signal_phrases": [
+        "security audit",
+        "harden this",
+        "before production",
+        "check for vulnerabilities",
+        "OWASP review",
+        "pentest prep"
+      ],
+      "typical_scale": "medium",
+      "phases": [
+        {
+          "phase": "audit",
+          "agents": ["security-review", "dependency-management"],
+          "produces": "prioritised findings (critical/warning/info) + CVE list",
+          "parallel": true
+        },
+        {
+          "phase": "fix",
+          "agents": ["tdd", "python-expert|typescript-expert|rust-expert", "database-expert"],
+          "produces": "patches for each critical/warning finding with tests",
+          "parallel": false
+        },
+        {
+          "phase": "verify",
+          "agents": ["security-review", "verification-before-completion", "code-review"],
+          "produces": "re-audit showing findings closed + reviewed change",
+          "parallel": false
+        }
+      ],
+      "risks": ["partial fixes", "regressing auth/authz", "missed supply-chain CVEs"],
+      "notes": "Fix highest-severity findings first. Re-run security-review to confirm closure, don't just self-attest."
+    },
+    {
+      "id": "performance-optimization",
+      "name": "Profile, fix, and benchmark a slow path",
+      "signal_phrases": [
+        "make it faster",
+        "this is slow",
+        "optimise the hot path",
+        "cut latency",
+        "reduce memory",
+        "speed up the query"
+      ],
+      "typical_scale": "small-medium",
+      "phases": [
+        {
+          "phase": "profile",
+          "agents": ["performance-profiling", "observability"],
+          "produces": "profile output + bottleneck identification + baseline benchmark",
+          "parallel": false
+        },
+        {
+          "phase": "fix",
+          "agents": ["performance-profiling", "python-expert|typescript-expert|rust-expert", "database-expert", "dsa-expert"],
+          "produces": "optimised code with preserved behaviour",
+          "parallel": false
+        },
+        {
+          "phase": "verify",
+          "agents": ["performance-profiling", "tdd", "verification-before-completion"],
+          "produces": "benchmark showing improvement + no regressions",
+          "parallel": false
+        }
+      ],
+      "risks": ["premature optimisation", "micro-bench that does not reflect reality", "correctness regressions"],
+      "notes": "Do not skip the baseline benchmark. Optimise the actual hot path shown by the profile, not what you think is hot."
+    },
+    {
+      "id": "new-language-library-adoption",
+      "name": "Research, spike, and integrate a new library",
+      "signal_phrases": [
+        "should we use X",
+        "evaluate this library",
+        "adopt a new dependency",
+        "try out framework Y",
+        "compare libraries for Z"
+      ],
+      "typical_scale": "medium",
+      "phases": [
+        {
+          "phase": "research",
+          "agents": ["research-agent", "docs-agent", "github-repo-researcher"],
+          "produces": "trade-off report + API reference + repo analysis",
+          "parallel": true
+        },
+        {
+          "phase": "spike",
+          "agents": ["brainstorming", "python-expert|typescript-expert|rust-expert", "tdd"],
+          "produces": "throwaway spike proving the library fits",
+          "parallel": false
+        },
+        {
+          "phase": "integrate",
+          "agents": ["dependency-management", "writing-plans", "subagent-driven-development"],
+          "produces": "integrated library with lockfile + plan for rollout",
+          "parallel": false
+        },
+        {
+          "phase": "verify",
+          "agents": ["verification-before-completion", "security-review", "code-review"],
+          "produces": "reviewed, CVE-clean integration",
+          "parallel": false
+        }
+      ],
+      "risks": ["sunk-cost after a big spike", "license incompatibility", "unmaintained upstream"],
+      "notes": "Spike should be discarded before real integration. Do not skip security-review on new deps."
+    },
+    {
+      "id": "codebase-onboarding",
+      "name": "Explore and document an unfamiliar repo",
+      "signal_phrases": [
+        "new repo",
+        "never seen this codebase",
+        "onboard me to X",
+        "how does this project work",
+        "orient me in this repo"
+      ],
+      "typical_scale": "small-medium",
+      "phases": [
+        {
+          "phase": "survey",
+          "agents": ["codebase-explainer", "github-repo-researcher"],
+          "produces": "architecture map + execution paths + key abstractions",
+          "parallel": true
+        },
+        {
+          "phase": "deepen",
+          "agents": ["codebase-explainer", "repomix"],
+          "produces": "packed context of key modules + traced flows",
+          "parallel": false
+        },
+        {
+          "phase": "document",
+          "agents": ["note-taker", "documentation"],
+          "produces": "onboarding notes + CLAUDE.md-style orientation",
+          "parallel": false
+        }
+      ],
+      "risks": ["skimming without reading", "building the wrong mental model", "stale docs"],
+      "notes": "For remote repos, start with github-repo-researcher; for local, codebase-explainer. repomix compresses large trees for a single-pass read."
+    },
+    {
+      "id": "infrastructure-migration",
+      "name": "Plan, implement, and verify an infra change",
+      "signal_phrases": [
+        "migrate to Kubernetes",
+        "move from docker-compose to K8s",
+        "cloud migration",
+        "change the deployment",
+        "switch hosting",
+        "rewrite the Dockerfile"
+      ],
+      "typical_scale": "medium-large",
+      "phases": [
+        {
+          "phase": "plan",
+          "agents": ["infrastructure-expert", "system-architecture-expert", "writing-plans"],
+          "produces": "migration plan with rollback + staged cutover",
+          "parallel": false
+        },
+        {
+          "phase": "implement",
+          "agents": ["infrastructure-expert", "github-actions-expert", "observability"],
+          "produces": "IaC + CI pipeline + observability instrumented",
+          "parallel": true
+        },
+        {
+          "phase": "verify",
+          "agents": ["verification-before-completion", "security-review", "performance-profiling"],
+          "produces": "staged environment verified, perf + security parity with old",
+          "parallel": false
+        }
+      ],
+      "risks": ["no rollback plan", "hidden coupling to old infra", "secret drift"],
+      "notes": "Always stage behind a feature flag or DNS cutover. observability must land before cutover or you go blind."
+    },
+    {
+      "id": "documentation-sprint",
+      "name": "Audit, write, and cross-link docs",
+      "signal_phrases": [
+        "write the docs",
+        "documentation sprint",
+        "update the README",
+        "docs are stale",
+        "add API docs",
+        "write a migration guide"
+      ],
+      "typical_scale": "small-medium",
+      "phases": [
+        {
+          "phase": "audit",
+          "agents": ["documentation-maintainer", "codebase-explainer"],
+          "produces": "list of missing/stale docs + ground truth from code",
+          "parallel": true
+        },
+        {
+          "phase": "write",
+          "agents": ["documentation", "note-taker"],
+          "produces": "new and updated docs with runnable examples",
+          "parallel": true
+        },
+        {
+          "phase": "link",
+          "agents": ["documentation-maintainer"],
+          "produces": "cross-links + TOC + sync with SKILL.md / AGENTS.md where applicable",
+          "parallel": false
+        }
+      ],
+      "risks": ["documenting intent not reality", "drift from code", "duplicated docs"],
+      "notes": "Verify each claim against the code. Prefer one source of truth over mirrored docs."
+    },
+    {
+      "id": "deep-research-report",
+      "name": "Multi-source research synthesised into a report",
+      "signal_phrases": [
+        "do deep research on X",
+        "write a report on Y",
+        "survey the literature",
+        "synthesise sources about Z",
+        "research report",
+        "what does the evidence say"
+      ],
+      "typical_scale": "medium-large",
+      "phases": [
+        {
+          "phase": "scope",
+          "agents": ["brainstorming", "research-agent"],
+          "produces": "research question + success criteria + source plan",
+          "parallel": false
+        },
+        {
+          "phase": "gather",
+          "agents": ["research-agent", "docs-agent", "web-scraper", "sci-hub", "youtube", "github-repo-researcher"],
+          "produces": "downloaded papers + scraped pages + transcripts + repo breakdowns",
+          "parallel": true
+        },
+        {
+          "phase": "synthesise",
+          "agents": ["note-taker", "kb-critic", "knowledge-base"],
+          "produces": "notes per source + contradiction map + integrated synthesis",
+          "parallel": false
+        },
+        {
+          "phase": "deliver",
+          "agents": ["documentation", "note-taker"],
+          "produces": "final report with citations + wiki cross-links",
+          "parallel": false
+        }
+      ],
+      "risks": ["one-source bias", "paraphrasing without citation", "scope creep into unrelated topics"],
+      "notes": "This is the target archetype for `af research`. Results should feed back into wiki/research/ as notes indexed by knowledge-base."
+    },
+    {
+      "id": "knowledge-base-ingestion",
+      "name": "Ingest external sources into the KB",
+      "signal_phrases": [
+        "add this to the KB",
+        "ingest these papers",
+        "import this video series",
+        "take notes on these docs",
+        "index this corpus"
+      ],
+      "typical_scale": "medium",
+      "phases": [
+        {
+          "phase": "acquire",
+          "agents": ["sci-hub", "youtube", "web-scraper", "file-converter"],
+          "produces": "raw source material (papers, transcripts, HTML to markdown)",
+          "parallel": true
+        },
+        {
+          "phase": "process",
+          "agents": ["file-converter", "note-taker"],
+          "produces": "markdown notes with YAML frontmatter + wikilinks",
+          "parallel": true
+        },
+        {
+          "phase": "index",
+          "agents": ["knowledge-base"],
+          "produces": "ingested into markstore with BM25 + vector search available",
+          "parallel": false
+        },
+        {
+          "phase": "audit",
+          "agents": ["kb-critic"],
+          "produces": "evidence-tier map + contradictions flagged against existing KB",
+          "parallel": false
+        }
+      ],
+      "risks": ["duplicate ingestion", "lossy conversion from PDF", "unvetted claims polluting the KB"],
+      "notes": "Run kb-critic after ingestion — never trust new material without auditing for contradictions."
+    },
+    {
+      "id": "skill-authoring",
+      "name": "Design, write, and test a new agentfiles skill",
+      "signal_phrases": [
+        "write a new skill",
+        "author a skill",
+        "create a SKILL.md",
+        "add a skill to agentfiles",
+        "skill for doing X"
+      ],
+      "typical_scale": "small-medium",
+      "phases": [
+        {
+          "phase": "design",
+          "agents": ["brainstorming", "design-advisor"],
+          "produces": "skill purpose + trigger phrases + non-goals",
+          "parallel": false
+        },
+        {
+          "phase": "write",
+          "agents": ["writing-skills", "documentation"],
+          "produces": "SKILL.md with frontmatter + structured body",
+          "parallel": false
+        },
+        {
+          "phase": "install",
+          "agents": ["agentfiles-manager", "audit"],
+          "produces": "skill registered in manifest.toml + symlinks verified",
+          "parallel": false
+        },
+        {
+          "phase": "test",
+          "agents": ["skill-tester"],
+          "produces": "eval output grading the skill against benchmark questions",
+          "parallel": false
+        }
+      ],
+      "risks": ["description too vague for routing", "overlap with existing skill", "not actually tested"],
+      "notes": "audit must pass before claiming install complete. skill-tester catches weak descriptions early."
+    },
+    {
+      "id": "api-design-review",
+      "name": "Spec an API, review it, iterate",
+      "signal_phrases": [
+        "design an API",
+        "review this API",
+        "OpenAPI spec",
+        "REST contract",
+        "GraphQL schema",
+        "check the endpoint design"
+      ],
+      "typical_scale": "small-medium",
+      "phases": [
+        {
+          "phase": "spec",
+          "agents": ["api-architect", "brainstorming", "docs-agent"],
+          "produces": "OpenAPI / structured markdown contract + example payloads",
+          "parallel": false
+        },
+        {
+          "phase": "review",
+          "agents": ["api-architect", "security-review", "database-expert"],
+          "produces": "findings across correctness, versioning, security, data model",
+          "parallel": true
+        },
+        {
+          "phase": "iterate",
+          "agents": ["api-architect", "writing-plans"],
+          "produces": "revised contract + implementation plan",
+          "parallel": false
+        }
+      ],
+      "risks": ["breaking change in a 'minor' version", "auth as afterthought", "N+1 baked into the contract"],
+      "notes": "Run security-review on auth paths. database-expert checks the contract does not force bad schemas."
+    },
+    {
+      "id": "data-analysis",
+      "name": "Ingest, clean, analyse, and report on data",
+      "signal_phrases": [
+        "analyse this dataset",
+        "run the numbers",
+        "data analysis on X",
+        "extract insights from Y",
+        "make a chart of Z"
+      ],
+      "typical_scale": "medium",
+      "phases": [
+        {
+          "phase": "ingest",
+          "agents": ["web-scraper", "file-converter", "database-expert"],
+          "produces": "structured data in JSONL/CSV/SQLite",
+          "parallel": true
+        },
+        {
+          "phase": "analyse",
+          "agents": ["python-expert", "dsa-expert", "database-expert"],
+          "produces": "analysis scripts + computed results",
+          "parallel": false
+        },
+        {
+          "phase": "report",
+          "agents": ["note-taker", "documentation", "typst-expert"],
+          "produces": "written report with charts + citations back to raw data",
+          "parallel": false
+        }
+      ],
+      "risks": ["unvalidated data", "p-hacking", "results not reproducible from the script"],
+      "notes": "Every chart in the report must come from a committed script. Prefer polars/duckdb for medium data."
+    },
+    {
+      "id": "multi-repo-change",
+      "name": "Coordinated change across multiple repos",
+      "signal_phrases": [
+        "change across repos",
+        "update the client and server",
+        "bump shared library",
+        "cross-repo refactor",
+        "sync three projects"
+      ],
+      "typical_scale": "large",
+      "phases": [
+        {
+          "phase": "plan",
+          "agents": ["system-architecture-expert", "writing-plans", "git-advisor", "coordination-advisor"],
+          "produces": "per-repo task list + merge order + rollout plan",
+          "parallel": false
+        },
+        {
+          "phase": "execute",
+          "agents": ["git-worktree-workflow", "python-expert|typescript-expert|rust-expert", "tdd"],
+          "produces": "branches per repo with passing tests, ready for PR",
+          "parallel": true,
+          "coordination": "manager with one subagent per repo"
+        },
+        {
+          "phase": "land",
+          "agents": ["github-expert", "github-actions-expert", "code-review"],
+          "produces": "PRs opened, CI green, merges in the planned order",
+          "parallel": false
+        },
+        {
+          "phase": "verify",
+          "agents": ["verification-before-completion", "observability"],
+          "produces": "post-merge smoke test + alerting confirmed",
+          "parallel": false
+        }
+      ],
+      "risks": ["merge-order deadlock", "half-rolled-out breaking change in production", "forgotten downstream consumer"],
+      "notes": "This is a clear manager escalation. Merge order matters — get it written down before anyone opens a PR."
+    }
+  ]
+}
