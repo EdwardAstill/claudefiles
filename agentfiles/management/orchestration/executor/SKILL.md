@@ -26,11 +26,17 @@ or "you already know the codebase" is not valid — context reveals assumptions 
 
 ## Step 1: Orient and assess
 
-Run af context and af status. Then check for in-progress work artifacts:
+Run `af context` and `af status`. If a `wiki/` directory exists at the repo root,
+also run `af wiki list` — it prints the research pages and lessons-learned that
+might already cover the work you're about to do. Then check for in-progress work
+artifacts:
 
 - **`docs/specs/*-design.md`** — an existing spec means brainstorming already happened. Don't re-brainstorm; ask if the user wants to resume from the spec.
 - **`docs/plans/*.md`** — an existing plan means planning already happened. Offer to execute it (via subagent-driven-development or executing-plans).
 - **Feature branch with uncommitted work** — `af status` shows this. Ask if the user wants to continue where they left off.
+- **Relevant wiki pages** — if `af wiki list` surfaced a research page or a lesson
+  that looks applicable, `af wiki show <slug>` before planning. Lessons-learned in
+  particular encode past mistakes you should not repeat.
 
 If none of these exist, this is a fresh task. Ask one question:
 
