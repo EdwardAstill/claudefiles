@@ -17,3 +17,4 @@ Routes to skill system tooling.
 | `agentfiles-manager` | Viewing, installing, or removing skills; setting up a new project |
 | `writing-skills` | Creating a new skill or editing an existing one |
 | `documentation-maintainer` | Syncing docs after skill/CLI changes |
+| `audit` | Checking manifest consistency — missing entries, orphaned cli tools, PATH gaps |

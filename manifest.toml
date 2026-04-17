@@ -7,6 +7,10 @@
 tools = []
 category = "management/meta"
 
+[skills.audit]
+tools = ["Bash", "Read", "Glob", "Grep"]
+category = "management/meta"
+
 [skills.brainstorming]
 tools = ["Read", "Write", "Glob", "Agent"]
 category = "planning"
@@ -153,6 +157,10 @@ tools = ["Bash", "Read", "Write"]
 mcp = ["context7"]
 category = "coding/languages"
 
+[skills.storm-tui]
+tools = ["Bash", "Read", "Write"]
+category = "coding/languages"
+
 [skills.ui-expert]
 tools = ["Bash", "Read", "Write"]
 mcp = ["context7", "firefox-devtools"]
@@ -215,6 +223,7 @@ category = "research"
 
 [skills.browser-control]
 tools = ["Bash", "Read"]
+cli = ["foxpilot"]
 category = "research"
 
 [skills.sci-hub]
@@ -290,3 +299,9 @@ manager = "bun"
 package = "jq"
 install = "bun install -g jq"
 description = "Command-line JSON processor"
+
+[cli.foxpilot]
+manager = "uv"
+package = "foxpilot"
+install = ["uv tool install /home/eastill/projects/foxpilot", "uv tool install git+https://github.com/EdwardAstill/foxpilot"]
+description = "Browser automation CLI — headless Firefox and Zen browser control via Marionette"
