@@ -69,6 +69,10 @@ Announce the decision briefly:
 **Non-trivial:** State your approach in 2–4 lines before acting. Enough to avoid
 wrong turns — not a full decomposition. Think, then act.
 
+For larger shapes, check `docs/reference/task-archetypes.json` first — if the user's
+request matches an archetype's `signal_phrases`, lift the phase layout from there
+instead of redesigning it. The registry is opinion-encoded; use it.
+
 ## Step 3: Execute
 
 **Calibrate effort to the ask.** Before launching research, deep analysis, or
