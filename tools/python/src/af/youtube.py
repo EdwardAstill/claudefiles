@@ -180,6 +180,16 @@ def _walk_channel_videos(channel: str, limit: int):
     return info.get("entries") or []
 
 
+def _search(query: str, limit: int):
+    """Search YouTube via yt-dlp's ytsearch extractor. Flat listing, no downloads."""
+    import yt_dlp
+
+    opts: dict[str, Any] = {**_YDL_FLAT, "playlistend": limit}
+    with yt_dlp.YoutubeDL(opts) as ydl:  # type: ignore[arg-type]
+        info = ydl.extract_info(f"ytsearch{limit}:{query}", download=False) or {}
+    return info.get("entries") or []
+
+
 def _walk_channel_playlists(channel: str, limit: int):
     import yt_dlp
 
@@ -431,3 +441,19 @@ def playlists(
         title = e.get("title", "?")
         count = e.get("playlist_count") or e.get("n_entries") or 0
         typer.echo(f"{pid}\t{count}\t{title}")
+
+
+@app.command()
+def search(
+    query: str = typer.Argument(..., help="Search query — artist name, song title, topic, etc."),
+    limit: int = typer.Option(10, "--limit", "-n"),
+):
+    """Search YouTube and print matches as TSV: id, duration, uploader, title."""
+    _ensure_deps()
+    entries = _search(query, limit)
+    for e in entries:
+        vid = e.get("id") or e.get("url", "?")
+        title = e.get("title", "?")
+        uploader = e.get("uploader") or e.get("channel") or ""
+        dur = e.get("duration") or 0
+        typer.echo(f"{vid}\t{int(dur)}s\t{uploader}\t{title}")

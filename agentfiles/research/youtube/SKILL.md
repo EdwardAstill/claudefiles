@@ -1,11 +1,12 @@
 ---
 name: youtube
 description: >
-  Use for anything YouTube: transcripts (single video, playlist, channel), audio
-  extraction (WAV / MP3 / any ffmpeg format), clip trimming, channel listing,
-  and LLM summarisation. Fully integrated as `af youtube <subcommand>` — no
-  external wrapper needed. Chains cleanly into `note-taker`,
-  `knowledge-base`, and `test-taker`.
+  Use for anything YouTube: search by name or phrase, transcripts (single video,
+  playlist, channel), audio extraction (WAV / MP3 / any ffmpeg format), clip
+  trimming, channel listing, and LLM summarisation. Handles the "I only have an
+  artist / topic name, find and download" flow by chaining `search` → `audio`.
+  Fully integrated as `af youtube <subcommand>` — no external wrapper needed.
+  Chains cleanly into `note-taker`, `knowledge-base`, and `test-taker`.
 ---
 
 # YouTube
@@ -26,6 +27,7 @@ prompt the calling agent can answer.
 | `af youtube summary <url> [--out FILE] [--model ID] [--keep-transcript]` | Transcript → structured summary (Anthropic, or prompt-fallback) |
 | `af youtube channel <@handle\|url> [--limit N]` | TSV list: `id   date   duration   title` |
 | `af youtube playlists <@handle\|url> [--limit N]` | TSV list: `id   count   title` |
+| `af youtube search <query> [--limit N]` | YouTube search → TSV: `id   duration   uploader   title`. No API key needed. |
 
 All commands accept any YouTube URL shape: `watch?v=`, `youtu.be/`,
 `/shorts/`, `/embed/`, `/live/`, `/playlist?list=`, `/@handle`,
@@ -48,6 +50,7 @@ All commands accept any YouTube URL shape: `watch?v=`, `youtu.be/`,
 | Channel (`@handle`, `/channel/…`, etc.) | `transcript --limit N`, or `channel` for metadata only |
 | Just want metadata | `channel` or `playlists` (no downloads) |
 | Need timestamps in the summary | Use raw yt-dlp VTT path — `af youtube` strips timestamps |
+| Only have a name / phrase, not a URL | `search` first → pick the id(s) → feed into another subcommand |
 
 ### Target directory
 
@@ -127,6 +130,51 @@ Then Read `/tmp/ready-to-summarise.md` and produce the summary inline.
 af youtube channel "@veritasium" --limit 10
 af youtube playlists "@veritasium"
 ```
+
+**Search for a term (no downloads):**
+
+```bash
+af youtube search "Radiohead Creep" --limit 5
+# id            duration  uploader       title
+# XFkzRNyygfk   237s      Radiohead      Radiohead - Creep
+# ...
+```
+
+**Artist → WAV files (the canonical "I only have a name" flow):**
+
+Search first, then pipe ids into `audio`. Pick a sensible limit — 20 hits
+rarely yields 20 distinct official tracks, so start at 5–10 and widen if
+needed. Prefer the results whose `uploader` column matches the artist's
+canonical channel (filter `grep` or read the user's pick).
+
+```bash
+mkdir -p ~/music/radiohead
+af youtube search "Radiohead" --limit 10 \
+  | awk -F'\t' '$3 == "Radiohead" {print $1}' \
+  | while read id; do
+      af youtube audio "https://www.youtube.com/watch?v=$id" \
+        --format wav \
+        --embed-thumbnail \
+        --out ~/music/radiohead
+    done
+```
+
+If the user wants every video on the artist's official channel rather
+than search hits (more exhaustive but more noise — behind-the-scenes, live
+cuts, shorts), swap `search` for `channel`:
+
+```bash
+af youtube channel "@radiohead" --limit 50 \
+  | cut -f1 \
+  | while read id; do
+      af youtube audio "https://www.youtube.com/watch?v=$id" --format wav --out ~/music/radiohead
+    done
+```
+
+Confirm the channel handle with the user first — some artists have
+multiple (`@radiohead`, `@radiohead-topic`, fan channels). The
+`-topic` channels YouTube auto-generates usually hold the cleanest
+official audio.
 
 ---
 
