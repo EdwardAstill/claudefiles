@@ -206,9 +206,9 @@ is the correct trade.
   bullet. This is the Voyager-style skill-accretion step.
 - **Add a reflection artefact distinct from raw observations.** Following
   Generative Agents, one layer between raw logs and skill proposals — a
-  `wiki/lessons-learned/<slug>.md` file written by the retrospective skill with
+  `research/lessons/<slug>.md` file written by the retrospective skill with
   structured fields (context, pattern, lesson, candidate artefact). The
-  `lessons-learned/` dir already exists; it needs a templated contribution flow.
+  `research/lessons/` dir already exists; it needs a templated contribution flow.
 - **Formalise the Reflexion-style rewrite for failing skills.** When a skill
   triggers `af log review` warnings (loaded but not used; causing loops), execute
   a structured rewrite step, not a freeform edit. The `writing-skills` skill

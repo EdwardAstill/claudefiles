@@ -8,23 +8,26 @@ anything new, ask: does this capability already exist? Is a plain `rg` / `cat` /
 enough? If yes, do not add.
 
 When you discover something worth remembering, append with `af note` or create a
-file directly in `wiki/lessons-learned/`. The research skills exist so the system can
+file directly in `research/lessons/`. The research skills exist so the system can
 teach itself — use them before falling back on guesses.
 
-## Before planning architectural changes, consult the wiki
+## Before planning architectural changes, consult agent knowledge
 
-The wiki is the project's long-term memory. Before proposing changes to the harness,
-orchestration, or skill system, check what has already been researched:
+`research/knowledge/` is the project's long-term memory — the distilled output of
+everything in `research/` (papers, projects, documentation, lessons). Before proposing
+changes to the harness, orchestration, or skill system, check what has already been
+researched:
 
 ```bash
-af wiki list                         # index of research + lessons
-rg "<pattern>" wiki/                 # full-text search
-cat wiki/research/<slug>.md          # read one page
+af ak list                           # index of research/knowledge/ pages
+af ak show <slug>                    # read one page
+af ak grep "<pattern>"               # full-text search inside knowledge/
+rg "<pattern>" research/             # search the whole research tree (raw inputs too)
 af archetype match "<user intent>"   # does this task match a known shape?
 ```
 
-If a research page already covers the ground, build on it rather than re-discovering.
-If a lesson-learned contradicts what you're about to do, stop and reconcile.
+If a knowledge page already covers the ground, build on it rather than re-discovering.
+If a lesson contradicts what you're about to do, stop and reconcile.
 
 ---
 

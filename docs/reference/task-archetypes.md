@@ -199,7 +199,7 @@ Add a new archetype when a recurring big-task shape does not cleanly map to an e
 | deliver | documentation, note-taker | final report with citations + wiki cross-links | no |
 
 **Risks:** one-source bias, paraphrasing without citation, scope creep.
-**Notes:** This is the target archetype for `af research`. Results should feed back into `wiki/research/` as notes indexed by `knowledge-base`.
+**Notes:** This is the target archetype for `af research`. Results should feed back into `research/knowledge/` as notes indexed by `knowledge-base`.
 
 ---
 

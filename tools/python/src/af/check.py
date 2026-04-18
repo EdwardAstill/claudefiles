@@ -125,8 +125,8 @@ def distinct_cmd(
 
     Computes Jaccard similarity between every pair of skill descriptions. Pairs
     at or above the threshold are worth reviewing: they likely compete for the
-    same user intent and dilute routing accuracy (see wiki/research/context-
-    engineering.md on tool-RAG distinguishability).
+    same user intent and dilute routing accuracy (see
+    research/knowledge/context-engineering.md on tool-RAG distinguishability).
     """
     cwd = Path.cwd()
     root = find_skills_root(cwd)

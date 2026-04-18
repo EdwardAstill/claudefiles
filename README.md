@@ -13,9 +13,9 @@ hands it back to you. You describe intent; the system handles the rest — routi
 right specialists, pulling in the right context, remembering what worked.
 
 To do that, this system is about growth, learning, and continual self-improvement. Every
-session leaves artifacts behind: logs (`af log`), findings (`af note`), wiki entries
-(`wiki/`), downloaded references (`wiki/papers/`). The system reads its own history to
-get better over time.
+session leaves artifacts behind: logs (`af log`), findings (`af note`), distilled
+knowledge (`research/knowledge/`), downloaded references (`research/papers/`). The
+system reads its own history to get better over time.
 
 The research skills (`research-agent`, `docs-agent`, `web-scraper`, `sci-hub`,
 `youtube`, `github-repo-researcher`) are the engine of self-improvement — they bring
@@ -334,4 +334,4 @@ description: >
 | [docs/reference/workflows.md](docs/reference/workflows.md) | End-to-end workflow traces |
 | [docs/reference/logging.md](docs/reference/logging.md) | Logging system, review cycle, `af log` reference |
 | [docs/reference/agent-orchestration-patterns.md](docs/reference/agent-orchestration-patterns.md) | Research: agent routing, scaling, failure modes |
-| [wiki/README.md](wiki/README.md) | Long-term memory: research, papers, lessons learned |
+| [research/README.md](research/README.md) | Long-term memory: knowledge, papers, projects, docs, lessons |

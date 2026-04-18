@@ -33,7 +33,7 @@ _DEPTH_HINTS = {
         "- Download 10+ papers via `sci-hub`, scrape 15-25 sources via `web-scraper`.\n"
         "- Transcribe any relevant YouTube talks or channel playlists (`af youtube transcript`).\n"
         "- Run `kb-critic` over the pulled material for contradictions and evidence tiers.\n"
-        "- Target output: full report (3000+ words), notes per source in `notes/`, and a wiki-ready summary."
+        "- Target output: full report (3000+ words), notes per source in `notes/`, and a knowledge-ready summary for research/knowledge/."
     ),
 }
 
@@ -81,7 +81,7 @@ Produce a well-sourced research brief on the topic above. Route through the
 4. **Synthesise** — write `{out_dir}/REPORT.md` with: TL;DR, key findings,
    open questions, contradictions, sources. Cite every non-trivial claim.
 5. **Feed back** — if findings belong in the personal knowledge base, mirror
-   the notes into `~/projects/agentfiles/wiki/research/` with consistent
+   the notes into `~/projects/agentfiles/research/knowledge/` with consistent
    frontmatter so `knowledge-base` (via `mks`) can index them.
 
 ## Deliverables

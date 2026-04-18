@@ -70,7 +70,7 @@ disk; the model calls `read`/`write`/`search` tools to move pages between them.
 This decouples storage size from context size.
 
 **For a single-user personal system**, flat markdown indexed by filename and full-text
-search is a surprisingly high ceiling. A `wiki/` directory plus `ripgrep` plus a
+search is a surprisingly high ceiling. A `research/` directory plus `ripgrep` plus a
 disciplined filename convention gets most of the way to semantic retrieval without
 an embedding pipeline. agentfiles currently works this way (`.agentfiles/notes.md`,
 skill SKILL.md files). A vector index would add recall, not architecture.
@@ -163,7 +163,7 @@ PROPOSED ACTION: tighten skill description to exclude "simple" cases
 A reflection only becomes useful memory when it becomes a *retrievable artefact*.
 For agentfiles, the artefacts are:
 
-- **`wiki/lessons-learned/<slug>.md`** — short notes with context, lesson,
+- **`research/lessons/<slug>.md`** — short notes with context, lesson,
   citation. Versioned; human-readable; grep-able.
 - **`SKILL.md` edits** — when a lesson crosses a threshold (repeated pattern),
   it becomes a skill-level rule.
@@ -204,8 +204,8 @@ git + grep is the starting design. Add vectors only when grep plateaus.
 | **Skill descriptions** | Tool-RAG via Skill tool at session start | Implemented |
 | **`CLAUDE.md` / `AGENTS.md`** | Injected on every turn (top of context) | Implemented; risks attention-budget debt |
 | **`.agentfiles/notes.md`** | Explicit via `af note --read` | Implemented; not auto-surfaced |
-| **`wiki/research/*.md`** | Manual reference by agents consulting design decisions | Created this pass |
-| **`wiki/lessons-learned/`** | Manual reference during retrospective + design | Scaffolded; needs contribution flow |
+| **`research/knowledge/*.md`** | `af ak list / show / grep`; manual reference by agents consulting design decisions | Implemented |
+| **`research/lessons/`** | Manual reference during retrospective + design | Scaffolded; needs contribution flow |
 | **`knowledge-base` skill** | Full-text search of personal knowledge base | Implemented for health/training domain |
 
 The gap: **no automatic retrieval of lessons-learned during task execution.** A
@@ -219,8 +219,8 @@ knowledge-base skill pattern is the model — extend it to the meta-domain
 ## Implications for agentfiles
 
 - **Adopt the three-type taxonomy explicitly.** `AGENTS.md` = procedural
-  (how-we-work rules); `wiki/research/` = semantic (what we've concluded);
-  `wiki/lessons-learned/` + session logs = episodic. Document the mapping in
+  (how-we-work rules); `research/knowledge/` = semantic (what we've concluded);
+  `research/lessons/` + session logs = episodic. Document the mapping in
   `AGENTS.md` so future skills respect the separation.
 - **Promote lessons to artefacts on a cadence, not ad hoc.** Schedule
   `retrospective` monthly (or after every N sessions). Require its output to
@@ -233,17 +233,17 @@ knowledge-base skill pattern is the model — extend it to the meta-domain
 - **Use recency for noise reduction, not just ordering.** Lessons older than
   six months without reinforcement should be marked dormant rather than deleted
   — preserves history while de-prioritising retrieval.
-- **Keep memory in the wiki, not a vector DB.** At personal-system scale, flat
-  markdown + grep dominates. Add embeddings only if a specific skill (e.g.
-  `knowledge-base`) demonstrates grep is insufficient.
+- **Keep memory in the research tree, not a vector DB.** At personal-system
+  scale, flat markdown + grep dominates. Add embeddings only if a specific skill
+  (e.g. `knowledge-base`) demonstrates grep is insufficient.
 - **Bind memory to the reflection loop, not the tool loop.** Reading memory
   on every turn is the wrong default (pollutes context). Reading memory when
   a skill explicitly asks ("given this task, retrieve relevant lessons") is
-  the right default. Today the path is `af wiki list` to surface candidates
-  plus `rg wiki/lessons-learned/` for full-text — no dedicated CLI needed
+  the right default. Today the path is `af ak list` to surface candidates
+  plus `rg research/lessons/` for full-text — no dedicated CLI needed
   until grep plateaus.
-- **Keep the lesson-file template in `wiki/lessons-learned/README.md`, not in
+- **Keep the lesson-file template in `research/lessons/README.md`, not in
   a CLI scaffolder.** A previous `af lessons new` scaffolder was reverted as
-  bloat: `touch wiki/lessons-learned/<YYYY-MM-DD-slug>.md` plus the README
+  bloat: `touch research/lessons/<YYYY-MM-DD-slug>.md` plus the README
   template is enough. Add a scaffolder only if filename or field drift
   becomes a measured problem.
