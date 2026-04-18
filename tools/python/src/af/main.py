@@ -36,6 +36,8 @@ _SUBCOMMANDS = [
     ("audit", "audit"),
     ("skill-usage", "skill_usage"),
     ("learn", "learn"),
+    ("plan-exec", "plan_exec_cli"),
+    ("plan-scaffold", "plan_scaffold"),
     ("include", "includes"),
     ("skill-find", "skill_find"),
     ("metrics", "metrics"),

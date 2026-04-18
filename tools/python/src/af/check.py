@@ -2,6 +2,8 @@ import typer
 from pathlib import Path
 import re
 
+from af import plan_exec
+
 app = typer.Typer(invoke_without_command=True)
 
 
@@ -168,4 +170,162 @@ def distinct_cmd(
     typer.echo(
         "\nReview: tighten the descriptions so the trigger conditions don't overlap, "
         "or merge skills that truly cover the same ground."
+    )
+
+
+# ---------------------------------------------------------------------------
+# `af check plans` — YAML <-> prose drift watchdog
+# ---------------------------------------------------------------------------
+
+
+_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+_TASK_HEADING_RE = re.compile(r"^###\s+Task\s+(\d+)\s*[:.]", re.MULTILINE)
+_SLUG_STRIP_RE = re.compile(r"[^a-z0-9\s-]+")
+_SLUG_SPACE_RE = re.compile(r"[\s_]+")
+
+
+def _slugify(heading: str) -> str:
+    """Return a GitHub-style lowercased kebab-case slug of a heading.
+
+    `## Task 3: Step 2` -> `task-3-step-2`. Drops punctuation, collapses
+    whitespace, lowercases. Used to match `prose_ref` anchors against the
+    actual markdown headings.
+    """
+    s = heading.lower().strip()
+    s = _SLUG_STRIP_RE.sub("", s)
+    s = _SLUG_SPACE_RE.sub("-", s)
+    s = re.sub(r"-+", "-", s).strip("-")
+    return s
+
+
+def _prose_anchors(md_text: str) -> set[str]:
+    """Extract the set of anchor slugs from every ATX heading in the prose."""
+    out: set[str] = set()
+    for _hashes, title in _HEADING_RE.findall(md_text):
+        out.add(_slugify(title))
+    return out
+
+
+def _prose_task_numbers(md_text: str) -> set[int]:
+    """Return the set of Task N numbers found as `### Task N:` headings."""
+    return {int(m) for m in _TASK_HEADING_RE.findall(md_text)}
+
+
+def _collect_prose_refs(plan: plan_exec.Plan) -> list[tuple[str, str]]:
+    """Return [(node_id, prose_ref), ...] for every node that sets prose_ref."""
+    refs: list[tuple[str, str]] = []
+    for n in plan.nodes:
+        if n.prose_ref:
+            refs.append((n.id, n.prose_ref))
+        if isinstance(n, plan_exec.LoopNode):
+            for inner in n.body:
+                if inner.prose_ref:
+                    refs.append((inner.id, inner.prose_ref))
+    return refs
+
+
+def _implement_node_count(plan: plan_exec.Plan) -> int:
+    """Count implement-type nodes (top-level plus loop body)."""
+    count = 0
+    for n in plan.nodes:
+        if isinstance(n, plan_exec.ImplementNode):
+            count += 1
+        if isinstance(n, plan_exec.LoopNode):
+            for inner in n.body:
+                if isinstance(inner, plan_exec.ImplementNode):
+                    count += 1
+    return count
+
+
+def check_plan_pair(yaml_path: Path, md_path: Path) -> list[str]:
+    """Return list of drift issues for a single (yaml, md) pair. Empty = clean."""
+    issues: list[str] = []
+
+    try:
+        plan = plan_exec.load(yaml_path)
+    except plan_exec.PlanParseError as e:
+        return [f"parse error: {e}"]
+
+    try:
+        md_text = md_path.read_text()
+    except OSError as e:
+        return [f"could not read prose {md_path}: {e}"]
+
+    anchors = _prose_anchors(md_text)
+
+    # (1) Every prose_ref must resolve to an anchor slug in the .md.
+    for node_id, ref in _collect_prose_refs(plan):
+        if ref not in anchors:
+            issues.append(
+                f"node '{node_id}' prose_ref '{ref}' does not match any "
+                f"heading slug in {md_path.name}"
+            )
+
+    # (2) Every `### Task N:` in the prose needs at least one implement node
+    # in the YAML. If the YAML has fewer implement nodes than prose tasks, we
+    # flag the count mismatch so the author can reconcile.
+    prose_tasks = _prose_task_numbers(md_text)
+    impl_count = _implement_node_count(plan)
+    if len(prose_tasks) > impl_count:
+        missing = sorted(prose_tasks)
+        issues.append(
+            f"prose has {len(prose_tasks)} `### Task N:` heading(s) "
+            f"({missing}) but YAML has only {impl_count} implement node(s) — "
+            f"extra markdown task(s) unclaimed"
+        )
+
+    return issues
+
+
+@app.command("plans")
+def plans_cmd(
+    plans_dir: Path = typer.Option(
+        Path("docs/plans"),
+        "--dir",
+        help="Directory containing plan .yaml + .md pairs.",
+    ),
+):
+    """Check YAML plan <-> prose drift.
+
+    For every `.yaml` in `docs/plans/` with a sibling `.md`, verify:
+      - Every `prose_ref` anchor resolves to a heading slug in the prose.
+      - Every `### Task N:` heading has at least one matching implement node.
+
+    Exit 0 on clean, exit 1 on drift.
+    """
+    plans_dir = Path(plans_dir)
+    if not plans_dir.is_dir():
+        typer.echo(f"af check plans: {plans_dir} not found (nothing to check).")
+        return
+
+    pairs: list[tuple[Path, Path]] = []
+    for yaml_path in sorted(plans_dir.glob("*.yaml")):
+        md_path = yaml_path.with_suffix(".md")
+        if md_path.exists():
+            pairs.append((yaml_path, md_path))
+
+    if not pairs:
+        typer.echo(
+            f"af check plans: no yaml+md plan pairs in {plans_dir}. Clean."
+        )
+        return
+
+    total_issues = 0
+    for yaml_path, md_path in pairs:
+        issues = check_plan_pair(yaml_path, md_path)
+        if issues:
+            total_issues += len(issues)
+            typer.echo(f"{yaml_path.name}:")
+            for msg in issues:
+                typer.echo(f"  {msg}")
+
+    if total_issues:
+        typer.echo(
+            f"\naf check plans: {total_issues} drift issue(s) across "
+            f"{len(pairs)} pair(s)."
+        )
+        raise typer.Exit(1)
+
+    typer.echo(
+        f"af check plans: {len(pairs)} plan pair(s) clean — no drift."
     )

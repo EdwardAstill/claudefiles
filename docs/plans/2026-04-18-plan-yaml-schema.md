@@ -1,19 +1,19 @@
 # Plan YAML Schema
 
-**Status:** Phase 1 complete — core loader, dataclasses, and DAG validator
-landed at `tools/python/src/af/plan_exec.py` with 18 tests in
-`tools/python/tests/test_plan_exec.py`. No CLI surface yet; module is
-importable but not registered in `af.main`.
+**Status:** Phase 2C complete — `subagent-driven-development` now prescribes
+a YAML-driven dispatch flow (see its SKILL.md "Dispatching from a YAML plan"
+section) and `af check plans` watches for YAML↔prose drift (`prose_ref`
+anchors resolve, every `### Task N:` has a matching `implement` node). Earlier
+phases landed the loader/validator (Phase 1, `tools/python/src/af/plan_exec.py`,
+18 tests), the Typer CLI (Phase 2A, `af plan-exec validate/list/next/mark/reset/status`),
+and the `writing-plans` YAML-sidecar emission path (Phase 2B).
 
-**Remaining for Phase 2:**
+**Remaining / deferred:**
 
-- Typer `app` + subcommands (`validate`, `next`, `mark`, `run`) and register
-  on `af.main`.
-- State mutation (Phase 2 Agent A owns `af plan-exec mark`).
-- Dispatch logic lives in the `subagent-driven-development` skill, not the
-  CLI — wire the skill to call the loader/validator once Phase 2 ships.
-- Update `writing-plans` skill to emit the YAML sidecar alongside the prose
-  plan (see §6 Migration).
+- `af plan-scaffold <plan.md>` for in-flight prose plans (see §6 Migration).
+- Dispatch itself is skill-prescribed, not Python-orchestrated — future work
+  could lift the loop into `af plan-exec run` if the skill-driven flow proves
+  too fragile.
 
 **Phase 1 notes / schema ambiguities flagged for Phase 2:**
 

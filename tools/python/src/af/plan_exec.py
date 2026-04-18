@@ -423,7 +423,7 @@ VALID_STATES = {"pending", "running", "done", "failed"}
 class StateFile:
     """Per-plan run state. {node_id: pending|running|done|failed}.
 
-    Phase 1 stub: load/save only. Mutation lives in Phase 2 Agent A.
+    Phase 2 extensions: `mark`, `reset`, `status_summary`, `ready_nodes`.
     """
 
     states: dict[str, str] = field(default_factory=dict)
@@ -455,3 +455,51 @@ class StateFile:
             raise ValueError("StateFile.save requires a path (none stored and none provided)")
         target.write_text(json.dumps(self.states, indent=2, sort_keys=True) + "\n")
         self.path = target
+
+    # ------------------------------------------------------------------
+    # Phase 2 mutation helpers
+    # ------------------------------------------------------------------
+
+    def mark(self, node_id: str, status: str) -> None:
+        """Set node_id to status and persist. Raises ValueError on bad status."""
+        if status not in VALID_STATES:
+            raise ValueError(
+                f"invalid status '{status}'; must be one of {sorted(VALID_STATES)}"
+            )
+        self.states[node_id] = status
+        if self.path is not None:
+            self.save(self.path)
+
+    @classmethod
+    def reset(cls, path: Path) -> None:
+        """Wipe the state file at path (no-op if missing)."""
+        path = Path(path)
+        if path.exists():
+            path.unlink()
+
+    def status_summary(self) -> dict[str, int]:
+        """Return counts per status (pending/running/done/failed)."""
+        out = {s: 0 for s in sorted(VALID_STATES)}
+        for v in self.states.values():
+            if v in out:
+                out[v] += 1
+        return out
+
+    def ready_nodes(self, plan: Plan) -> list[Node]:
+        """Return top-level nodes whose deps are all `done` and own status is `pending`.
+
+        A node's own status is `pending` if it is not in the state map or the
+        state map records `pending` explicitly. Order matches toposort.
+        """
+        order = toposort(plan)
+        out: list[Node] = []
+        for n in order:
+            own = self.states.get(n.id, "pending")
+            if own != "pending":
+                continue
+            deps_done = all(
+                self.states.get(dep) == "done" for dep in n.depends_on
+            )
+            if deps_done:
+                out.append(n)
+        return out

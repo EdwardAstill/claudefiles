@@ -111,6 +111,75 @@ git commit -m "feat: add specific feature"
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD, frequent commits
 
+## Machine Plan YAML Sidecar
+
+Non-trivial plans ship as a **pair** — the prose markdown above, plus a sibling `docs/plans/YYYY-MM-DD-<feature-name>.yaml` that encodes the same task graph in a form `subagent-driven-development` can dispatch from directly. The prose is the authority for humans; the YAML is the authority for the executor.
+
+**When to emit the YAML (complexity threshold from the YAML-plan design doc, §7):**
+
+- ≥3 tasks, **or**
+- any human gate (`pause` node), **or**
+- any loop body (per-item fanout).
+
+For **single-task bugfixes, simple one-file refactors, and plans short enough to hold on one screen (<3 tasks, no gates, no loops), prose alone is sufficient** — skip the YAML. Research/exploration plans whose output is a document (not code) also don't need a YAML.
+
+**Schema** (full spec: `docs/plans/2026-04-18-plan-yaml-schema.md` §3):
+
+```yaml
+version: 1
+plan:
+  slug: <plan-slug>              # matches the markdown filename minus date/ext
+  prose: docs/plans/<...>.md     # back-reference to the markdown authority
+  goal: <one-sentence goal>
+
+nodes:
+  - id: <snake_case_unique>
+    type: implement | review | verify | pause | loop
+    depends_on: [<other_ids>]    # optional; empty = root
+    description: <one-line intent>
+    files:                       # optional mirror of the markdown table
+      create: [...]
+      modify: [...]
+      test:   [...]
+    verify:                      # optional shell commands; must exit 0
+      - <cmd>
+    on_fail: retry | escalate | pause    # default escalate
+```
+
+Type-specific fields: `review.reviewer` (`spec` | `code_quality`); `pause.prompt`; `loop.items` (list) or `loop.from` (path), `loop.body` (inline subgraph), `loop.max_parallel` (default 1, cap 10). `${item}` is the only templating primitive, scoped to loop bodies.
+
+**Condensed worked example** — a 2-node slice showing shape (full example lives in the design doc §3):
+
+```yaml
+- id: cli_wiring
+  type: implement
+  depends_on: [spec_contract]
+  description: Register `resume` on the session Typer app.
+  verify:
+    - uv run --directory tools/python af session resume --help
+
+- id: human_gate_ux
+  type: pause
+  depends_on: [cli_wiring]
+  prompt: Approve wording before docs?
+```
+
+### Dual-file consistency
+
+- The markdown header carries a `**Machine plan:** <slug>.yaml` line beneath `**Goal:**`, pointing at the sidecar.
+- The YAML's `plan.prose` points back at the markdown file.
+- `af check` validates both sides — every `### Task N` in the prose has a matching `implement` node in the YAML, and the YAML's `prose:` resolves.
+
+### Migration of existing prose-only plans
+
+For in-flight plans written before the YAML schema existed, run:
+
+```bash
+uv run --project tools/python af plan-scaffold docs/plans/<YYYY-MM-DD-name>.md
+```
+
+This greps `### Task N:` headings and emits a YAML skeleton with one `implement` node per task, sequential `depends_on`. It's a starting point — you still fill in `verify:` commands, real dependency edges, and any human-gate / loop nodes by hand. Use `--force` to overwrite an existing sibling `.yaml`. Completed plans stay as-is; no auto-migration.
+
 ## Plan Review Loop
 
 After writing the complete plan:

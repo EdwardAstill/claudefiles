@@ -95,6 +95,63 @@ digraph process {
 }
 ```
 
+## Dispatching from a YAML plan
+
+When a plan ships a machine-readable sidecar (`<plan>.yaml` beside `<plan>.md`),
+dispatch from the YAML instead of pattern-matching the prose. Schema and
+rationale live in `docs/plans/2026-04-18-plan-yaml-schema.md` — don't duplicate
+it here.
+
+**Detection.** Before extracting tasks, check for `<plan>.yaml` next to
+`<plan>.md`. If present, use the YAML flow below. If absent, fall back to the
+prose extraction described in the Process digraph above (unchanged behavior).
+
+**Flow.**
+
+1. **Validate.** Run `af plan-exec validate <plan.yaml>`. If it fails, surface
+   the errors to the user and stop — do not dispatch against a broken plan.
+2. **Loop until done.** Repeatedly call `af plan-exec next <plan.yaml>` to get
+   the set of ready nodes (all dependencies satisfied, status `pending`). For
+   each ready node:
+   - `af plan-exec mark <id> running` before dispatch.
+   - Dispatch per node type:
+     - **`implement`** → implementer subagent. Pass the node's `description`
+       plus the prose slice: read `plan.prose` (the markdown) and cut to the
+       section whose slug matches `prose_ref` (when set). The implementer
+       never reads the plan file itself; you curate the slice.
+     - **`review` with `reviewer: spec`** → spec-reviewer subagent
+       (`./spec-reviewer-prompt.md`).
+     - **`review` with `reviewer: code_quality`** → code-quality-reviewer
+       subagent (`./code-quality-reviewer-prompt.md`).
+     - **`verify`** → run the node's `verify:` shell commands locally,
+       synchronously, with a timeout. Not a subagent. Non-zero exit = failure.
+     - **`pause`** → print the node's `prompt` and wait for explicit user
+       confirmation before proceeding. Block; do not assume consent.
+     - **`loop`** → expand `items` (or `from:` path contents). Dispatch one
+       fresh subagent per item, substituting `${item}` in the inline `body`
+       nodes' `description` and `verify` fields. Cap concurrent dispatches at
+       `max_parallel` (hard cap 10).
+   - On success: `af plan-exec mark <id> done`.
+   - On failure: `af plan-exec mark <id> failed`, then honor `on_fail`:
+     - `retry` → re-dispatch the node; cap at 2 retries, then escalate.
+     - `escalate` (default) → stop and surface to the user.
+     - `pause` → block and ask the user how to proceed.
+3. **Completion.** When `af plan-exec next` returns empty and every node is
+   `done`, run the final holistic code review (same as the prose flow) and
+   report completion.
+
+**Anti-patterns.**
+
+- Manually re-running nodes already marked `done` — the state file is the
+  source of truth; re-runs skip them for a reason.
+- Skipping `review` nodes because "the implementer looked fine." Every review
+  node is a gate; bypassing defeats the schema.
+- Ignoring `pause` gates. A pause is a human checkpoint, not a suggestion —
+  block until the user confirms.
+- Editing `<plan>.state.json` by hand instead of using `af plan-exec mark`.
+- Parsing the YAML yourself instead of calling `af plan-exec`. The CLI is the
+  only sanctioned surface; hand-parsing will drift from the validator.
+
 ## Batch Loop Mode — fresh context per item, parallel dispatch
 
 **Use when** you have N items of the same shape and each can be processed
