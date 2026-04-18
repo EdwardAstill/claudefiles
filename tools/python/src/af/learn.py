@@ -91,8 +91,21 @@ def _step(e: dict) -> str:
     return f"{tool}({','.join(sorted(inp.keys())[:3])})"
 
 
+_DATE_PREFIX = re.compile(r"^\d{4}-\d{2}-\d{2}-")
+_STOP_TOKENS = {"ls", "cat", "cd", "rm", "mv", "cp", "wc", "echo", "grep", "head", "tail"}
+
+
 def _slug(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:48] or "session-run"
+    # Normalise: lowercase, replace non-alnum with hyphens, strip leading date
+    s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    s = _DATE_PREFIX.sub("", s)
+    # Dedupe consecutive/repeating tokens
+    parts: list[str] = []
+    for tok in s.split("-"):
+        if not tok or tok in parts:
+            continue
+        parts.append(tok)
+    return "-".join(parts)[:48] or "session-run"
 
 
 def _title(entries: list[dict], idx: list[int]) -> tuple[str, str]:
@@ -101,9 +114,13 @@ def _title(entries: list[dict], idx: list[int]) -> tuple[str, str]:
         e = entries[i]
         inp = e.get("input", {}) or {}
         if e.get("tool") in BASH:
-            kw.extend(inp.get("command", "").split()[:2])
+            for tok in inp.get("command", "").split()[:2]:
+                if tok.lower() not in _STOP_TOKENS:
+                    kw.append(tok)
         elif "file_path" in inp:
-            kw.append(Path(inp["file_path"]).stem)
+            stem = Path(inp["file_path"]).stem
+            stem = _DATE_PREFIX.sub("", stem)
+            kw.append(stem)
     text = " ".join(kw)[:80] or "session run"
     return _slug(text), text.strip()
 
@@ -266,9 +283,13 @@ def promote(
         typer.echo(f"error: target already exists: {target}", err=True)
         raise typer.Exit(code=2)
 
-    # Move the draft
-    path.rename(target)
-    typer.echo(f"  [moved] {path.name} → {target.relative_to(REPO_ROOT)}")
+    # Move the draft, rewriting the `name:` frontmatter field so it matches
+    # the target slug — audit check 1 compares manifest keys to SKILL.md name:.
+    body = path.read_text()
+    body = re.sub(r"^name:\s*.+$", f"name: {slug}", body, count=1, flags=re.MULTILINE)
+    target.write_text(body)
+    path.unlink()
+    typer.echo(f"  [moved] {path.name} → {target.relative_to(REPO_ROOT)} (name: → {slug})")
 
     # Create registry symlink
     registry = REPO_ROOT / "skills" / slug

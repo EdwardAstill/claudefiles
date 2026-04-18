@@ -1,6 +1,9 @@
 ---
 name: explore
-description: Fast read-only codebase exploration. Use for finding files by pattern, searching code for keywords, or answering open-ended questions about the codebase. Specify thoroughness: "quick", "medium", or "very thorough".
+description: >
+  Fast read-only codebase exploration. Use for finding files by pattern,
+  searching code for keywords, or answering open-ended questions about the
+  codebase. Specify thoroughness as "quick", "medium", or "very thorough".
 tools: Glob, Grep, Read, LS, WebFetch, NotebookRead, BashOutput
 model: haiku
 ---

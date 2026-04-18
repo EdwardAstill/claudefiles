@@ -21,6 +21,5 @@
     "coding"
   ],
   "skills": "./skills/",
-  "agents": "./agentfiles/agents/",
   "hooks": "./hooks/hooks.json"
 }
