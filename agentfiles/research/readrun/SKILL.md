@@ -323,6 +323,119 @@ client-side, so any static host works — no server runtime.
 
 ---
 
+## Step 7: Quizzes (`.quiz.md`)
+
+readrun also renders quizzes. A quiz is a single Markdown file in
+`.readrun/quizzes/<name>.quiz.md` — it shows up under the Quizzes tab of
+`rr <folder>`. This replaces what used to be a separate `make-quiz` skill
+or `quizme` CLI: quiz authoring is part of readrun.
+
+### Output location
+
+All quiz files go to `.readrun/quizzes/` in the content folder. Create the
+directory if it doesn't exist. Save an accompanying `.quizspec` (YAML) next
+to the `.quiz.md` when the quiz is generated from a spec — it's a reusable
+recipe, not runtime input.
+
+### `.quiz.md` format
+
+```
+---                              ← YAML frontmatter (required)
+title: Quiz Title
+description: Optional subtitle
+---
+
+## [info] Heading                ← info page (non-scoring)
+:::
+Markdown body, including code fences, math, images.
+:::
+
+# Section Title                  ← sections group items in the sidebar
+
+## [single] Question text        ← single-choice
+- Wrong option
+- Correct option *               ← trailing * marks the correct answer
+- Another wrong option
+?> Hint text                     ← optional hint
+> Explanation (always include)
+
+## [multi] Question text         ← multiple-choice (zero or more correct)
+- Correct *
+- Also correct *
+- Wrong
+
+## [truefalse] Statement
+true *                           ← or "false *"
+
+## [freetext] Question
+= Expected answer                ← exact match, 1-3 words
+
+## [group] Shared prompt         ← grouped sub-questions
+### [truefalse] Sub-question 1
+true *
+### [freetext] Sub-question 2
+= Answer
+```
+
+Supported item types: `single`, `multi`, `truefalse`, `freetext`, `info`,
+`group`. Text fields accept Markdown and KaTeX math (`$inline$`,
+`$$block$$`) — same pipeline as regular pages.
+
+**Currency trap:** bare `$500` triggers math mode. Write `500 USD` or
+`US$500` instead. Inside math blocks, use `\text{\textdollar}` not `\$`.
+
+### Question design rules
+
+- **Mix question types.** A quiz that's 100% `[single]` is a bad quiz.
+- **Progress within each section** from easier to harder.
+- **Every question needs an explanation** — that's where learning happens.
+  Explain why the right answer is right *and* why the common wrong answer
+  is wrong.
+- **Distractors must be plausible.** Use real misconceptions, off-by-one
+  errors, lookalike alternatives — not absurd fillers.
+- **Free-text answers are 1–3 words, unambiguous.** If the answer has
+  multiple valid phrasings, use `[single]` or `[multi]` instead.
+- **No trick questions.** Challenging is fine; gotchas aren't.
+- **Code in questions** — fenced for multi-line, backticks for identifiers.
+- **Info pages introduce sections.** Short explanation of the topic, then
+  the questions; or substantial mini-lessons in "teach mode".
+
+### Difficulty calibration
+
+| Level | Question style |
+|---|---|
+| Beginner | "What is X?" / "Which of these is Y?" |
+| Intermediate | "Why does X happen?" / "What's the difference between X and Y?" |
+| Advanced | "Given this scenario..." / "What would happen if..." / debug-style |
+
+### Quiz validation checklist
+
+Before writing the file:
+
+- [ ] Correct answers are marked (`*` on options, `true *`/`false *`,
+      `= answer` for freetext).
+- [ ] Every question has an explanation.
+- [ ] Free-text answers are short and unambiguous.
+- [ ] At least 3 question types used.
+- [ ] Info pages introduce each section.
+- [ ] Difficulty progresses within sections.
+- [ ] No bare `$` for currency.
+- [ ] File is `.quiz.md` (not JSON — only use JSON if the user explicitly asks).
+
+### From spec to quiz (when one is provided)
+
+If the user hands you a `.quizspec` YAML (source paths, count, difficulty,
+types, focus/exclude, teach mode, notes), follow it. If no spec is
+provided, ask enough to fill one — source material, difficulty, rough
+count — then write the spec to `.readrun/quizspec/<name>.quizspec` as a
+record, and generate the `.quiz.md` from it.
+
+Batch mode (`generate.mode: per_file` or `per_source`): produce one quiz
+per file or per source entry, each independent, with the same parameters
+and notes applied. Write to `generate.output_dir`.
+
+---
+
 ## Limits to communicate up front
 
 If the user proposes something that readrun cannot do, say so before writing code:

@@ -133,8 +133,8 @@ for AI to regenerate boilerplate).
 ## Handoff
 
 - Wants a markdown architecture doc for engineers instead → `codebase-explainer`.
-- Wants a quiz *only*, not a course → `make-quiz`.
-- Wants formal lecture notes → `note-taker` (LLM / human modes).
+- Wants a quiz *only*, not a course → `readrun` (quizzes live in `.readrun/quizzes/`).
+- Wants formal lecture notes → `readrun` (plain Markdown, skip the executable fences).
 - Wants to host the output → the directory is already static; any static
   host works (GitHub Pages, Netlify drop).
 
