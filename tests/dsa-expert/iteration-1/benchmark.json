@@ -1,0 +1,59 @@
+{
+  "skill_name": "dsa-expert",
+  "skill_path": "agentfiles/coding/dsa/SKILL.md",
+  "iteration": 1,
+  "evals_run": [
+    "lru-cache-with-ttl",
+    "median-in-streaming-data",
+    "concurrent-skip-list-vs-btree",
+    "string-matching-multiple-patterns"
+  ],
+  "per_criterion_averages": {
+    "with_skill": {
+      "correctness":   5.00,
+      "completeness":  5.00,
+      "structure":     5.00,
+      "clarity":       4.00,
+      "actionability": 5.00,
+      "total":        24.00
+    },
+    "without_skill": {
+      "correctness":   4.00,
+      "completeness":  3.00,
+      "structure":     4.00,
+      "clarity":       5.00,
+      "actionability": 3.25,
+      "total":        19.25
+    },
+    "delta": {
+      "correctness":    1.00,
+      "completeness":   2.00,
+      "structure":      1.00,
+      "clarity":       -1.00,
+      "actionability":  1.75,
+      "total":          4.75
+    }
+  },
+  "per_eval_totals": {
+    "lru-cache-with-ttl":             { "with_skill": 24, "without_skill": 19, "delta": 5 },
+    "median-in-streaming-data":       { "with_skill": 24, "without_skill": 19, "delta": 5 },
+    "concurrent-skip-list-vs-btree":  { "with_skill": 24, "without_skill": 19, "delta": 5 },
+    "string-matching-multiple-patterns": { "with_skill": 24, "without_skill": 20, "delta": 4 }
+  },
+  "token_cost": {
+    "note": "Estimated from word count (words * 1.35). Response-only; prompt side not counted.",
+    "with_skill":    { "total_tokens_estimated": 6903, "mean_tokens_per_response": 1726 },
+    "without_skill": { "total_tokens_estimated": 2360, "mean_tokens_per_response":  590 },
+    "delta_tokens_per_response": 1136
+  },
+  "efficiency": {
+    "tokens_per_rubric_point": {
+      "with_skill":    71.9,
+      "without_skill": 30.6,
+      "delta":         41.3
+    },
+    "interpretation": "With-skill is ~2.9x more verbose per rubric point but wins on correctness/completeness/actionability and ties on structure; clarity is the only criterion where without-skill wins, driven by brevity."
+  },
+  "verdict": "recommend",
+  "rationale": "Consistent +5-point delta on 3 of 4 evals and +4 on the fourth, with the skill strictly winning on the three substantive criteria (correctness, completeness, actionability). The -1 clarity trade-off reflects brevity, not comprehension cost. Token overhead is real but acceptable for the depth gained, especially for design/architecture questions where implementation quality outweighs response length."
+}

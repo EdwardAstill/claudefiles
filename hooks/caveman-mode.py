@@ -3,69 +3,22 @@
 # requires-python = ">=3.11"
 # dependencies = []
 # ///
-"""UserPromptSubmit hook — re-injects caveman mode each turn if enabled.
+"""Deprecated — shim that delegates to `hooks/modes.py`.
 
-Controlled by ~/.claude/caveman-mode (file exists = enabled; contents = level).
-
-Levels: lite, full, actual-caveman. Default: full.
-Disable: delete the file (or `af caveman off`).
+Kept for one release so any cached plugin config that still references
+this path keeps working. `hooks/hooks.json` now points at `modes.py`
+directly. Remove this file once you're sure no installer snapshot still
+references it.
 """
 
-import json
-import sys
+from __future__ import annotations
+
+import runpy
 from pathlib import Path
-
-STATE = Path.home() / ".claude" / "caveman-mode"
-
-REMINDERS = {
-    "lite": (
-        "caveman-lite: drop filler (just/really/basically), pleasantries "
-        "(sure/of course), hedging. Keep articles and full grammar."
-    ),
-    "full": (
-        "caveman-full: drop filler, pleasantries, hedging, AND articles. "
-        "Fragments OK. Short synonyms. Technical terms exact. "
-        "Code blocks unchanged. One sentence per thought. "
-        "Auto-clarity: drop to normal prose for security/destructive warnings "
-        "and multi-step instructions; resume after."
-    ),
-    "actual-caveman": (
-        "actual-caveman: grunt style, cave analogies, broken grammar on purpose. "
-        "Keep code blocks and errors unchanged. Drop to normal prose for "
-        "security/destructive warnings."
-    ),
-}
-
-# Accepted aliases → canonical key
-ALIASES = {
-    "lite": "lite",
-    "full": "full",
-    "actual": "actual-caveman",
-    "actual-caveman": "actual-caveman",
-    "cave": "actual-caveman",
-}
 
 
 def main() -> None:
-    if not STATE.exists():
-        sys.exit(0)
-
-    try:
-        raw = STATE.read_text().strip().lower() or "full"
-    except OSError:
-        sys.exit(0)
-
-    level = ALIASES.get(raw, "full")
-    msg = f"Reminder: {REMINDERS[level]}"
-
-    payload = {
-        "hookSpecificOutput": {
-            "hookEventName": "UserPromptSubmit",
-            "additionalContext": msg,
-        }
-    }
-    print(json.dumps(payload))
-    sys.exit(0)
+    runpy.run_path(str(Path(__file__).with_name("modes.py")), run_name="__main__")
 
 
 if __name__ == "__main__":

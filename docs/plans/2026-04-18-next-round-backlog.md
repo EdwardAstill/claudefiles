@@ -14,8 +14,8 @@ bottom of the doc lists the top-5 for a focused session.
 
 | # | Item | Spec | Effort | Status |
 |---|---|---|---|---|
-| N1 | Implement `includes/` fragments | `2026-04-18-includes-fragments.md` | 1 day | **in progress** |
-| N2 | Implement behavioral modes | `2026-04-18-behavioral-modes.md` | 2–3 days | deferred |
+| N1 | Implement `includes/` fragments | `2026-04-18-includes-fragments.md` | 1 day | **done** — loader + 6 fragments + 4 experts migrated (python, rust, typescript, typst); ui/tui skipped (design skills, no shared fragment) |
+| N2 | Implement behavioral modes | `2026-04-18-behavioral-modes.md` | 2–3 days | **done (MVP)** — `modes/` primitive + `af mode` CLI + `hooks/modes.py` + token-efficient + caveman ported. 4 other modes (deep-research, verify-first, rubber-duck, planner) deferred. |
 | N3 | Implement typed hook payloads | `2026-04-18-typed-hook-payloads.md` | 1 day | deferred |
 | N4 | Implement plan YAML schema | `2026-04-18-plan-yaml-schema.md` | 2 days | deferred |
 
@@ -49,11 +49,22 @@ bottom of the doc lists the top-5 for a focused session.
 
 | # | Item | Effort | Status |
 |---|---|---|---|
-| N16 | Sync `hooks/install-gemini-hooks.sh` with `install-hooks.sh` | 15 min | **in progress** |
-| N17 | Filter non-agentfiles skills from `af skill-usage` output | 15 min | **in progress** |
+| N16 | Sync `hooks/install-gemini-hooks.sh` with `install-hooks.sh` | 15 min | **done** |
+| N17 | Filter non-agentfiles skills from `af skill-usage` output | 15 min | **done** |
 | N18 | More entries in `research/projects/education-and-showcases/` | half session | deferred |
 | N19 | Copy remaining Claude Code `feature-dev:*` subagents locally | 1 hour | deferred |
-| N20 | Formalise hook tests into `hooks/tests/` | 1 hour | **in progress** |
+| N20 | Formalise hook tests into `hooks/tests/` | 1 hour | **done** |
+
+## Tier 6 — Rough edges noticed during execution
+
+Added 2026-04-18 late-session pass as they surfaced.
+
+| # | Item | Signal | Effort | Status |
+|---|---|---|---|---|
+| N21 | `af learn propose` slug still includes raw path fragments (e.g. `skill-home-eastill-projects-agentfiles-skills-ag`) — smarter keyword selection needed. Filter or collapse `/`-heavy tokens, prefer short meaningful nouns. | user observation after N15 ran | 30 min | open |
+| N22 | Node / bun / Python deps in `~/.claude/skills/hooks/*` aren't validated at install time — a hook that imports a missing package fails silently on first trigger. Add an `af check hooks` (or fold into `af audit`) that dry-runs each hook script against `/dev/null` input and reports import errors. | user observation after multiple hook churn | 1 hour | open |
+| N23 | Design plans in `docs/plans/2026-04-18-*.md` rot if they sit. Of 5 originally deferred, 2 now done (includes/, behavioral-modes MVP). 3 remain: typed-hook-payloads (N3), plan-yaml-schema (N4), and the next-round-backlog itself when all rows land. Schedule one per focused session rather than letting them sit. | this doc | per-plan effort already listed | see N3, N4, backlog-archive |
+| N24 | `af learn promote --apply` was tested on a scratch draft but not yet on a real candidate that survives review. First production promote is the remaining verification gap. | verification gap #4 | 30 min | open |
 
 ---
 

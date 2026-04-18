@@ -27,6 +27,7 @@ _SUBCOMMANDS = [
     ("hub", "hub"),
     ("repo", "repo"),
     ("caveman", "caveman"),
+    ("mode", "mode"),
     ("youtube", "youtube"),
     ("terminal", "terminal"),
     ("webscraper", "webscraper"),

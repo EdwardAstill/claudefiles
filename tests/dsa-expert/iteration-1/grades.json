@@ -1,0 +1,69 @@
+{
+  "note": "Each grade is a separate 1-5 judgement per (eval, condition, criterion), with a 1-2 sentence evidence string. Scores anchored against the evals.json reference_answer.",
+  "grades": {
+    "lru-cache-with-ttl": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All elements of the reference answer are present: hashmap+DLL+min-heap core, version-tombstone trick for stale heap entries, evict_lru walks past expired tail nodes, lazy+periodic hybrid. No technical errors." },
+        "completeness":  { "score": 5, "evidence": "Covers eager/lazy/hybrid trade-off, memory overhead arithmetic, thread safety (coarse, RWLock critique, sharding, Caffeine), and 7 edge cases including ttl=0, version drift, capacity=1, clock skew, heap compaction." },
+        "structure":     { "score": 5, "evidence": "Follows the 5-step skill process with clear headers (constraint summary, candidates, invariants, pseudocode, complexity proof, edge cases, lang handoff). Sections flow logically without redundancy." },
+        "clarity":       { "score": 4, "evidence": "Tight prose throughout, but the trade-off table plus memory arithmetic plus version-tombstone discussion is information-dense and takes work to scan. Still concise for the depth delivered." },
+        "actionability": { "score": 5, "evidence": "Pseudocode is complete enough to implement directly; invariants, complexity, and per-language mapping (Python OrderedDict, Rust lru+BinaryHeap, Caffeine, Go container/list) give concrete next-step handoffs." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "Core design correct (hashmap+DLL+heap, lazy vs eager, sharding). Minor gaps: doesn't explicitly describe version numbers to invalidate stale heap entries beyond mentioning 'tombstone' briefly; evict_lru walking past expired isn't called out." },
+        "completeness":  { "score": 3, "evidence": "Covers main trade-offs and names edge cases (ttl=0, capacity=1, all-expired, clock) but treats them as a list without discussion. No memory arithmetic, no bounded-growth analysis on heap tombstones." },
+        "structure":     { "score": 4, "evidence": "Readable sections (data structures, operations, eager vs lazy, memory, thread safety, edge cases, complexity) but lacks explicit invariants and trade-off table. Flat rather than layered." },
+        "clarity":       { "score": 5, "evidence": "Short, no filler, easy to skim — arguably reads faster than the with-skill version for someone already familiar." },
+        "actionability": { "score": 3, "evidence": "Pseudocode is sketch-level prose, not code; implementer would need to fill in move_to_front, heap entry schema, and the version/tombstone mechanism themselves. No language-specific pointers." }
+      }
+    },
+    "median-in-streaming-data": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "Identifies the bounded-range lever first, recommends frequency array with median-pointer invariant (matches reference), includes correct two-heap fallback and t-digest/P² for approximation." },
+        "completeness":  { "score": 5, "evidence": "Full comparison table across 4 approaches, explicit invariants for frequency-array approach, complexity proof, skew analysis, edge cases including overflow and sparse-bucket degenerate, language mappings." },
+        "structure":     { "score": 5, "evidence": "Clear 5-step layout with embedded invariants and comparison table; frequency-array vs two-heap cleanly separated." },
+        "clarity":       { "score": 4, "evidence": "Dense but well-paced. The median-pointer pseudocode with while-loops is the trickiest part and could benefit from one extra sentence on the integer-ceil convention; otherwise tight." },
+        "actionability": { "score": 5, "evidence": "Pseudocode is directly translatable; language handoff gives concrete stdlib pointers for Python numpy, Rust Vec, Java int[], C++ std::array and a t-digest pointer for distributed case." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "Correct descriptions of two-heap, BST, frequency array, t-digest. Does note frequency array as 'best choice for this constraint' but leads with two-heap as the canonical answer — slightly less pointed than the reference." },
+        "completeness":  { "score": 3, "evidence": "Covers trade-offs and skew/approximation briefly. Missing: explicit invariants, detailed pseudocode for the frequency-array median pointer maintenance, complexity proof beyond big-O labels." },
+        "structure":     { "score": 4, "evidence": "Approach-by-approach sections with trade-offs and edge cases. Works, but lacks the scaffolding (constraint summary, invariants) that makes the with-skill easier to verify." },
+        "clarity":       { "score": 5, "evidence": "Short, readable, no padding." },
+        "actionability": { "score": 3, "evidence": "Pseudocode for two-heap is actionable; the frequency-array recommendation is not accompanied by concrete pointer-maintenance code, so the implementer would have to derive it." }
+      }
+    },
+    "concurrent-skip-list-vs-btree": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "Accurate comparison on lock granularity, cache, memory, contention. Skip list insert pseudocode (Herlihy-Shavit) is correct including the marked/fully_linked commit protocol, B-link tree called out for read-heavy fallback." },
+        "completeness":  { "score": 5, "evidence": "Covers 6 explicit invariants, edge cases for duplicates/concurrent delete/iterator invalidation, memory reclamation (EBR vs hazard pointers), language-specific library pointers, and a conditional recommendation for read-heavy vs mixed." },
+        "structure":     { "score": 5, "evidence": "Constraint summary, comparison table, recommendation with reasoning, invariants, pseudocode, complexity proof, edge cases, language handoff — matches the skill's prescribed layout cleanly." },
+        "clarity":       { "score": 4, "evidence": "Dense but well-structured. The invariants + pseudocode + memory-reclamation triple takes some reading; no obvious fat." },
+        "actionability": { "score": 5, "evidence": "Pseudocode is implementable; library recommendations per language and note on EBR/hazard pointers mean the next step is concrete." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "Comparison is correct, pseudocode is essentially right but less annotated. Recommendation matches reference." },
+        "completeness":  { "score": 3, "evidence": "Covers the main axes but omits explicit invariants, memory-reclamation depth (one line), B-link tree mechanics, and recommendation conditionals are sparse." },
+        "structure":     { "score": 4, "evidence": "Clean section headers (lock granularity, cache, memory, scalability, recommendation, pseudocode, edge cases). Lacks invariants and trade-off table." },
+        "clarity":       { "score": 5, "evidence": "Readable and concise throughout." },
+        "actionability": { "score": 3, "evidence": "Pseudocode present but lightly commented; missing the detail on why lock acquisition is bounded and why MAX_LEVEL matters — implementer has to derive these." }
+      }
+    },
+    "string-matching-multiple-patterns": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "Aho-Corasick recommendation with correct amortized analysis, complete BFS failure-link construction, correct statement of the output-extension invariant, and a grounded latency back-of-envelope." },
+        "completeness":  { "score": 5, "evidence": "All three approaches compared, two-tier AC architecture for dynamic updates (exceeds reference), NFC vs NFKC vs casefold discussion, homoglyph confusables, sharding, 7 edge cases including overlapping/prefix/short-pattern inflation." },
+        "structure":     { "score": 5, "evidence": "5-step layout preserved, dedicated sections for case-insensitive, Unicode, dynamic updates, and sharding; edge cases listed cleanly." },
+        "clarity":       { "score": 4, "evidence": "Dense — sub-ms budget math, NFKC trade-offs, and two-tier AC in quick succession. Information-dense but not padded." },
+        "actionability": { "score": 5, "evidence": "Library recommendation per language (pyahocorasick, aho-corasick-rs, BurntSushi, Cloudflare, Hyperscan), normalization libs, and Turkish-I pitfall called out. Implementer can start immediately." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "All three approaches described correctly. Less depth on the specific failure-link construction; output-chain propagation is mentioned for overlapping patterns but not stated as an invariant." },
+        "completeness":  { "score": 3, "evidence": "Covers the reference answer's key points but thinner on dynamic-update strategy (one line on two-tier), Unicode normalization (one paragraph), and no sharding / throughput math." },
+        "structure":     { "score": 4, "evidence": "Approach-by-approach with recommendation and cross-cutting sections. Clean but lacks invariants/proof layer." },
+        "clarity":       { "score": 5, "evidence": "Easy to read, succinct." },
+        "actionability": { "score": 4, "evidence": "Library list per language is present. Pseudocode for the AC build is absent — implementer relies on library or derives build themselves, which is fine but a notch below the with-skill." }
+      }
+    }
+  }
+}

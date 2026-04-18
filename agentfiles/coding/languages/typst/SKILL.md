@@ -4,27 +4,17 @@ description: >
   Typst document expert. Use when writing or debugging Typst documents —
   markup, custom functions, styling, packages, and compilation. Uses the
   tinymist LSP for live introspection and typst.app/docs for reference.
+includes:
+  - typst/tinymist
 ---
 
 # Typst Expert
 
 Typst is a modern typesetting system — think LaTeX with a sane syntax.
 Handles document structure, custom functions, styling, and the typst package
-ecosystem. Uses tinymist for LSP support.
-
-## LSP — tinymist
-
-tinymist is the official Typst language server. Provides completions, hover
-docs, diagnostics, and symbol navigation for `.typ` files.
-
-```
-LSP: hover       — function signatures, parameter docs
-LSP: diagnostics — syntax errors, undefined variables, type mismatches
-LSP: definition  — jump to function or variable definition
-LSP: completions — context-aware completions for functions and packages
-```
-
-Install: `cargo install tinymist`
+ecosystem. LSP workflow, tinymist install, config, and diagnostics live in the
+`typst/tinymist` fragment (see `## Shared Conventions`); this file is for
+Typst-specific markup patterns and the document toolchain.
 
 ## Documentation
 
@@ -38,14 +28,15 @@ Always check the installed Typst version — the language evolves quickly.
 typst --version
 ```
 
-## Toolchain
+## Toolchain at a glance
 
-| Tool | Purpose | Command |
-|------|---------|---------|
-| `typst compile` | Compile to PDF | `typst compile doc.typ` |
-| `typst watch` | Recompile on save | `typst watch doc.typ` |
-| `tinymist` | LSP server | via editor |
-| `typst query` | Extract metadata | `typst query doc.typ <selector>` |
+| Tool            | Purpose               | Covered in fragment   |
+|-----------------|-----------------------|-----------------------|
+| `typst compile` | Compile to PDF        | inline below          |
+| `typst watch`   | Recompile on save     | `typst watch doc.typ` |
+| `tinymist`      | LSP server            | `typst/tinymist`      |
+| `typst query`   | Extract metadata      | `typst query doc.typ <selector>` |
+| `typstyle`      | Formatter             | see `typst/tinymist`  |
 
 ## Document Structure
 

@@ -1,19 +1,27 @@
-"""af caveman — toggle persistent caveman mode across all Claude Code sessions.
+"""af caveman — backwards-compatible alias for `af mode on/off caveman`.
 
-Three levels: lite, full (default/recommended), actual-caveman. Plus off.
+The caveman mode was the original ad-hoc behavioral mode. It has since been
+ported to the generic `agentfiles/modes/` primitive (see
+`agentfiles/modes/caveman/MODE.md`). This module is kept as a thin wrapper so
+existing shortcuts (shell aliases, fish config, muscle memory) keep working.
+
+Legacy state file `~/.claude/caveman-mode` is still read on first use and
+migrated to `~/.claude/modes/caveman`.
 """
+
+from __future__ import annotations
 
 from pathlib import Path
 
 import typer
 
-app = typer.Typer(help="Toggle persistent caveman-mode re-injection (UserPromptSubmit hook).")
+from af import mode as mode_mod
 
-STATE = Path.home() / ".claude" / "caveman-mode"
+app = typer.Typer(help="Toggle caveman mode — alias for `af mode on/off caveman`.")
 
-# Canonical levels
-LEVELS = {"lite", "full", "actual-caveman"}
-# User-friendly aliases → canonical
+LEGACY_STATE = Path.home() / ".claude" / "caveman-mode"
+
+# User-friendly aliases → canonical level. Matches legacy behaviour.
 ALIASES = {
     "lite": "lite",
     "full": "full",
@@ -21,6 +29,7 @@ ALIASES = {
     "actual-caveman": "actual-caveman",
     "cave": "actual-caveman",
     "caveman": "actual-caveman",
+    "on": "full",
 }
 
 LEVEL_DESC = {
@@ -30,45 +39,74 @@ LEVEL_DESC = {
 }
 
 
-def _write(level: str) -> None:
-    STATE.parent.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(level + "\n")
+def _migrate_legacy() -> None:
+    """If the old `~/.claude/caveman-mode` file exists, migrate to new state dir."""
+    if not LEGACY_STATE.exists():
+        return
+    try:
+        level = LEGACY_STATE.read_text().strip().lower() or "full"
+    except OSError:
+        return
+    canon = ALIASES.get(level, "full")
+    mode_mod.activate("caveman", canon)
+    try:
+        LEGACY_STATE.unlink()
+    except OSError:
+        pass
+
+
+@app.callback(invoke_without_command=True)
+def _main(ctx: typer.Context):
+    """Toggle caveman mode. With no subcommand, shows status."""
+    _migrate_legacy()
+    if ctx.invoked_subcommand is None:
+        _status()
 
 
 @app.command()
 def on(
-    level: str = typer.Argument("full", help=f"Level: {', '.join(sorted(LEVELS))}."),
+    level: str = typer.Argument("full", help="lite | full | actual-caveman"),
 ):
-    """Enable persistent caveman mode at the given level."""
-    canon = ALIASES.get(level.lower())
+    """Enable caveman mode at the given level."""
+    _migrate_legacy()
+    canon = ALIASES.get(level.strip().lower())
     if not canon:
-        typer.echo(f"Unknown level: {level}. Choose from: {', '.join(sorted(LEVELS))}")
+        typer.echo(
+            f"Unknown level: {level}. Choose from: lite, full, actual-caveman.",
+            err=True,
+        )
         raise typer.Exit(1)
-    _write(canon)
+    mode_mod.activate("caveman", canon)
     typer.echo(f"caveman mode: ON ({canon}) — {LEVEL_DESC[canon]}")
 
 
 @app.command()
 def off():
-    """Disable persistent caveman mode."""
-    if STATE.exists():
-        STATE.unlink()
-    typer.echo("caveman mode: OFF")
+    """Disable caveman mode."""
+    _migrate_legacy()
+    _off()
 
 
 @app.command()
 def status():
     """Show current caveman-mode state."""
-    if STATE.exists():
-        level = STATE.read_text().strip() or "full"
-        canon = ALIASES.get(level, "full")
-        typer.echo(f"caveman mode: ON ({canon}) — {LEVEL_DESC[canon]}")
-    else:
+    _migrate_legacy()
+    _status()
+
+
+def _off() -> None:
+    active = mode_mod.active_modes()
+    if "caveman" in active:
+        mode_mod.deactivate("caveman")
+    typer.echo("caveman mode: OFF")
+
+
+def _status() -> None:
+    active = mode_mod.active_modes()
+    level = active.get("caveman")
+    if level is None:
         typer.echo("caveman mode: OFF")
-
-
-@app.callback(invoke_without_command=True)
-def main(ctx: typer.Context):
-    """Toggle persistent caveman mode. With no subcommand, shows status."""
-    if ctx.invoked_subcommand is None:
-        status()
+        return
+    canon = ALIASES.get(level, level)
+    desc = LEVEL_DESC.get(canon, "")
+    typer.echo(f"caveman mode: ON ({canon}) — {desc}")

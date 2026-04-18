@@ -31,13 +31,38 @@
   in `includes/` instead.
 - `af check` still passes, `af audit` regression-free (same 34 pre-existing
   issues, same 4/8 summary), `af ak list` unchanged.
+- Second-wave migration landed 2026-04-19:
+  - `agentfiles/coding/languages/rust/SKILL.md` uses
+    `includes: [rust/clippy]`. Clippy toolchain row + "Ignoring clippy
+    warnings" anti-pattern/common-mistake entries removed from the body;
+    net line count 189 → 193 because the frontmatter block + restyled
+    "Toolchain at a glance" table cost a few lines over what the inline
+    clippy rows did (the bulk of the clippy content — 81 lines — now
+    lives once in `includes/rust/clippy.md`).
+  - `agentfiles/coding/languages/typescript/SKILL.md` uses
+    `includes: [typescript/tsc-strict]`. Strict-mode config block,
+    forbidden-escape-hatch table, and type-only-import section removed
+    from the body (now in the fragment). 181 → 169 lines.
+  - `agentfiles/coding/languages/typst/SKILL.md` uses
+    `includes: [typst/tinymist]`. New fragment
+    `agentfiles/includes/typst/tinymist.md` (92 lines) shipped alongside
+    the migration — covers LSP verbs, install, `tinymist.toml` config,
+    and diagnostics interpretation. Skill body 162 → 153 lines.
+  - `af include check` resolves on all three files; `af include expand`
+    produces coherent `## Shared Conventions` sections. pytest suite
+    still 128 passed / 1 skipped, `af audit` 8/8 passed.
 
 ### Remaining
 
-- Migrate the other four language experts (`rust`, `typescript`, `typst`,
-  plus `tui-expert` / `ui-expert` handoff block). Out of scope for this
-  session by design — the loader + one reference implementation ships
-  first.
+- `ui-expert` / `tui-expert` were read in the second-wave pass and
+  deliberately left as-is — these are design-spec skills, not language
+  toolchain skills. Their content (design intelligence, framework widget
+  catalogs, component-spec template, TUI color/keyboard design) is
+  genuinely unique per skill; no shared tooling fragment fits without
+  fabricating duplication. The original `handoff/to-language-expert`
+  fragment proposed in §3 is still viable if the handoff paragraphs
+  across `ui`, `tui`, and any future design experts converge — revisit
+  then.
 - Extract the language-agnostic fragments originally proposed in §3
   (`lsp/base-workflow`, `docs/fetching`, `testing/structure`,
   `packaging/lockfile`, `handoff/to-language-expert`,

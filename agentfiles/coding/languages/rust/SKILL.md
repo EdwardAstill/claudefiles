@@ -6,12 +6,16 @@ description: >
   (ownership, lifetimes, error handling) that benefit from structured guidance.
   Covers ownership, borrowing, lifetimes, error handling, cargo toolchain,
   and live code introspection via the rust-analyzer LSP.
+includes:
+  - rust/clippy
 ---
 
 # Rust Expert
 
 Deep Rust knowledge — ownership model, type system, async patterns, cargo
-ecosystem, and live LSP introspection via rust-analyzer.
+ecosystem, and live LSP introspection via rust-analyzer. Clippy is covered in
+the `rust/clippy` fragment (see `## Shared Conventions`); this file is for
+Rust-specific patterns, ownership rules, and testing shape.
 
 ## LSP — rust-analyzer
 
@@ -37,15 +41,15 @@ Install: `rustup component add rust-analyzer`
 - **Version check:** `af versions --write` reads `Cargo.toml` and `Cargo.lock`
 - **Local docs:** `cargo doc --open` to browse all deps locally
 
-## Toolchain
+## Toolchain at a glance
 
-| Tool | Purpose | Command |
-|------|---------|---------|
-| `cargo` | Build, test, package manager | `cargo build`, `cargo test`, `cargo add <crate>` |
-| `clippy` | Linter — catches real bugs | `cargo clippy -- -D warnings` |
-| `rustfmt` | Formatter | `cargo fmt` |
-| `rust-analyzer` | LSP | via editor |
-| `cargo-watch` | Re-run on file change | `cargo watch -x test` |
+| Tool            | Purpose                          | Covered in fragment  |
+|-----------------|----------------------------------|----------------------|
+| `cargo`         | Build, test, package manager     | inline below         |
+| `clippy`        | Linter — catches real bugs       | `rust/clippy`        |
+| `rustfmt`       | Formatter                        | see `rust/clippy`    |
+| `rust-analyzer` | LSP                              | see "LSP" above      |
+| `cargo-watch`   | Re-run on file change            | `cargo watch -x test`|
 
 ## Ownership and Borrowing
 
@@ -102,7 +106,8 @@ struct UserId(u64);
 | `.clone()` to satisfy borrow checker | Rethink ownership structure |
 | `Arc<Mutex<T>>` everywhere | Consider whether shared state is needed |
 | Raw pointer manipulation | Use safe abstractions |
-| Ignoring clippy warnings | Fix them — they're almost always right |
+
+(Clippy-specific rules and `#[allow]` discipline live in the `rust/clippy` fragment.)
 
 ## Testing
 
@@ -178,7 +183,6 @@ async = ["dep:tokio"]
 | `.unwrap()` in production | Use `?` to propagate, or handle the error explicitly |
 | `.clone()` to appease borrow checker | Rethink ownership — clone is often a design smell |
 | `Arc<Mutex<T>>` as default shared state | Consider channels or ownership transfer first |
-| Ignoring clippy warnings | Fix them — `cargo clippy -- -D warnings` in CI |
 | `impl` blocks scattered across files | Group all `impl Foo` in one place |
 | Returning `Box<dyn Error>` from lib | Define a proper error type with `thiserror` |
 

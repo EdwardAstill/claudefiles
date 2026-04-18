@@ -1,7 +1,38 @@
 # Behavioral Modes — Implementation Plan
 
-**Status:** proposed
+**Status:** MVP shipped (2026-04-18) — primitive, CLI, hook, and two modes (token-efficient + caveman) live.
 **Inspired by:** `SuperClaude_Framework` — see `research/projects/skill-suites/superclaude-framework.md`
+
+## Status
+
+### Done (MVP)
+
+- `agentfiles/modes/` primitive with authoring guide (`modes/README.md`).
+- Two modes shipped: `agentfiles/modes/token-efficient/MODE.md` and `agentfiles/modes/caveman/MODE.md` (ported from the old communication/caveman SKILL.md).
+- Generic `hooks/modes.py` (multi-mode dispatcher) — reads `~/.claude/modes/`, concatenates reminders in category order, emits one `UserPromptSubmit` payload. Zero external deps, inline YAML-ish parser for the frontmatter subset we commit to.
+- State layout: directory `~/.claude/modes/`, one file per active mode (contents = level). Overridable via `$AF_MODES_STATE_DIR` for tests.
+- CLI `af mode list|on|off|status` with `--active`, `--level`, conflict detection, and clean errors on unknown mode/level. Registered in `tools/python/src/af/main.py`.
+- `af caveman` kept as backwards-compat alias (writes to the new state dir; migrates the legacy `~/.claude/caveman-mode` file on first use).
+- `hooks/hooks.json` swapped `caveman-mode.py` → `modes.py`. Old `caveman-mode.py` kept as a one-release shim that delegates to `modes.py`.
+- Tests: `tools/python/tests/test_mode.py` — 13 tests (discovery, parse, activate/deactivate, CLI list/on/off/status, unknown-mode, unknown-level, priority ordering, caveman alias, hook subprocess integration).
+- `af audit` stays 8/8. Full test suite 141 passed / 1 skipped.
+
+### Remaining (later passes)
+
+- Ship `deep-research`, `verify-first`, `rubber-duck`, `planner` modes (one MODE.md each — primitive already supports them).
+- `af check` validator for MODE.md frontmatter (required keys, known category, conflicts_with resolves, unique names, no SKILL.md under modes/, no MODE.md outside it).
+- Delete `agentfiles/communication/caveman/SKILL.md` and its `[skills.caveman]` manifest entry once callers (marketplace blurb, hooks/install-*.sh, docs/skill-tree.md, tools/python/tests/test_cli_smoke.py) are migrated.
+- Delete `hooks/caveman-mode.py` shim next release.
+- Per-project modes (`af mode on --project` → `.claude/modes/` in the repo) — open question from section 9.
+- Named bundles (`af mode preset research-deepdive`) — deferred per section 9.
+- Raise conflict-line bloat cap (currently none; plan calls for 5-active limit).
+
+### On-the-fly design calls
+
+- **YAML parsing:** no PyYAML dep. Inline minimal parser covers folded scalars (`>`), inline lists (`[a, b]`), dash-lists, and one-level mappings (for `reminders:` and `aliases:`). Same parser lives in `mode.py` and `hooks/modes.py`; duplication is intentional to keep the hook deps-free.
+- **State override envs:** `$AF_MODES_STATE_DIR` + `$AF_MODES_DIR` for tests. Production code never sets them.
+- **Caveman shim order:** callback runs `_migrate_legacy()` every time before dispatching, so muscle-memory invocations are silently migrated on first run.
+- **Audit vs port:** kept `agentfiles/communication/caveman/SKILL.md` in place (and its `[skills.caveman]` manifest entry) to avoid a cross-cutting cleanup pass. Listed above as a remaining follow-up.
 
 ## 1. Goal
 
