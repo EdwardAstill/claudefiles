@@ -1,6 +1,46 @@
 # Plan YAML Schema
 
-**Status:** proposed
+**Status:** Phase 1 complete — core loader, dataclasses, and DAG validator
+landed at `tools/python/src/af/plan_exec.py` with 18 tests in
+`tools/python/tests/test_plan_exec.py`. No CLI surface yet; module is
+importable but not registered in `af.main`.
+
+**Remaining for Phase 2:**
+
+- Typer `app` + subcommands (`validate`, `next`, `mark`, `run`) and register
+  on `af.main`.
+- State mutation (Phase 2 Agent A owns `af plan-exec mark`).
+- Dispatch logic lives in the `subagent-driven-development` skill, not the
+  CLI — wire the skill to call the loader/validator once Phase 2 ships.
+- Update `writing-plans` skill to emit the YAML sidecar alongside the prose
+  plan (see §6 Migration).
+
+**Phase 1 notes / schema ambiguities flagged for Phase 2:**
+
+- **YAML parser choice.** Spec §5 names `ruamel.yaml`; Phase 1 used
+  `PyYAML` (`pyyaml>=6.0`) per the Phase 1 task brief. Revisit if round-trip
+  preservation (comment/line-number fidelity) becomes a requirement for
+  error messages or `af plan-scaffold`.
+- **Loop body ids and duplicates.** The current validator treats duplicate
+  ids as global (top-level + loop body ids share one namespace). Spec is
+  silent; reconsider if you want per-loop id scoping.
+- **Loop body `depends_on`.** Validator only resolves top-level
+  `depends_on` against top-level ids. Whether inner body nodes can
+  `depends_on` each other (likely yes) or reach out of the loop (likely
+  no) is not nailed down in the spec.
+- **`${item}` templating.** Recognised syntactically in fixtures; not
+  expanded, not validated, not enforced as the only templating primitive.
+  Phase 2 dispatcher needs to define substitution semantics.
+- **`files.test`.** Parsed but not validated (neither create-if-missing
+  nor must-exist makes obvious sense for tests). Spec doesn't say.
+- **`verify` node type.** Coerced into a dataclass but the spec table
+  elides type-specific requirements — currently permissive (treated like
+  `implement` minus type name). Decide if a `verify`-type node must have a
+  non-empty `verify:` list.
+- **`repo_root` for filesystem invariants.** `validate()` accepts an
+  explicit `repo_root` so tests can sandbox. Phase 2 CLI will need a
+  policy (plan file dir? `git rev-parse --show-toplevel`? CWD?).
+
 **Inspired by:** `coleam00/Archon` — see `research/projects/methodology-and-workflows/coleam00-archon.md`
 
 ## 1. Goal
