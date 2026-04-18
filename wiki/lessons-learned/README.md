@@ -84,12 +84,13 @@ unbounded self-editing).
 
 ---
 
-## Not yet populated
+## Current state
 
-No lessons yet — this directory was scaffolded as part of the initial wiki build.
-First lessons should come from the first `af log review` → `retrospective`
-cycle after the wiki ships.
+Seeded with the foundational-research-pass entry from the wiki build itself
+(`2026-04-18-foundational-research-pass.md`). Subsequent lessons should come
+from `af log review` → `retrospective` cycles, or from any session where
+something happened that the next session would benefit from knowing.
 
-The `retrospective` skill should check this directory and its conventions before
-writing its first lesson, and can refine the template above based on practical
+The `retrospective` skill should check this directory and its conventions
+before writing a lesson, and can refine the template above based on practical
 experience.

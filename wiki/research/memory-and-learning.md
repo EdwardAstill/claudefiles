@@ -239,7 +239,11 @@ knowledge-base skill pattern is the model — extend it to the meta-domain
 - **Bind memory to the reflection loop, not the tool loop.** Reading memory
   on every turn is the wrong default (pollutes context). Reading memory when
   a skill explicitly asks ("given this task, retrieve relevant lessons") is
-  the right default. Add a `af lessons <query>` CLI for this.
-- **Automate the lesson-file template.** `af lesson new <slug>` scaffolds a
-  `wiki/lessons-learned/<slug>.md` with structured fields. Without the
-  scaffold the file format drifts and grep loses precision.
+  the right default. Today the path is `af wiki list` to surface candidates
+  plus `rg wiki/lessons-learned/` for full-text — no dedicated CLI needed
+  until grep plateaus.
+- **Keep the lesson-file template in `wiki/lessons-learned/README.md`, not in
+  a CLI scaffolder.** A previous `af lessons new` scaffolder was reverted as
+  bloat: `touch wiki/lessons-learned/<YYYY-MM-DD-slug>.md` plus the README
+  template is enough. Add a scaffolder only if filename or field drift
+  becomes a measured problem.
