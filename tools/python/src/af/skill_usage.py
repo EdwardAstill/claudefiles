@@ -59,13 +59,24 @@ def _discover_catalog_skills() -> set[str]:
     return names
 
 
+def _filter_agentfiles(events: list[dict], catalog: set[str]) -> list[dict]:
+    """Strip events whose skill name isn't in the agentfiles catalog."""
+    if not catalog:
+        return events
+    return [e for e in events if e.get("skill") in catalog]
+
+
 @app.command("summary")
 def summary_cmd(
     days: int = typer.Option(30, "--days", "-d", help="Only include events from the last N days"),
     top: int = typer.Option(20, "--top", "-n", help="How many rows per table"),
+    include_external: bool = typer.Option(False, "--include-external", help="Include skills not in the agentfiles catalog (noise from other projects)"),
 ):
     """Ranked tables: most-loaded, cold-loaded, top parent→child chains."""
     events = _load_events()
+    catalog = _discover_catalog_skills()
+    if catalog and not include_external:
+        events = _filter_agentfiles(events, catalog)
     cutoff = None
     if days > 0:
         cutoff = datetime.now(timezone.utc).timestamp() - days * 86400

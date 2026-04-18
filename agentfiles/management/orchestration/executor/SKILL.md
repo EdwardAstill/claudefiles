@@ -1,10 +1,15 @@
 ---
 name: executor
 description: >
-  Use when starting any new task. Orients, makes the routing decision inline,
-  and handles the task end-to-end. Absorbs specialist skills inline rather than
-  dispatching them as subagents. Escalates to manager only when parallel
-  multi-agent coordination is genuinely needed.
+  Use at the start of every new task before any other skill. Trigger phrases:
+  "can you help me", "I need to", "let's work on", "please do X", "fix this",
+  "build X", "investigate Y", "look into Z", "start a new task", "work on this",
+  "do the thing", any bare user request with no other skill already loaded.
+  Runs orient (af context / af status), makes the routing decision inline, and
+  handles the task end-to-end — absorbs specialist skills rather than dispatching.
+  Do NOT use when the task genuinely needs parallel multi-domain agents (use
+  manager) or when an implementation plan already exists and just needs execution
+  (use subagent-driven-development).
 ---
 
 # Executor
@@ -122,6 +127,21 @@ Debugging a bug    → Skill("systematic-debugging") → apply in this conversat
 ```
 
 Inline loading keeps full context throughout. Subagents lose the session; inline keeps it.
+
+### Check the skill's `next:` chain
+
+When you load a skill, read its frontmatter `next:` field (if present). That
+lists the skills commonly invoked *after* this one. Queue them mentally as
+likely-next steps rather than re-deciding at each transition. Example flow:
+
+```
+brainstorming        → next: [writing-plans]
+writing-plans        → next: [subagent-driven-development]
+subagent-driven-development → next: [verification-before-completion, code-review]
+```
+
+`next:` is a hint, not a contract. If the work diverges from the declared
+chain, follow the work.
 
 ## Step 4: Verify before completion (MANDATORY)
 

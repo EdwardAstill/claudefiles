@@ -1,12 +1,16 @@
 ---
 name: youtube
 description: >
-  Use for anything YouTube: search by name or phrase, transcripts (single video,
-  playlist, channel), audio extraction (WAV / MP3 / any ffmpeg format), clip
-  trimming, channel listing, and LLM summarisation. Handles the "I only have an
-  artist / topic name, find and download" flow by chaining `search` → `audio`.
-  Fully integrated as `af youtube <subcommand>` — no external wrapper needed.
-  Chains cleanly into `note-taker`, `knowledge-base`, and `test-taker`.
+  Use for anything YouTube. Trigger phrases: "get the transcript of this video",
+  "download this playlist", "rip audio from this YouTube link", "summarise this
+  YouTube video", "find videos by artist X", "download as MP3", "transcribe the
+  talk", "list videos on this channel", "clip from 1:30 to 2:45", "I only have
+  the channel name, find the video". Covers search, transcripts (video /
+  playlist / channel bulk), audio extraction (WAV / MP3 / any ffmpeg format),
+  clip trimming, channel + playlist listings, and LLM summarisation via `af
+  youtube <subcommand>`. Do NOT use for arbitrary web video (use web-scraper or
+  browser-control) or for converting a local media file you already have (use
+  file-converter).
 ---
 
 # YouTube

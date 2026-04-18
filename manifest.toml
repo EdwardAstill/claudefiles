@@ -291,10 +291,56 @@ tools = ["Bash", "Read", "Write", "Edit"]
 cli = ["uv"]
 category = "reasoning"
 
+[skills.codebase-to-course]
+tools = ["Read", "Write", "Glob", "Grep"]
+category = "research"
+
+[skills.coding]
+tools = []
+category = "coding"
+
+[skills.coding-quality]
+tools = []
+category = "coding/quality"
+
+[skills.management]
+tools = []
+category = "management"
+
+[skills.management-meta]
+tools = []
+category = "management/meta"
+
+[skills.planning]
+tools = []
+category = "planning"
+
+[skills.research]
+tools = []
+category = "research"
+
 # ── CLI tool registry ─────────────────────────────────────────────────────────
 # Tools installed via bun, uv, cargo, or rustup.
 # af-agents checks PATH for each and flags missing ones.
 # Use 'install' to override the default install command.
+
+[cli.af]
+manager = "uv"
+package = "af"
+install = "uv tool install -e ~/projects/agentfiles/tools/python/"
+description = "agentfiles CLI — context, status, install, archetype, ak, audit, skill-usage, learn"
+
+[cli.uv]
+manager = "system"
+package = "uv"
+install = ["curl -LsSf https://astral.sh/uv/install.sh | sh"]
+description = "Python package / tool manager used throughout agentfiles"
+
+[cli.curl]
+manager = "system"
+package = "curl"
+install = ["pacman -S curl", "apt install curl", "brew install curl"]
+description = "HTTP client used by web-scraper and various bootstrap flows"
 
 [cli.repomix]
 manager = "bun"
@@ -319,12 +365,6 @@ manager = "cargo"
 package = "convert2"
 install = ["cargo install --path ~/projects/convert2", "cargo install --git https://github.com/EdwardAstill/convert2"]
 description = "PDF to AI-friendly markdown, RAG, and Knowledge Graph converter"
-
-[cli.pk]
-manager = "bun"
-package = "pdfkit"
-install = ["cd ~/projects/pdfkit && bun install && bun link", "bun install -g github:EdwardAstill/pdfkit"]
-description = "PDF operations CLI — extract, combine, rotate, split, impose, booklet"
 
 [cli.pyright]
 manager = "bun"
@@ -360,12 +400,6 @@ manager = "cargo"
 package = "ripgrep"
 install = "cargo install ripgrep"
 description = "ripgrep — fastest recursive line-oriented search tool"
-
-[cli.jq]
-manager = "bun"
-package = "jq"
-install = "bun install -g jq"
-description = "Command-line JSON processor"
 
 [cli.foxpilot]
 manager = "uv"

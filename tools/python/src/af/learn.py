@@ -221,8 +221,18 @@ def list_drafts():
 
 
 @app.command()
-def promote(draft: str = typer.Argument(..., help="Draft filename under docs/skills-drafts/")):
-    """Print shell commands to move draft into skills/ + register. Does NOT execute."""
+def promote(
+    draft: str = typer.Argument(..., help="Draft filename under docs/skills-drafts/"),
+    category: str = typer.Option("", "--category", "-c", help="Target category (e.g. research, coding/quality). Required unless --dry-run."),
+    apply: bool = typer.Option(False, "--apply", help="Actually move + register + commit. Without this flag, prints commands only."),
+):
+    """Promote a draft into agentfiles/<category>/<slug>/ and register in manifest.
+
+    Without --apply, prints the commands it would run (safe default). With
+    --apply, moves the file, adds a [skills.<slug>] stub to manifest.toml, runs
+    `af audit` to confirm consistency, and offers a commit message.
+    """
+    import subprocess
     path = DRAFTS_DIR / draft
     if not path.exists():
         alt = DRAFTS_DIR / f"{draft}.md"
@@ -232,10 +242,54 @@ def promote(draft: str = typer.Argument(..., help="Draft filename under docs/ski
             typer.echo(f"Draft not found: {path}")
             raise typer.Exit(1)
     slug = path.stem.split("-", 3)[-1]
-    typer.echo("# Review the draft, then run (manually):")
-    typer.echo(f"mkdir -p {REPO_ROOT}/skills/{slug}")
-    typer.echo(f"mv {path} {REPO_ROOT}/skills/{slug}/SKILL.md")
-    typer.echo("# then register in manifest.toml and commit:")
-    typer.echo(f"$EDITOR {REPO_ROOT}/manifest.toml")
-    typer.echo(f"git -C {REPO_ROOT} add skills/{slug} manifest.toml && "
-               f"git -C {REPO_ROOT} commit -m 'skill: promote {slug} from draft'")
+
+    if not apply:
+        typer.echo(f"# Preview — re-run with --apply --category <cat> to execute")
+        cat_seg = category or "<category>"
+        target = REPO_ROOT / "agentfiles" / cat_seg / slug / "SKILL.md"
+        typer.echo(f"mkdir -p {target.parent}")
+        typer.echo(f"mv {path} {target}")
+        typer.echo(f"ln -s ../agentfiles/{cat_seg}/{slug} {REPO_ROOT}/skills/{slug}")
+        typer.echo(f"# manifest.toml: add [skills.{slug}] / tools = [] / category = \"{cat_seg}\"")
+        typer.echo(f"af audit   # confirm consistency")
+        typer.echo(f"git add . && git commit -m 'skill: promote {slug} from draft'")
+        return
+
+    if not category:
+        typer.echo("error: --category is required when --apply", err=True)
+        raise typer.Exit(code=2)
+
+    target_dir = REPO_ROOT / "agentfiles" / category / slug
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / "SKILL.md"
+    if target.exists():
+        typer.echo(f"error: target already exists: {target}", err=True)
+        raise typer.Exit(code=2)
+
+    # Move the draft
+    path.rename(target)
+    typer.echo(f"  [moved] {path.name} → {target.relative_to(REPO_ROOT)}")
+
+    # Create registry symlink
+    registry = REPO_ROOT / "skills" / slug
+    if not registry.exists():
+        rel = Path("..") / "agentfiles" / category / slug
+        registry.symlink_to(rel)
+        typer.echo(f"  [linked] skills/{slug} → {rel}")
+
+    # Append manifest entry (stub)
+    manifest = REPO_ROOT / "manifest.toml"
+    existing = manifest.read_text()
+    if f"[skills.{slug}]" not in existing:
+        insertion = f'\n[skills.{slug}]\ntools = []\ncategory = "{category}"\n'
+        manifest.write_text(existing + insertion)
+        typer.echo(f"  [manifest] appended [skills.{slug}]")
+
+    # Run audit
+    r = subprocess.run(["af", "audit"], capture_output=True, text=True)
+    last = [ln for ln in r.stdout.splitlines() if "SUMMARY:" in ln]
+    typer.echo(f"  [audit] {last[0] if last else 'no summary line'}")
+
+    typer.echo("")
+    typer.echo(f"Promoted. Review and commit:")
+    typer.echo(f"  git -C {REPO_ROOT} add . && git -C {REPO_ROOT} commit -m 'skill: promote {slug} from draft'")

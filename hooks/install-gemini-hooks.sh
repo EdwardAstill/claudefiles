@@ -40,6 +40,17 @@ HOOKS_CONFIG=$(cat <<EOF
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "name": "caveman-mode",
+            "type": "command",
+            "command": "$HOOK_BASE/caveman-mode.py"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -60,6 +71,42 @@ HOOKS_CONFIG=$(cat <<EOF
             "name": "skill-logger",
             "type": "command",
             "command": "$HOOK_BASE/skill-logger.py"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "name": "notify-stop",
+            "type": "command",
+            "command": "$HOOK_BASE/notify.py",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "name": "notify-permission",
+            "type": "command",
+            "command": "$HOOK_BASE/notify.py",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "name": "notify",
+            "type": "command",
+            "command": "$HOOK_BASE/notify.py",
+            "async": true
           }
         ]
       }

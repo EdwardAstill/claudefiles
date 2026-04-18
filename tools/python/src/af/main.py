@@ -35,6 +35,9 @@ _SUBCOMMANDS = [
     ("audit", "audit"),
     ("skill-usage", "skill_usage"),
     ("learn", "learn"),
+    ("include", "includes"),
+    ("skill-find", "skill_find"),
+    ("metrics", "metrics"),
 ]
 
 @app.callback(invoke_without_command=True)

@@ -1,11 +1,15 @@
 ---
 name: codebase-explainer
 description: >
-  Codebase mental-model builder. Answers "how does this codebase work?" — maps
-  architecture layers, traces execution paths, identifies key abstractions. Use
-  when entering an unfamiliar codebase, onboarding, or planning changes that span
-  multiple layers. NOT for external library docs (docs-agent) or evaluating
-  approaches (research-agent). Reads the code itself to build understanding.
+  Use when building a mental model of an unfamiliar repo. Trigger phrases:
+  "how does this codebase work", "walk me through this project", "explain the
+  architecture", "what does this service do", "trace how a request flows",
+  "where does X live in the code", "onboard me to this repo", "I need to change
+  Y, what does it touch", "map out the layers", "give me the tour". Reads the
+  source to map architecture layers, trace execution paths end-to-end, and
+  surface key abstractions + dependencies. Do NOT use for external library or
+  framework docs (use docs-agent), for comparing approaches or tech choices
+  (use research-agent), or for planning a concrete change (use writing-plans).
 ---
 
 # Codebase Explainer

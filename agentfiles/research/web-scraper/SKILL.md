@@ -1,13 +1,16 @@
 ---
 name: web-scraper
 description: >
-  Pure-HTTP web scraping expert. Use when the user needs data from a website
-  and the data is reachable without running JavaScript — fetch HTML/JSON,
-  parse structure, paginate, and store. Covers target triage (API endpoint vs
-  JSON-LD vs HTML), session handling, anti-bot tactics short of a browser,
-  pagination, retries/backoff, rate limiting, and output (JSONL/CSV/SQLite).
-  NOT for JS-rendered pages (use browser-control / foxpilot) and NOT for
-  format conversion of a file you already have (use file-converter).
+  Use for pure-HTTP scraping when data is reachable without a real browser.
+  Trigger phrases: "scrape this site", "pull data from X", "crawl this listing",
+  "extract all the articles from Y", "build a dataset from this website", "hit
+  their API", "download everything under this URL", "paginate through these
+  pages", "parse the JSON-LD", "grab the sitemap and fetch each page". Runs via
+  `af webscraper inspect / scaffold / fetch`: framework fingerprinting, API
+  endpoint discovery, robots.txt, rate-limited fetching, JSONL/CSV/SQLite
+  output. Do NOT use for JS-rendered pages that only populate after client-side
+  execution (use browser-control) or for converting HTML/PDF files already on
+  disk (use file-converter).
 ---
 
 # web-scraper

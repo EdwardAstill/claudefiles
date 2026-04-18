@@ -1,11 +1,16 @@
 ---
 name: research-agent
 description: >
-  Trade-off and risk analysis specialist. Answers "should I use X?" — evaluates
-  approaches, finds expert consensus, surfaces pitfalls, compares alternatives.
-  NOT for API lookups (docs-agent) or codebase understanding (codebase-explainer).
-  Use when choosing between options, evaluating risks, or needing evidence-based
-  recommendations before committing to an approach. Works for any topic.
+  Use when the user needs a trade-off, risk, or evidence analysis before
+  committing. Trigger phrases: "should I use X or Y", "what are the risks of
+  Z", "compare these approaches", "is there consensus on X", "what do experts
+  recommend for Y", "I've heard conflicting things about X", "what are the
+  known failure modes", "evaluate this library for my use case", "deep dive on
+  topic X", "investigate whether Z is a good idea". Searches across sources,
+  weights evidence, flags contradictions, and returns a structured report.
+  Works for coding and non-coding topics. Do NOT use when the user wants the
+  exact API/syntax of a library (use docs-agent) or understanding of the
+  current codebase (use codebase-explainer).
 ---
 
 # Research Agent

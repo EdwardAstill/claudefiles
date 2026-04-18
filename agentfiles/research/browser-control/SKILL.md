@@ -1,9 +1,15 @@
 ---
 name: browser-control
 description: >
-  Use when automating a browser — navigating pages, clicking, filling forms,
-  selecting dropdowns, scrolling, screenshots, extracting content, or any
-  web interaction. Use the foxpilot CLI exclusively via Bash tool.
+  Use when driving a real browser session. Trigger phrases: "open this in my
+  browser", "log into X", "click the button", "fill out the form", "screenshot
+  this page", "scrape the JS-rendered site", "it needs my cookies", "use my
+  logged-in session", "navigate to and then", "check the page after login",
+  "the data only loads after JavaScript runs". Uses foxpilot CLI exclusively via
+  Bash — headless for stateless recon, --zen for the user's authenticated Zen
+  session. Do NOT use for pure-HTTP scraping where JS is not required (use
+  web-scraper) or for converting a file already on disk to markdown (use
+  file-converter).
 ---
 
 Use the **foxpilot CLI** (`Bash` tool) for all browser interaction. No MCP tools.

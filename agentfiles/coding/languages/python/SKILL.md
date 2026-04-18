@@ -6,29 +6,19 @@ description: >
   tooling integration and project conventions that the base model doesn't enforce.
   Not for general Python knowledge (the model already has that). Covers type hints,
   testing with pytest, and live code introspection via the pyright LSP.
+includes:
+  - python/pyright
+  - python/uv
+  - python/ruff
 ---
 
 # Python Expert
 
 Deep Python knowledge — idiomatic patterns, type system, toolchain, and live
-LSP introspection. Uses pyright for type analysis and context7 for package docs.
-
-## LSP — pyright
-
-Always run LSP diagnostics before suggesting fixes. Pyright catches type errors,
-undefined names, and incorrect signatures that reading code alone can miss.
-
-```
-LSP: hover       — type of any expression
-LSP: diagnostics — type errors, undefined references
-LSP: definition  — jump to source of any symbol
-LSP: references  — find all usages
-```
-
-Install: `bun install -g pyright`
-
-For richer completions and refactoring, `pylsp` is an alternative:
-`uv tool install python-lsp-server`
+LSP introspection. Uses pyright for type analysis, uv for packaging, and ruff
+for lint/format. Those three tool chapters live in shared fragments (see the
+`## Shared Conventions` block at the bottom); this file is for Python-specific
+patterns, testing shape, and anti-patterns.
 
 ## Documentation
 
@@ -38,15 +28,15 @@ For richer completions and refactoring, `pylsp` is an alternative:
 
 Always verify the installed version before fetching docs — APIs change between minor versions.
 
-## Toolchain
+## Toolchain at a glance
 
-| Tool | Purpose | Command |
-|------|---------|---------|
-| `uv` | Package manager, virtual envs, tool runner | `uv add <pkg>`, `uv run <cmd>` |
-| `ruff` | Linter and formatter (replaces black + flake8) | `ruff check .`, `ruff format .` |
-| `pytest` | Test runner | `uv run pytest` |
-| `pyright` | Type checker | `pyright` |
-| `mypy` | Alternative type checker | `uv run mypy .` |
+| Tool       | Purpose                                | Covered in fragment    |
+|------------|----------------------------------------|------------------------|
+| `uv`       | Package manager, venvs, tool runner    | `python/uv`            |
+| `ruff`     | Linter and formatter                   | `python/ruff`          |
+| `pyright`  | Type checker and LSP                   | `python/pyright`       |
+| `pytest`   | Test runner                            | see "Testing" below    |
+| `mypy`     | Alternative type checker               | inline, project choice |
 
 ## Idiomatic Patterns
 
@@ -56,12 +46,8 @@ def process(items: list[str]) -> dict[str, int]:
     ...
 ```
 
-**Virtual envs** — use uv, never system pip:
-```bash
-uv init my-project
-uv add requests
-uv run python main.py
-```
+**Virtual envs** — use uv, never system pip (see `python/uv` fragment for
+the full workflow).
 
 **Async** — prefer `asyncio` with `async`/`await`; use `anyio` for library code that shouldn't pin to a specific event loop.
 
@@ -116,30 +102,6 @@ def test_upper(input, expected):
 uv run pytest tests/unit/ -v           # unit only
 uv run pytest -k "test_auth" -v        # by name pattern
 uv run pytest --cov=src --cov-report=term-missing
-```
-
-## Package Management (uv)
-
-**New project:**
-```bash
-uv init my-project          # creates pyproject.toml, .python-version, .venv
-uv add requests fastapi     # add dependencies
-uv add --dev pytest ruff    # dev-only dependencies
-```
-
-**Lock file:** `uv.lock` — always commit. Reproduces exact dependency tree.
-
-**Run commands:**
-```bash
-uv run python main.py       # runs in project venv
-uv run pytest               # runs pytest from project venv
-uv sync                     # install all deps from lock file
-```
-
-**Global tools:**
-```bash
-uv tool install ruff         # install globally, not per-project
-uvx ruff check .             # run without installing
 ```
 
 ## Common Mistakes

@@ -1,0 +1,19 @@
+{
+  "name": "agentfiles",
+  "owner": {
+    "name": "Edward Astill",
+    "email": "edwardast.ll@gmail.com"
+  },
+  "metadata": {
+    "description": "Personal Claude Code skill suite and CLI toolset. Routes tasks to the right specialist.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agentfiles",
+      "description": "54 curated skills (executor, manager, specialists for coding/research/planning), 10 subagents, and session hooks (caveman mode, safety gate, skill logger, notify). Requires the 'af' CLI on PATH for full functionality (install via 'uv tool install -e tools/python/').",
+      "source": "./",
+      "strict": false
+    }
+  ]
+}

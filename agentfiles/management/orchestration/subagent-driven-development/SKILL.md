@@ -1,6 +1,16 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: >
+  Use when an implementation plan or spec already exists and the tasks are
+  mostly independent. Trigger phrases: "execute this plan", "implement the
+  spec at docs/plans/X.md", "work through the tasks in this plan", "build
+  everything in the design doc", "dispatch subagents to do this", "run the
+  plan in this session", "each of these tasks is independent, do them all".
+  Dispatches a fresh subagent per task with two-stage review (spec compliance,
+  then code quality) and TaskUpdate tracking. Do NOT use when there is no plan
+  yet (use brainstorming or writing-plans first), when tasks are tightly
+  coupled and need shared context (just execute via executor), or when the plan
+  needs a separate parallel session (use executing-plans).
 next: [verification-before-completion, code-review]
 ---
 

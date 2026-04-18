@@ -1,6 +1,15 @@
 ---
 name: writing-skills
-description: Use when creating new skills, editing existing skills, or verifying skills work before deployment
+description: >
+  Use when authoring or modifying a SKILL.md. Trigger phrases: "write a new
+  skill", "create a skill for X", "edit this skill", "improve this skill",
+  "update the skill", "add a skill that does Y", "test this skill", "verify
+  the skill works", "the skill isn't being loaded", "polish the skill before
+  committing", "turn this pattern into a skill". Applies TDD to skill docs:
+  pressure-test with subagents, watch baseline fail, write SKILL.md, watch it
+  pass, refactor. New skills go in ~/projects/agentfiles/skills/. Do NOT use for
+  raw skill discoverability fixes (use skill-manager) or for cataloguing /
+  auditing the existing set (use skill-catalog or audit).
 ---
 
 # Writing Skills

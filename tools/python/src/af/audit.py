@@ -102,7 +102,9 @@ def _registry_symlinks(repo_root: Path) -> tuple[set[str], list[str]]:
 
 
 @app.callback(invoke_without_command=True)
-def audit():
+def audit(
+    fix: bool = typer.Option(False, "--fix", help="Auto-repair obvious drift (missing registry symlinks)."),
+):
     """Run the full manifest consistency audit."""
     repo_root = _find_repo_root()
     agentfiles_dir = repo_root / "agentfiles"
@@ -171,6 +173,45 @@ def audit():
     if missing_registry:
         for n in sorted(missing_registry):
             issues.append(f"  ✗ agentfiles skill '{n}' has no skills/{n} registry symlink — af install won't see it")
+
+    # ── --fix mode: repair safely-repairable drift ──────────────────────────
+    if fix:
+        fixed: list[str] = []
+        # Fix 8a: create missing registry symlinks
+        skills_by_name: dict[str, Path] = {}
+        for skill_md in agentfiles_dir.rglob("SKILL.md"):
+            if "agents" in skill_md.parent.parts:
+                continue
+            for line in skill_md.read_text().splitlines():
+                if line.startswith("name:"):
+                    skills_by_name[line.split(":", 1)[1].strip()] = skill_md.parent
+                    break
+        skills_dir = repo_root / "skills"
+        skills_dir.mkdir(exist_ok=True)
+        for name in sorted(missing_registry):
+            src = skills_by_name.get(name)
+            if src is None:
+                continue
+            rel = Path("..") / src.relative_to(repo_root)
+            dst = skills_dir / name
+            if dst.exists() or dst.is_symlink():
+                continue
+            dst.symlink_to(rel)
+            fixed.append(f"  ✓ created skills/{name} → {rel}")
+
+        # Fix 8b: remove broken registry symlinks
+        for entry in list(skills_dir.iterdir()):
+            if entry.is_symlink() and not entry.exists():
+                target = entry.readlink()
+                entry.unlink()
+                fixed.append(f"  ✓ removed broken symlink skills/{entry.name} (was → {target})")
+
+        if fixed:
+            typer.echo("")
+            typer.echo("Auto-repaired:")
+            for line in fixed:
+                typer.echo(line)
+            typer.echo(f"  ({len(fixed)} fixes applied — re-run `af audit` to see remaining issues)")
 
     # Render
     for line in passed:

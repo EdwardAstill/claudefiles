@@ -1,9 +1,16 @@
 ---
 name: manager
 description: >
-  Use when executor escalates here — genuinely multi-agent work: parallel domains,
-  or scale so large a single context degrades. Runs a single planning review pass,
-  then dispatches agents. Not for complex-but-sequential work (that's executor).
+  Use only when work genuinely needs parallel multi-domain agents. Trigger
+  phrases: "coordinate multiple agents on this", "run frontend and backend in
+  parallel", "dispatch agents across repos X and Y at the same time", "this is
+  too big for one context", "20+ independent subtasks across unrelated areas",
+  "executor escalated to manager", "orchestrate a multi-agent build". Runs one
+  planning review pass (design, git strategy, coordination — pulling advisors
+  inline only for non-obvious calls), confirms plan with user, then dispatches.
+  Do NOT use for complex-but-sequential work in one domain (use executor) or
+  for executing an already-written plan in the current session (use
+  subagent-driven-development).
 ---
 
 # Manager

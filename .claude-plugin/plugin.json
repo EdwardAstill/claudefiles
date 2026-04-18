@@ -1,0 +1,26 @@
+{
+  "name": "agentfiles",
+  "version": "1.0.0",
+  "description": "Personal Claude Code skill suite and CLI toolset. Routes tasks to the right specialist.",
+  "author": {
+    "name": "Edward Astill",
+    "email": "edwardast.ll@gmail.com",
+    "url": "https://github.com/EdwardAstill"
+  },
+  "homepage": "https://github.com/EdwardAstill/agentfiles",
+  "repository": "https://github.com/EdwardAstill/agentfiles",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "agents",
+    "orchestration",
+    "claude-code",
+    "agentfiles",
+    "executor",
+    "research",
+    "coding"
+  ],
+  "skills": "./skills/",
+  "agents": "./agentfiles/agents/",
+  "hooks": "./hooks/hooks.json"
+}

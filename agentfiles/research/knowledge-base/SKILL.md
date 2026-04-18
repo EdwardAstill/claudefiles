@@ -1,10 +1,15 @@
 ---
 name: knowledge-base
 description: >
-  Use when answering questions about health, training, enhancement, pharmacology,
-  nutrition, exercise, hormones, supplements, cognition, recovery, sleep, or any
-  topic covered in the personal knowledge base. Search before answering — KB
-  notes override general knowledge. Also use when ingesting new notes or papers.
+  Use BEFORE answering any question touching health, training, enhancement,
+  pharmacology, nutrition, exercise, hormones, supplements, cognition, recovery,
+  or sleep. Trigger phrases: "what do my notes say about X", "search my KB",
+  "look up X in my knowledge base", "what's the protocol for Y", "is creatine
+  safe", "best dose of Z", "how should I train for X", "what do I know about
+  hormone Y", "add this note / paper to the KB", "ingest this doc". Queries the
+  personal mks store at ~/.markstore/ — KB notes override general training data.
+  Do NOT use for external web research with no KB coverage (use research-agent)
+  or for library API docs (use docs-agent).
 ---
 
 Personal KB at `~/projects/knowledge/`. 2028 docs in `~/.markstore/store.db`.

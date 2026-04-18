@@ -35,7 +35,39 @@ this bar.
 
 ## Install
 
-### New machine (recommended)
+Two install paths, for two audiences.
+
+### As a Claude Code plugin (users)
+
+If you just want the skills, agents, and hooks inside Claude Code, install via
+the plugin marketplace:
+
+```
+/plugin marketplace add EdwardAstill/agentfiles
+/plugin install agentfiles@agentfiles
+```
+
+This installs 54 curated skills, 10 subagents, and the session hooks (caveman
+mode, safety gate, skill logger, notify). The plugin does **not** bundle the
+`af` CLI — install that separately if you want the context/install/git tooling
+(`uv tool install -e tools/python/` from a local clone).
+
+To hack on the plugin without a marketplace, point Claude Code at a local
+checkout:
+
+```bash
+claude --plugin-dir /path/to/agentfiles
+```
+
+See [`.claude-plugin/README.md`](./.claude-plugin/README.md) for plugin
+manifest details.
+
+### As an author of this repo (full dev loop)
+
+Authors want the `af` CLI, manifest editing, `af check`, and project-level
+symlinks — use the bootstrap install.
+
+#### New machine (recommended)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/EdwardAstill/agentfiles/main/bootstrap.sh | bash
@@ -50,7 +82,7 @@ To install all skills and CLI tools globally:
 af install
 ```
 
-### From a local clone
+#### From a local clone
 
 ```bash
 git clone https://github.com/EdwardAstill/agentfiles ~/.local/share/agentfiles-src
@@ -59,7 +91,7 @@ cd ~/.local/share/agentfiles-src
 af install                                   # install all skills + CLI tools
 ```
 
-### Project-level install
+#### Project-level install
 
 ```bash
 af install --local /path/to/project
@@ -67,7 +99,7 @@ af install --local /path/to/project
 
 Symlinks skills into `<project>/.claude/skills/` and `<project>/.gemini/skills/`, and adds `.agentfiles/` to `.gitignore`.
 
-### Update
+#### Update
 
 Re-run `bootstrap.sh` — it pulls the latest and re-installs.
 

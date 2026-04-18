@@ -1,7 +1,61 @@
 # Includes Fragments System
 
-**Status:** proposed
+**Status:** partially implemented (2026-04-18)
 **Inspired by:** `zircote/.claude` — see `research/projects/skill-suites/zircote-claude.md`
+
+## Status (2026-04-18)
+
+### Done
+
+- Loader module `tools/python/src/af/includes.py` with `expand()`,
+  `read_fragment()`, `list_fragments()`, `missing_includes()`.
+- CLI surface wired under `af include`:
+  - `af include list` — list every fragment under `agentfiles/includes/`.
+  - `af include show <slug>` — print a fragment body with frontmatter stripped.
+  - `af include expand <path>` — print SKILL.md with fragments inlined under
+    a `## Shared Conventions` block.
+  - `af include check <path>` — verify every `includes:` entry resolves.
+- 12 unit tests in `tools/python/tests/test_includes.py` covering the loader,
+  missing-include detection, and the four CLI subcommands. `pytest` green
+  (128 passed, 1 skipped).
+- Five concrete fragments shipped (75–100 lines each, tooling-focused rather
+  than the purely language-agnostic set originally sketched in §3):
+  - `agentfiles/includes/python/pyright.md`
+  - `agentfiles/includes/python/ruff.md`
+  - `agentfiles/includes/python/uv.md`
+  - `agentfiles/includes/typescript/tsc-strict.md`
+  - `agentfiles/includes/rust/clippy.md`
+- `agentfiles/coding/languages/python/SKILL.md` (python-expert) migrated to
+  use `includes: [python/pyright, python/uv, python/ruff]`. Line count
+  dropped from 159 → 121 in the SKILL.md body; fragment content lives once
+  in `includes/` instead.
+- `af check` still passes, `af audit` regression-free (same 34 pre-existing
+  issues, same 4/8 summary), `af ak list` unchanged.
+
+### Remaining
+
+- Migrate the other four language experts (`rust`, `typescript`, `typst`,
+  plus `tui-expert` / `ui-expert` handoff block). Out of scope for this
+  session by design — the loader + one reference implementation ships
+  first.
+- Extract the language-agnostic fragments originally proposed in §3
+  (`lsp/base-workflow`, `docs/fetching`, `testing/structure`,
+  `packaging/lockfile`, `handoff/to-language-expert`,
+  `outputs/expert-footer`). These were deferred in favour of the
+  tooling-specific fragments the task brief pinned. Revisit once two more
+  language experts are migrated — the shape of shared content will be
+  clearer.
+- Route the Claude-side skill-invocation code path through `expand()` so
+  the model sees the assembled body rather than the raw SKILL.md. Today
+  the loader runs on demand; inline auto-expansion is a follow-up.
+- Wire `af check` to call `missing_includes()` on every SKILL.md so broken
+  references fail the existing pre-commit/CI command. (Per-skill check
+  already exists via `af include check`.)
+- `manifest.toml` untouched. An `[includes.*]` registry is still optional;
+  decide once the second-wave migration tells us whether fragments need
+  declared owners / tool tags.
+- `AGENTS.md` / `README.md` paragraph linking this plan (step 8 in §6) —
+  still TODO.
 
 ## 1. Goal
 
