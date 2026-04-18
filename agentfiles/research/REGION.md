@@ -44,6 +44,20 @@ Skills for documentation lookup and research.
 - **Produces:** Architecture map, traced execution path, key abstractions summary, "where to look" guide
 - **Chains into:** brainstorming (informs design), writing-plans (informs task breakdown)
 
+### youtube
+- **Purpose:** Pull transcripts, audio (WAV/MP3 + clip trim), and summaries from any YouTube URL — video, playlist, or channel
+- **Use when:** User wants text, audio, or a summary of one or more YouTube videos; channel-scale bulk transcript grabs; metadata listings
+- **NOT for:** Other video sites (use yt-dlp directly), or videos that need authenticated access (out of scope)
+- **Produces:** `.txt` transcripts, `.mp3`/`.wav` audio, structured summary blocks
+- **Chains into:** note-taker (turn transcripts into notes), knowledge-base (index into KB), test-taker (Q&A over a set)
+
+### terminal-read
+- **Purpose:** Capture the user's live terminal scrollback so the agent can see output that happened outside the conversation
+- **Use when:** "Look at what just printed", "check that error", "see the output of setup.fish" — when the user has **not** pasted the output into chat
+- **NOT for:** Output from commands the agent itself ran (Bash tool output is already visible)
+- **Produces:** A plain-text capture file via `af terminal --out <path>`, ready to Read
+- **Chains into:** systematic-debugging, codebase-explainer, executor
+
 ### knowledge-base
 
 - **Purpose:** Retrieve and synthesise from the personal knowledge base (~3700 docs)
@@ -51,6 +65,13 @@ Skills for documentation lookup and research.
 - **NOT for:** Building protocols (health-advisor) or auditing beliefs (kb-critic)
 - **Produces:** Synthesised answer grounded in personal KB notes
 - **Chains into:** health-advisor (turns retrieval into protocol), kb-critic (audits retrieved beliefs)
+
+### web-scraper
+- **Purpose:** Pull data off a website via pure HTTP — fetch HTML/JSON, parse, paginate, store
+- **Use when:** User wants information from a site and the data is present in raw HTML, embedded JSON (`__NEXT_DATA__`, JSON-LD), or a discoverable JSON API endpoint
+- **NOT for:** JS-rendered pages with no backing API (use `browser-control`), local file conversion (use `file-converter`), or full browser-driven sessions
+- **Produces:** Runnable `uv run` Python script (httpx + selectolax + trafilatura) → JSONL/CSV/SQLite output
+- **Chains into:** file-converter (HTML → markdown after scrape), note-taker (scraped prose → notes), knowledge-base (index), test-taker (Q&A over scraped corpus)
 
 > For action-oriented coaching or evidence critique, see `coaches/` region:
 > `health-advisor` (protocols) and `kb-critic` (evidence audit).
