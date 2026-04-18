@@ -243,7 +243,7 @@ af worktree <branch> [base]   # create worktree + open Claude Code
 | `docs-agent` | "How do I use X?" — API lookup |
 | `research-agent` | "Should I use X?" — trade-off analysis |
 | `codebase-explainer` | "How does this codebase work?" |
-| `note-taker` | Create notes or interactive lessons |
+| `readrun` | Create interactive Markdown docs (runnable Python + JSX visualisations) |
 | `test-taker` | Answer questions from reference material |
 
 ---

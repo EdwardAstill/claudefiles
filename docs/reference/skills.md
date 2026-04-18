@@ -124,7 +124,7 @@
 | `docs-agent` | "How do I use X?" | Need API signatures, config options, working examples |
 | `research-agent` | "Should I use X?" | Evaluating trade-offs, risks, expert consensus |
 | `codebase-explainer` | "How does this codebase work?" | Entering unfamiliar code, onboarding |
-| `note-taker` | — | Creating notes, lessons, or interactive tutorials |
+| `readrun` | — | Interactive Markdown docs with runnable Python and JSX visualisations |
 | `test-taker` | — | Answering questions from reference material |
 
 ---

@@ -72,5 +72,5 @@ Invoke any skill with `/agentfiles:<name>` or via the Skill tool.
 | `agentfiles:docs-agent` | Library docs, API reference, versioned examples |
 | `agentfiles:research-agent` | Trade-offs, risks, consensus across sources |
 | `agentfiles:codebase-explainer` | Unfamiliar codebase — execution paths, architecture |
-| `agentfiles:note-taker` | Notes for humans (readrun interactive code) or LLMs (dense, structured reference) |
+| `agentfiles:readrun` | Interactive Markdown docs (runnable Python + JSX visualisations) via the `rr` CLI |
 | `agentfiles:test-taker` | Answering questions from reference material |

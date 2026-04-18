@@ -67,7 +67,7 @@ session start and the system routes through executor automatically.
 | "How do I use X?" — API lookup | `docs-agent` |
 | "Should I use X?" — trade-offs | `research-agent` |
 | Answer questions from reference material | `test-taker` |
-| Write notes or interactive lessons | `note-taker` |
+| Write notes or interactive lessons | `readrun` |
 | Parallel multi-agent work | `manager` |
 | Create or edit a skill | `writing-skills` |
 

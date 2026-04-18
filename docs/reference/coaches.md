@@ -115,7 +115,7 @@ health-advisor → produces protocol
      ↓ (optional)
 kb-critic → audit the beliefs the protocol rests on
      ↓
-note-taker → update any notes flagged as weak or outdated
+readrun → update any notes flagged as weak or outdated
 ```
 
 ### Belief-first: audit then act
@@ -133,7 +133,7 @@ health-advisor → re-build protocol on stronger foundations
 ```
 kb-critic on a domain (e.g. "audit my nutrition notes")
      ↓
-note-taker → update flagged notes
+readrun → update flagged notes
      ↓
 mks graph build → rebuild graph with updated content
 ```

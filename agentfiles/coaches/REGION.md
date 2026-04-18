@@ -23,4 +23,4 @@ The key distinction from `research/knowledge-base`:
 - **Use when:** You want to stress-test a belief, find contradictions, or audit a topic area
 - **NOT for:** Retrieving information (knowledge-base) or building protocols (health-advisor)
 - **Produces:** Evidence tier map, contradiction report, bias flags, recommended updates
-- **Chains into:** note-taker (to update notes based on findings), health-advisor (re-plan after audit)
+- **Chains into:** readrun (to update notes based on findings), health-advisor (re-plan after audit)

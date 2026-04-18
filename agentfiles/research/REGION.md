@@ -24,10 +24,10 @@ Skills for documentation lookup and research.
 - **Produces:** `answers.md` (all questions answered) + `scripts/q<N>_*.py` (one per calculation question, already executed)
 - **Chains into:** (terminal)
 
-### note-taker
-- **Purpose:** Create markdown notes in two modes: human-readable (with readrun interactive code) or LLM-optimized (dense, structured reference for AI/RAG consumption)
-- **Use when:** "Make notes on X", "create a lesson", "write a readrun page", "LLM notes on Y", "add reference docs for Z to the knowledge base"
-- **Produces:** Human mode: `.md` note(s) + `.readrun/scripts/` (if readrun). LLM mode: `.md` with YAML frontmatter, wikilinks, semantic headers.
+### readrun
+- **Purpose:** Create readrun documentation — folders of Markdown rendered by the `rr` CLI as interactive sites with runnable Python (Pyodide) and auto-mounting JSX/React visualisations
+- **Use when:** "Make readrun docs for X", "add an interactive tutorial", "document this with JSX widgets", "turn these notes into a readrun site", "build a lesson with runnable code"
+- **Produces:** `.md` pages + `.readrun/scripts/` (Python, JSX, HTML), `.readrun/images/`, `.readrun/files/`; verified with `rr validate` and previewed with `rr <folder>`
 - **Chains into:** (terminal)
 
 ### github-repo-researcher

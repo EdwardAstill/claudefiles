@@ -108,8 +108,9 @@ tools = ["Bash", "Read", "Grep", "Glob"]
 cli = ["repomix"]
 category = "research"
 
-[skills.note-taker]
+[skills.readrun]
 tools = ["Bash", "Read", "Write"]
+cli = ["rr"]
 category = "research"
 
 [skills.test-taker]
@@ -300,6 +301,12 @@ manager = "bun"
 package = "repomix"
 install = "bun install -g repomix"
 description = "Pack repo into single AI-friendly file — --compress cuts ~70% tokens via Tree-sitter, --remote for GitHub repos"
+
+[cli.rr]
+manager = "bun"
+package = "readrun"
+install = "bun install -g github:EdwardAstill/readrun"
+description = "Render folders of Markdown as interactive sites with runnable Python (Pyodide) and auto-mounting JSX/React components"
 
 [cli.mks]
 manager = "cargo"
