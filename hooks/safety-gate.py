@@ -5,19 +5,21 @@
 # ///
 """PreToolUse safety gate — blocks dangerous Bash commands.
 
-`rm -rf` has an escape valve: allowed when every target path is inside the
-current git working tree. Rationale — `git checkout` can always restore the
-files, so it's not the same blast radius as `rm -rf` on arbitrary paths.
+`rm -rf` uses a blacklist: allowed unless the target resolves to a catastrophic
+path (`/`, top-level system dirs, `$HOME` exact, anywhere outside the user's
+home or /tmp). Rationale — the original blanket block caused too much friction
+on routine cleanup (bun installs, cloned projects, scratch dirs); the real
+risk is a handful of catastrophic targets, not every `rm -rf` ever.
+
 Other patterns (force push, DROP TABLE, fork bomb, dd, mkfs) remain hard-blocked.
 """
 
 import json
 import os
 import re
-import subprocess
 import sys
 
-# (pattern, allow_inside_git_worktree)
+# (pattern, uses_rm_blacklist)
 DANGEROUS_PATTERNS: list[tuple[str, bool]] = [
     (r"rm\s+-rf?\b", True),
     (r"git\s+push\s+--force", False),
@@ -28,6 +30,15 @@ DANGEROUS_PATTERNS: list[tuple[str, bool]] = [
     (r"dd\s+if=", False),
     (r"\bmkfs\b", False),
 ]
+
+# Absolute paths that are catastrophic to rm -rf. Exact match on the resolved
+# absolute path, OR target is the filesystem root.
+_CATASTROPHIC_EXACT = {
+    "/",
+    "/bin", "/boot", "/etc", "/home", "/lib", "/lib32", "/lib64",
+    "/opt", "/proc", "/root", "/run", "/sbin", "/srv", "/sys",
+    "/usr", "/var",
+}
 
 
 def _extract_rm_targets(command: str) -> list[str]:
@@ -43,36 +54,51 @@ def _extract_rm_targets(command: str) -> list[str]:
     return [tok for tok in raw if not tok.startswith("-")]
 
 
-def _inside_git_worktree(path: str, cwd: str) -> bool:
-    """True when `path` (resolved against cwd) is tracked or inside a git dir."""
-    abs_path = os.path.abspath(os.path.join(cwd, os.path.expanduser(path)))
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            cwd=os.path.dirname(abs_path) or cwd,
-            capture_output=True,
-            text=True,
-            timeout=3,
-        )
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
-    if result.returncode != 0:
-        return False
-    worktree = result.stdout.strip()
-    if not worktree:
-        return False
-    try:
-        rel = os.path.relpath(abs_path, worktree)
-    except ValueError:
-        return False
-    return not rel.startswith("..") and not os.path.isabs(rel)
+def _resolve_target(path: str, cwd: str) -> str:
+    """Expand ~ and make absolute against cwd."""
+    return os.path.abspath(os.path.join(cwd, os.path.expanduser(path)))
 
 
-def _rm_all_targets_in_worktree(command: str, cwd: str) -> bool:
+def _is_catastrophic(path: str, cwd: str) -> bool:
+    """Return True if rm -rf on this path would be a disaster."""
+    abs_path = _resolve_target(path, cwd)
+    normalized = os.path.normpath(abs_path).rstrip("/") or "/"
+
+    # Catastrophic exact-match paths: / and top-level system dirs
+    if normalized in _CATASTROPHIC_EXACT:
+        return True
+
+    # $HOME exact, or ~ exact (already expanded by _resolve_target)
+    home = os.path.expanduser("~").rstrip("/")
+    if home and normalized == home:
+        return True
+
+    # A wildcard (*, ?, [) near the root is dangerous — e.g. rm -rf /*, rm -rf ~/*
+    # Detect by checking if the ORIGINAL argument (pre-resolve) contained a glob
+    # that would expand to catastrophic paths. We do a simple check: if the
+    # argument contains any glob char and the parent dir is in the catastrophic
+    # set (or is /, or is $HOME), block.
+    if any(ch in path for ch in "*?[") :
+        parent = os.path.dirname(normalized).rstrip("/") or "/"
+        if parent in _CATASTROPHIC_EXACT or parent == home or parent == "/":
+            return True
+
+    # Outside $HOME and outside /tmp: suspicious. Block unless explicitly
+    # under common scratch/project roots users do own.
+    safe_prefixes = [home + "/", "/tmp/", "/var/tmp/"]
+    if not any(normalized.startswith(p) for p in safe_prefixes) and normalized not in (home, "/tmp", "/var/tmp"):
+        return True
+
+    return False
+
+
+def _rm_any_target_catastrophic(command: str, cwd: str) -> bool:
+    """True when at least one rm target would be catastrophic — block the command."""
     targets = _extract_rm_targets(command)
     if not targets:
-        return False
-    return all(_inside_git_worktree(t, cwd) for t in targets)
+        # No extractable targets (parse fail) — be safe, block.
+        return True
+    return any(_is_catastrophic(t, cwd) for t in targets)
 
 
 def main():
@@ -97,10 +123,10 @@ def main():
     if tool_name != "Bash" or not command:
         sys.exit(0)
 
-    for pattern, git_escape in DANGEROUS_PATTERNS:
+    for pattern, rm_blacklist in DANGEROUS_PATTERNS:
         if re.search(pattern, command, re.IGNORECASE):
-            if git_escape and _rm_all_targets_in_worktree(command, cwd):
-                # All targets inside a git worktree — recoverable. Let it through.
+            if rm_blacklist and not _rm_any_target_catastrophic(command, cwd):
+                # No catastrophic target — let it through.
                 sys.exit(0)
             print(
                 f"[safety-gate] BLOCKED: command matches dangerous pattern '{pattern}'",
