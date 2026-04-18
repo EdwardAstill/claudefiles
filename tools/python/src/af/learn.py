@@ -93,34 +93,111 @@ def _step(e: dict) -> str:
 
 _DATE_PREFIX = re.compile(r"^\d{4}-\d{2}-\d{2}-")
 _STOP_TOKENS = {"ls", "cat", "cd", "rm", "mv", "cp", "wc", "echo", "grep", "head", "tail"}
+# Generic stem names that leak directory context rather than topic content.
+_GENERIC_STEMS = {
+    "skill", "readme", "index", "__init__", "init", "main", "agents",
+    "region", "manifest", "pyproject", "setup", "conftest", "test",
+    "notes", "log", "config", "makefile",
+}
+# Path-fragment tokens we never want in a slug (user-specific / filesystem noise).
+_PATH_NOISE = {
+    "home", "eastill", "projects", "agentfiles", "usr", "var", "tmp", "opt",
+    "src", "tools", "python", "docs", "skills", "drafts", "tests",
+    "claude", "logs", "sessions",
+}
+_SLUG_MAX = 32
 
 
 def _slug(text: str) -> str:
     # Normalise: lowercase, replace non-alnum with hyphens, strip leading date
     s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     s = _DATE_PREFIX.sub("", s)
-    # Dedupe consecutive/repeating tokens
+    # Dedupe tokens and drop path-noise fragments
     parts: list[str] = []
     for tok in s.split("-"):
-        if not tok or tok in parts:
+        if not tok or tok in parts or tok in _PATH_NOISE:
             continue
         parts.append(tok)
-    return "-".join(parts)[:48] or "session-run"
+    # Enforce <=_SLUG_MAX chars without cutting a token mid-word.
+    out: list[str] = []
+    used = 0
+    for tok in parts:
+        extra = len(tok) + (1 if out else 0)
+        if used + extra > _SLUG_MAX:
+            break
+        out.append(tok)
+        used += extra
+    return "-".join(out) or "session-run"
+
+
+def _clean_stem(file_path: str) -> str:
+    """Return a meaningful basename stem for a path, or '' if generic/noise."""
+    name = Path(file_path).name
+    # Strip common extensions.
+    stem = re.sub(r"\.(md|py|sh|txt|toml|yaml|yml|json|rst|ini|cfg)$", "", name, flags=re.IGNORECASE)
+    stem = _DATE_PREFIX.sub("", stem)
+    low = stem.lower()
+    if not stem or low in _GENERIC_STEMS:
+        return ""
+    return stem
+
+
+def _path_keywords(file_path: str) -> list[str]:
+    """At most 2 meaningful tokens from a path: basename-stem + optional dir basename."""
+    stem = _clean_stem(file_path)
+    toks: list[str] = []
+    if stem:
+        toks.append(stem)
+    else:
+        # Generic filename — substitute parent directory basename as context.
+        parent = Path(file_path).parent.name
+        if parent and parent.lower() not in _PATH_NOISE:
+            toks.append(parent)
+    return toks[:2]
 
 
 def _title(entries: list[dict], idx: list[int]) -> tuple[str, str]:
     kw: list[str] = []
+    path_stems: list[str] = []  # remember meaningful stems; if many share a dir, collapse
+    path_parents: list[str] = []
     for i in idx[:6]:
         e = entries[i]
         inp = e.get("input", {}) or {}
         if e.get("tool") in BASH:
-            for tok in inp.get("command", "").split()[:2]:
-                if tok.lower() not in _STOP_TOKENS:
-                    kw.append(tok)
+            for tok in inp.get("command", "").split()[:3]:
+                low = tok.lower()
+                if tok.startswith("-"):
+                    continue
+                if low in _STOP_TOKENS:
+                    continue
+                kw.append(tok)
+                if len([k for k in kw if k]) >= 2:
+                    break
         elif "file_path" in inp:
-            stem = Path(inp["file_path"]).stem
-            stem = _DATE_PREFIX.sub("", stem)
-            kw.append(stem)
+            fp = inp["file_path"]
+            parent = Path(fp).parent.name
+            stem = _clean_stem(fp)
+            if stem:
+                path_stems.append(stem)
+            if parent and parent.lower() not in _PATH_NOISE:
+                path_parents.append(parent)
+
+    # Collapse same-directory multi-file edits into the dir basename.
+    if path_parents:
+        parent_counts = Counter(path_parents)
+        dominant_parent, dom_count = parent_counts.most_common(1)[0]
+        if dom_count >= 2:
+            kw.append(dominant_parent)
+            # keep at most one distinct stem for extra flavor
+            for s in path_stems[:1]:
+                kw.append(s)
+        else:
+            # unique parents/stems — use up to 2 meaningful stems, else parents.
+            picks = path_stems[:2] if path_stems else path_parents[:2]
+            kw.extend(picks)
+    else:
+        kw.extend(path_stems[:2])
+
     text = " ".join(kw)[:80] or "session run"
     return _slug(text), text.strip()
 
