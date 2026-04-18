@@ -143,10 +143,32 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 - **One question at a time** - Don't overwhelm with multiple questions
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
+- **Use `AskUserQuestion` for enumerable choices.** When the question has a small
+  finite set of reasonable answers (architecture A vs B vs C, Postgres vs
+  SQLite, CLI vs web UI, 3 vs 5 vs 10 items), call the `AskUserQuestion` tool
+  rather than asking in prose. The structured picker is faster for the user and
+  reduces ambiguity. Reserve prose questions for open-ended exploration
+  ("what does X mean to you here?"), not for picking among known options.
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
+
+## Fresh session for implementation
+
+Per Anthropic's Claude Code best practices: after the spec is written and
+approved, starting implementation in a **fresh session** is often cleaner than
+continuing inline. The intake Q&A bloats the context, and the implementation
+agent doesn't need to re-read every clarifying exchange — only the committed
+spec. If the user is continuing in the same session, that's fine; just note it
+as an option:
+
+> "Spec is committed to `<path>`. You can continue here, or open a fresh
+> session with `claude --continue` on just that spec for cleaner execution
+> context. Which do you prefer?"
+
+Most users pick "continue here" for velocity. The option matters when the
+intake was long or the implementation will be large.
 
 ## Visual Companion
 

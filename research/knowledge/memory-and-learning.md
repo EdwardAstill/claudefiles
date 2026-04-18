@@ -1,3 +1,7 @@
+---
+id: K-003
+---
+
 # Memory and Learning Across Sessions
 
 An agent without memory is a translator: every turn begins from zero. A personal

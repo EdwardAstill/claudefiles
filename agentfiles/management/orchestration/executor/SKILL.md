@@ -74,6 +74,25 @@ Announce the decision briefly:
 **Non-trivial:** State your approach in 2–4 lines before acting. Enough to avoid
 wrong turns — not a full decomposition. Think, then act.
 
+### When to enter Plan Mode first
+
+**Plan Mode is warranted when all three hold:**
+1. **Multi-file** — the change touches ≥3 files or spans unrelated layers.
+2. **Unfamiliar code** — you haven't traced the relevant modules this session.
+3. **Ambiguous approach** — ≥2 reasonable architectures and no signal yet for which.
+
+When any two of those hold, **recommend Plan Mode to the user** rather than
+entering it unilaterally — "this looks multi-file with an unclear approach; want
+me to switch to Plan Mode first?" Lets the user override if they'd rather see
+you dive in.
+
+When none of the three hold, skip Plan Mode — it burns a round-trip for no
+benefit.
+
+Source: Anthropic's Claude Code Best Practices — "Explore → Plan → Implement →
+Commit" is the default for non-trivial work, but "if the diff fits one sentence,
+skip planning."
+
 For larger shapes, consult the task-archetypes registry first. One command:
 
 ```bash

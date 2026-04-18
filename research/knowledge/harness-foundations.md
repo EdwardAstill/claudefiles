@@ -1,3 +1,7 @@
+---
+id: K-002
+---
+
 # Harness Foundations
 
 An **agent harness** is everything between the language model and the real world: the

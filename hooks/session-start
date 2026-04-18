@@ -45,7 +45,20 @@ if [[ -s "$ANOMALIES_FILE" ]]; then
     anomaly_note="\n\n**Routing anomalies from recent sessions:** ${count} session(s) had self-loops, deep chains, or wasted skill loads. Review with \`af log review\` or clear with \`rm ${ANOMALIES_FILE}\`."
 fi
 
-context="<EXTREMELY_IMPORTANT>\nYou must invoke using-agentfiles before starting any task.\n\n**Below is the full content of your 'using-agentfiles' skill:**\n\n${content_escaped}${anomaly_note}\n</EXTREMELY_IMPORTANT>"
+# Pre-run `af context` + `af status` so the session starts with project state
+# already loaded (deterministic enforcement of the orient step). Silently skip
+# if `af` isn't on PATH or the commands fail — we still inject the skill body.
+orient_block=""
+if command -v af >/dev/null 2>&1; then
+    af_context=$(af context 2>/dev/null || true)
+    af_status=$(af status 2>/dev/null || true)
+    if [[ -n "$af_context" || -n "$af_status" ]]; then
+        orient_raw=$'\n\n---\n**Project state at session start (via `af context` + `af status`):**\n\n```\n'"$af_context"$'\n\n'"$af_status"$'\n```\n'
+        orient_block=$(escape_for_json "$orient_raw")
+    fi
+fi
+
+context="<EXTREMELY_IMPORTANT>\nYou must invoke using-agentfiles before starting any task.\n\n**Below is the full content of your 'using-agentfiles' skill:**\n\n${content_escaped}${orient_block}${anomaly_note}\n</EXTREMELY_IMPORTANT>"
 
 printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$context"
 

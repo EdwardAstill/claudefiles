@@ -1,3 +1,7 @@
+---
+id: K-004
+---
+
 # Multi-Agent Coordination
 
 Multi-agent systems (MAS) are the most oversold primitive in the 2024-2026 agent

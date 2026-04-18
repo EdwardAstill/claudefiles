@@ -1,3 +1,7 @@
+---
+id: K-001
+---
+
 # Context Engineering
 
 Prompt engineering was about picking the right words. **Context engineering** is about

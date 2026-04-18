@@ -7,6 +7,33 @@ Every file here answers a load-bearing question about how this system
 `../projects/`, `../documentation/`, `../lessons/`) and are consulted
 only when a knowledge page points at them.
 
+## Stable citation IDs
+
+Every page has an `id: K-NNN` frontmatter field. IDs are stable — once
+assigned, never change — even if the file is renamed or moved.
+
+When referencing a knowledge page from a skill, a retrospective, a lesson,
+or a code comment, cite it by id:
+
+```
+See [K-003] for the memory taxonomy.
+...per the three retrieval strategies in [K-003]...
+```
+
+The id is the contract. Filenames can drift (rename for clarity, move to a
+subfolder); the id keeps citations valid.
+
+**Assigning a new id:** next integer, zero-padded to 3. If `af ak list` shows
+up to `K-012`, the next page is `K-013`. Ids are global across the flat dir
+and any future subfolders — they don't reset per folder.
+
+**Resolving citations from the CLI:**
+
+```bash
+af ak show K-003           # resolves by id
+af ak show memory-and-learning   # resolves by slug (same page)
+```
+
 ## Filename convention
 
 Flat at the top level. Name files for the concept they cover:

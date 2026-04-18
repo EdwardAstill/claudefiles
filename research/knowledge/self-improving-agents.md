@@ -1,3 +1,7 @@
+---
+id: K-005
+---
+
 # Self-Improving Agent Systems
 
 The interesting question is not "how good is the agent on turn 1?" but "is turn 1000

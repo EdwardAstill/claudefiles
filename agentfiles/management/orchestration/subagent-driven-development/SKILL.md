@@ -84,6 +84,81 @@ digraph process {
 }
 ```
 
+## Batch Loop Mode — fresh context per item, parallel dispatch
+
+**Use when** you have N items of the same shape and each can be processed
+independently. Examples: migrate N files from pattern A to pattern B, generate
+a summary for each of N documents, run a verification pass on every row in a
+dataset.
+
+This is different from the sequential per-task flow above. Per-task is for
+*plan steps that depend on each other*. Batch loop is for *identical
+operations across independent inputs*, and each subagent gets a clean context
+with only what it needs.
+
+### Rules
+
+1. **Independence is a prerequisite.** If the outputs need to be merged or if
+   task N's result depends on task N-1, you're not in batch mode — fall back
+   to sequential per-task.
+2. **Fresh context per item.** Each dispatch includes only the specific item
+   being processed, plus a shared uniform instruction. Nothing leaks across
+   subagents.
+3. **Uniform verification.** The same check runs on every output — same test,
+   same linter, same structural rule. If verification varies per item, split
+   into separate batches.
+4. **Cap parallelism.** Dispatch at most 5–10 subagents simultaneously. More
+   floods the parent context with results and muddles failure triage.
+
+### Process
+
+```
+Controller:
+  1. Build the shared instruction: "For the given <item>, apply <operation>;
+     verify with <check>; return <structured result>."
+  2. Dispatch N subagents, each with one item from the list and the shared
+     instruction. No cross-item context.
+  3. Wait for all results.
+  4. Aggregate: group by status (done / failed / needs review), surface only
+     the failures + a one-line summary.
+  5. Re-dispatch only the failures (same or different subagent type) with
+     diagnostic info added.
+```
+
+### Anti-patterns
+
+- Passing the full list to one subagent and asking it to loop. Defeats the
+  isolation; one bad item corrupts the rest.
+- Sharing mutable state between batch subagents (a shared file, counter).
+  If coordination is needed, use the sequential per-task flow.
+- Adding per-item prompts ("for this specific item, also check X"). If the
+  instruction varies, the batch isn't uniform — split it.
+
+### Example
+
+```
+Task: Normalize import order in every .py file under src/ (47 files).
+
+Controller dispatches 8 subagents in parallel, each given:
+  - One file path
+  - Instruction: "sort imports per PEP-8, run ruff on the result,
+    commit if clean, return {path, status, diff_size}"
+
+Results:
+  ✓ 42 files cleaned (diff_size range: 2–18 lines)
+  ✗ 3 files — ruff errors unrelated to import order
+  ? 2 files — subagent BLOCKED (imports reference undefined names)
+
+Controller re-dispatches the 5 failures with diagnostic context, runs one more
+pass, reports final state.
+```
+
+This pattern is adapted from coleam00/Archon's loop-node primitive (see
+`research/projects/methodology-and-workflows/coleam00-archon.md`). Archon
+formalizes "loop until a condition is met, reset context each iteration" as a
+workflow node. We adopt the fresh-context-per-iteration discipline without the
+YAML DSL — plain subagent dispatch with a shared template is sufficient.
+
 ## Model Selection
 
 Use the least powerful model that can handle each role to conserve cost and increase speed.

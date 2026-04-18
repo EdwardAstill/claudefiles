@@ -65,15 +65,15 @@ Comparative analysis of public Claude Code skill/plugin suites and related proje
 
 | Gap | Best Reference | Priority | Status |
 |-----|----------------|----------|--------|
-| **`SessionStart` hook** — auto-run `af context` + `af status` | hooks-mastery | High | open |
-| **Plan Mode trigger rule in executor** — multi-file / unfamiliar / ambiguous heuristic | Anthropic best-practices | High | open |
-| **Fresh-context loop nodes** — `subagent-driven-development` formalises "loop N, reset each" | Archon | High | open |
-| **Machine-readable plan output** — YAML with `depends_on` + pause gates | Archon | Medium | open |
-| **Progressive-disclosure knowledge retrieval** — `af ak search / list-around / show` trio | claude-mem | Medium | open |
-| **AskUserQuestion-driven brainstorming → SPEC.md** | Anthropic best-practices | Medium | open |
+| **`SessionStart` hook** — auto-run `af context` + `af status` | hooks-mastery | High | **done** (2026-04-18) |
+| **Plan Mode trigger rule in executor** — multi-file / unfamiliar / ambiguous heuristic | Anthropic best-practices | High | **done** (2026-04-18) |
+| **Fresh-context loop nodes** — `subagent-driven-development` formalises "loop N, reset each" | Archon | High | **done** (2026-04-18) |
+| **Machine-readable plan output** — YAML with `depends_on` + pause gates | Archon | Medium | deferred (schema decisions warrant own session) |
+| **Progressive-disclosure knowledge retrieval** — `af ak search / list-around / show` trio | claude-mem | Medium | won't-do (solves a scale problem we don't have at 5 files) |
+| **AskUserQuestion-driven brainstorming → SPEC.md** | Anthropic best-practices | Medium | **done** (2026-04-18) |
 | **`includes/` fragments** — per-language standards injected at invocation time | zircote | Medium | open |
 | **Behavioral modes** — operating posture switches (token-efficiency, deep-research) | SuperClaude | Medium | open |
-| **Stable citation IDs for knowledge entries** — `[K-042]` inline refs | claude-mem | Low | open |
+| **Stable citation IDs for knowledge entries** — `[K-042]` inline refs | claude-mem | Low | **done** (2026-04-18) |
 | **Skill Learning Loop** — agent records new successful patterns | hermes-agent | Low | open |
 | **Typed Hook Payloads** — auto-completion and typed JSON for hook dev | johnlindquist | Low | open |
 | **Workflow Trigger Chains** — skills explicitly referencing the "next" specialist | Jeffallan | Low | open |
