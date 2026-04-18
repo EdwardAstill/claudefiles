@@ -19,10 +19,12 @@ Comparative analysis of public Claude Code skill/plugin suites and related proje
 | Project | Key Differentiator |
 |---------|--------------------|
 | [obra/superpowers](methodology-and-workflows/obra-superpowers.md) | Enforced sequential dev methodology, cross-agent portability |
-| [coleam00/Archon](methodology-and-workflows/coleam00-archon.md) | Deterministic, YAML-based AI coding workflows |
+| [coleam00/Archon](methodology-and-workflows/coleam00-archon.md) | DAG workflows with fresh-context loop nodes and pause gates |
 | [gsd-build/get-shit-done](methodology-and-workflows/gsd-build.md) | Advanced skill suite for phase-based project lifecycle management |
 | [GitHub Next: Agentic Workflows](methodology-and-workflows/github-agentic-workflows.md) | Markdown-based automation for GitHub Actions and repo maintenance |
 | [Spec Kit (GitHub)](methodology-and-workflows/github-spec-kit.md) | Structured workflow toolkit using `/specify`, `/plan`, and `/tasks` |
+| [Anthropic — Claude Code Best Practices](methodology-and-workflows/anthropic-claude-best-practices.md) | Canonical guide: context discipline, verification gates, Plan Mode, session hygiene |
+| [thedotmack/claude-mem](methodology-and-workflows/thedotmack-claude-mem.md) | Hook-driven tool-use capture + worker service with FTS5 + vector retrieval |
 
 ## 🛠️ Skill Suites
 *Large collections of commands, experts, and personas.*
@@ -64,8 +66,14 @@ Comparative analysis of public Claude Code skill/plugin suites and related proje
 | Gap | Best Reference | Priority | Status |
 |-----|----------------|----------|--------|
 | **`SessionStart` hook** — auto-run `af context` + `af status` | hooks-mastery | High | open |
+| **Plan Mode trigger rule in executor** — multi-file / unfamiliar / ambiguous heuristic | Anthropic best-practices | High | open |
+| **Fresh-context loop nodes** — `subagent-driven-development` formalises "loop N, reset each" | Archon | High | open |
+| **Machine-readable plan output** — YAML with `depends_on` + pause gates | Archon | Medium | open |
+| **Progressive-disclosure knowledge retrieval** — `af ak search / list-around / show` trio | claude-mem | Medium | open |
+| **AskUserQuestion-driven brainstorming → SPEC.md** | Anthropic best-practices | Medium | open |
 | **`includes/` fragments** — per-language standards injected at invocation time | zircote | Medium | open |
 | **Behavioral modes** — operating posture switches (token-efficiency, deep-research) | SuperClaude | Medium | open |
+| **Stable citation IDs for knowledge entries** — `[K-042]` inline refs | claude-mem | Low | open |
 | **Skill Learning Loop** — agent records new successful patterns | hermes-agent | Low | open |
 | **Typed Hook Payloads** — auto-completion and typed JSON for hook dev | johnlindquist | Low | open |
 | **Workflow Trigger Chains** — skills explicitly referencing the "next" specialist | Jeffallan | Low | open |
