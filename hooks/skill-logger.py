@@ -19,6 +19,13 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Make the sibling `hooks/hook_types.py` importable. `uv run --script`
+# doesn't add the script's directory to sys.path automatically, so we do
+# it here. Named `hook_types` (not `types`) so it doesn't shadow the
+# stdlib `types` module during import.
+sys.path.insert(0, str(Path(__file__).parent))
+import hook_types  # noqa: E402  (import after sys.path tweak)
+
 SKILL_LOG = Path.home() / ".claude" / "logs" / "agentfiles.jsonl"
 SESSION_LOG_DIR = Path.home() / ".claude" / "logs" / "sessions"
 SESSION_STATE_DIR = Path.home() / ".claude" / "logs" / ".sessions"
@@ -112,23 +119,28 @@ def _cleanup_old_sessions() -> None:
 
 
 def main():
-    try:
-        data = json.load(sys.stdin)
-    except (json.JSONDecodeError, ValueError):
+    payload: hook_types.PostToolUsePayload = hook_types.parse(
+        "PostToolUse", sys.stdin.read()
+    )
+    # Malformed / empty payload → parse() returned {} → bail out quietly.
+    if not payload:
         sys.exit(0)
 
-    # Resolve session ID
+    # Resolve session ID — keep env-var fallback; it's a cross-process
+    # channel, not part of the payload shape.
     session_id = (
-        data.get("session_id")
-        or data.get("session", {}).get("id")
+        payload.get("session_id")
+        or (payload.get("session", {}) or {}).get("id")
         or os.environ.get("CLAUDE_SESSION_ID", "")
         or "unknown"
     )
 
-    # Resolve tool and input/output
-    tool_name = data.get("tool_name", "") or data.get("tool", "")
-    tool_input = data.get("tool_input") or data.get("input", {})
-    tool_output = data.get("tool_output") or data.get("output", "")
+    # Resolve tool and input/output. Helper handles the flat-vs-nested
+    # `tool_name`/`tool` variance; keep the `tool_input`/`input` and
+    # `tool_output`/`output` fallback chains as-is for behavior parity.
+    tool_name = hook_types.tool_name(payload) or ""
+    tool_input = payload.get("tool_input") or payload.get("input") or {}
+    tool_output = payload.get("tool_output") or payload.get("output", "")
 
     # --- Layer 1: Session trace (all tool calls) ---
     session_entry = {

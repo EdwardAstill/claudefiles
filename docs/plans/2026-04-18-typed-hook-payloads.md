@@ -1,7 +1,52 @@
 # Typed Hook Payloads
 
-**Status:** proposed
+**Status:** Phase 1 landed (2026-04-18) — shared TypedDict module + safety-gate migration. Phase 2 pending (skill-logger, notify, caveman-mode).
 **Inspired by:** `johnlindquist/claude-hooks` — see `research/projects/education-and-showcases/johnlindquist-claude-hooks.md`
+
+## Status
+
+### Phase 1 — DONE (2026-04-18)
+
+- Committed option is **(a) Stay Python + add TypedDicts per event** (not Pydantic; zero runtime deps).
+- Shared module: `hooks/hook_types.py` (194 lines, stdlib only).
+  - One `TypedDict(total=False)` per event we hook: `SessionStartPayload`, `UserPromptSubmitPayload`, `PreToolUsePayload`, `PostToolUsePayload`, `StopPayload`, `PermissionRequestPayload`, `NotificationPayload`.
+  - Common fields factored into `BasePayload` via inheritance.
+  - Helpers: `parse(event, raw)` → returns dict matching the event's TypedDict, empty dict on malformed input (never raises); `tool_name(payload)` → handles `tool_name`/`tool`; `bash_command(payload)` → handles `tool_input.command`/`input.command`/top-level `command`.
+  - **Why `hook_types.py`, not `types.py`:** putting a `types.py` on `sys.path` shadows the stdlib `types` module and breaks anything that imports `enum` (which pulls `types`). The `hook_` prefix avoids that footgun — discovered during migration, documented in the module docstring.
+- Reference migration: `hooks/safety-gate.py` — swaps the manual `.get(...).get(...)` chain for `hook_types.parse("PreToolUse", sys.stdin.read())` + `hook_types.tool_name()` + `hook_types.bash_command()`. All 18/18 `hooks/tests/test_safety_gate.py` cases still pass; behavior unchanged (same block patterns, same exit codes, same fail-safe-exit-0 on malformed input).
+- New tests: `tools/python/tests/test_hook_types.py` (14 tests: 7-event round-trip, malformed JSON, non-object JSON, unknown events, flat/nested/legacy shape variants for both helpers). Full pytest suite: 168 passed, 1 skipped.
+- `af audit`: 9/9 checks pass, 0 issues. Check 9 (hook script health) ignores `hook_types.py` because it has no shebang and no PEP-723 script block — it's a library, not a hook.
+
+### Phase 2 — TODO
+
+Migrate the remaining three hooks using the same pattern. Recipe:
+
+1. Add after existing `import sys` / `os`:
+   ```python
+   from pathlib import Path
+   sys.path.insert(0, str(Path(__file__).parent))
+   import hook_types  # noqa: E402
+   ```
+2. Replace the `json.load(sys.stdin)` + manual field resolution with:
+   ```python
+   payload: hook_types.<EventName>Payload = hook_types.parse("<EventName>", sys.stdin.read())
+   if not payload:
+       sys.exit(0)
+   ```
+3. Swap `data.get("tool_name") or data.get("tool")` → `hook_types.tool_name(payload)`.
+4. Swap the `tool_input.command` chain → `hook_types.bash_command(payload)` (if applicable).
+5. Keep all non-payload logic (env-var fallbacks, state files, notify-send calls) untouched.
+6. Run the hook's smoke test if it has one; otherwise fire a canned payload with `printf ... | hook.py`.
+
+Specific per-hook notes for Phase 2:
+
+- **`skill-logger.py`** (PostToolUse): keeps its `CLAUDE_SESSION_ID` env-var fallback — that's not a payload shape, it's a cross-process channel. Use `payload.get("session_id")` then fall back to env. `tool_input`/`tool_output` access stays the same shape; `hook_types.PostToolUsePayload` types them as `dict[str, Any]`.
+- **`notify.py`** (Stop + PermissionRequest + Notification): branches on `payload.get("hook_event_name")` — cheapest migration since it's already event-aware. Use `hook_types.parse(event, raw)` after reading `hook_event_name` once to pick the right TypedDict type-hint. Or parse as base and let TypedDict narrowing happen per branch.
+- **`caveman-mode.py`** / **`modes.py`** (UserPromptSubmit): migration is more cosmetic since these barely touch the payload today. Still worth doing for consistency.
+
+### Phase 3 — OPEN
+
+Shape of `tool_input` per tool. Currently `dict[str, Any]`. Tighten with per-tool TypedDicts (`BashToolInput`, `ReadToolInput`, `WriteToolInput`) when a hook actually branches on tool-specific fields. Don't pre-model — the original design doc (section 8) was explicit about this.
 
 ## 1. Goal
 

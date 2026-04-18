@@ -24,6 +24,13 @@ import re
 import sys
 from pathlib import Path
 
+# Make the sibling `hooks/hook_types.py` importable. `uv run --script`
+# doesn't add the script's directory to sys.path automatically, so we do
+# it here. Named `hook_types` (not `types`) so it doesn't shadow the
+# stdlib `types` module during import.
+sys.path.insert(0, str(Path(__file__).parent))
+import hook_types  # noqa: E402  (import after sys.path tweak)
+
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -228,16 +235,27 @@ def _collect_reminders() -> list[str]:
 
 
 def main() -> None:
+    # Drain stdin through the typed parser. modes.py doesn't consume any
+    # payload fields today (its state lives in ~/.claude/modes/), but we
+    # still parse for consistency with the other hooks. Unlike safety-gate,
+    # an empty/malformed payload is NOT a reason to bail — the reminder
+    # logic reads from the filesystem, not the payload. We read stdin only
+    # to drain the pipe cleanly and surface typed access if a future change
+    # wants to gate on `payload["prompt"]`.
+    payload: hook_types.UserPromptSubmitPayload = hook_types.parse(  # noqa: F841
+        "UserPromptSubmit", sys.stdin.read()
+    )
+
     reminders = _collect_reminders()
     if not reminders:
         sys.exit(0)
-    payload = {
+    output = {
         "hookSpecificOutput": {
             "hookEventName": "UserPromptSubmit",
             "additionalContext": "\n".join(reminders),
         }
     }
-    print(json.dumps(payload))
+    print(json.dumps(output))
     sys.exit(0)
 
 

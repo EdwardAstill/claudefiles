@@ -22,6 +22,13 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Make the sibling `hooks/hook_types.py` importable. `uv run --script`
+# doesn't add the script's directory to sys.path automatically, so we do
+# it here. Named `hook_types` (not `types`) so it doesn't shadow the
+# stdlib `types` module during import.
+sys.path.insert(0, str(Path(__file__).parent))
+import hook_types  # noqa: E402  (import after sys.path tweak)
+
 STATUS_DIR = Path.home() / ".claude" / "terminal-status"
 SKILL_LOG = Path.home() / ".claude" / "logs" / "agentfiles.jsonl"
 ANOMALIES_FILE = Path.home() / ".claude" / "logs" / "anomalies.md"
@@ -116,14 +123,36 @@ def short_path(cwd: str) -> str:
 
 
 def main() -> None:
+    raw = sys.stdin.read()
+    # Peek at the event name before narrowing to a per-event TypedDict.
+    # Keep the same fail-safe posture as before: malformed JSON → exit 0.
     try:
-        data = json.load(sys.stdin)
+        preview = json.loads(raw)
     except (json.JSONDecodeError, ValueError):
         sys.exit(0)
+    if not isinstance(preview, dict):
+        sys.exit(0)
 
-    event = data.get("hook_event_name", "")
-    session_id = data.get("session_id", "unknown")
-    cwd = data.get("cwd", "")
+    # Default to Stop for older payloads that omit hook_event_name —
+    # matches the prior behavior of falling through the Stop branch only
+    # when the field is literally "Stop". Empty/missing goes to the
+    # unknown-event path and exits quietly.
+    event = preview.get("hook_event_name", "")
+
+    if event == "Stop":
+        payload: hook_types.StopPayload = hook_types.parse("Stop", raw)
+    elif event == "PermissionRequest":
+        payload = hook_types.parse("PermissionRequest", raw)
+    elif event == "Notification":
+        payload = hook_types.parse("Notification", raw)
+    else:
+        sys.exit(0)
+
+    if not payload:
+        sys.exit(0)
+
+    session_id = payload.get("session_id", "unknown")
+    cwd = payload.get("cwd", "")
     label = short_path(cwd)
 
     if event == "Stop":
@@ -139,12 +168,12 @@ def main() -> None:
             )
 
     elif event == "PermissionRequest":
-        tool = data.get("tool_name", "unknown tool")
+        tool = payload.get("tool_name", "unknown tool")
         write_status(session_id, "needs_approval", cwd, {"tool": tool})
         notify("Claude Code — Needs Approval", f"{tool}  ·  {label}", urgency="critical")
 
     elif event == "Notification":
-        if data.get("notification_type") == "idle_prompt":
+        if payload.get("notification_type") == "idle_prompt":
             write_status(session_id, "waiting_input", cwd)
             notify("Claude Code — Waiting", f"Needs input  ·  {label}", urgency="critical")
 

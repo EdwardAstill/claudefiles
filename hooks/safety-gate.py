@@ -14,10 +14,17 @@ risk is a handful of catastrophic targets, not every `rm -rf` ever.
 Other patterns (force push, DROP TABLE, fork bomb, dd, mkfs) remain hard-blocked.
 """
 
-import json
 import os
 import re
 import sys
+from pathlib import Path
+
+# Make the sibling `hooks/hook_types.py` importable. `uv run --script`
+# doesn't add the script's directory to sys.path automatically, so we do
+# it here. Named `hook_types` (not `types`) so it doesn't shadow the
+# stdlib `types` module during import.
+sys.path.insert(0, str(Path(__file__).parent))
+import hook_types  # noqa: E402  (import after sys.path tweak)
 
 # (pattern, uses_rm_blacklist)
 DANGEROUS_PATTERNS: list[tuple[str, bool]] = [
@@ -102,25 +109,25 @@ def _rm_any_target_catastrophic(command: str, cwd: str) -> bool:
 
 
 def main():
-    try:
-        data = json.load(sys.stdin)
-    except (json.JSONDecodeError, ValueError):
+    payload: hook_types.PreToolUsePayload = hook_types.parse(
+        "PreToolUse", sys.stdin.read()
+    )
+    # Malformed / empty payload → parse() returned {} → bail out quietly.
+    if not payload:
         sys.exit(0)
 
-    tool_name = data.get("tool_name", "") or data.get("tool", "")
-    command = (
-        data.get("tool_input", {}).get("command")
-        or data.get("input", {}).get("command")
-        or data.get("command")
-        or ""
-    )
+    tool = hook_types.tool_name(payload)
+    command = hook_types.bash_command(payload)
+    # Preserve the old `cwd` fallback chain: top-level, nested under
+    # tool_input, then the process cwd.
+    tool_input = payload.get("tool_input") or {}
     cwd = (
-        data.get("cwd")
-        or data.get("tool_input", {}).get("cwd")
+        payload.get("cwd")
+        or (tool_input.get("cwd") if isinstance(tool_input, dict) else None)
         or os.getcwd()
     )
 
-    if tool_name != "Bash" or not command:
+    if tool != "Bash" or not command:
         sys.exit(0)
 
     for pattern, rm_blacklist in DANGEROUS_PATTERNS:
