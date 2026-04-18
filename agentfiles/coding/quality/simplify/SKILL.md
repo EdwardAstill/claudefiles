@@ -5,6 +5,7 @@ description: >
   code for unnecessary complexity. Covers DRY violations, dead code,
   over-engineering, poor naming, long functions, and clever-but-opaque logic.
   Does not add features or change behavior — only makes correct code clearer.
+next: [verification-before-completion]
 ---
 
 # Simplify

@@ -5,6 +5,7 @@ description: >
   behavior — before any implementation begins. Use when requirements aren't fully
   defined or the approach isn't decided. Required before touching code for any new
   feature, regardless of perceived simplicity.
+next: [writing-plans]
 ---
 
 # Brainstorming Ideas Into Designs

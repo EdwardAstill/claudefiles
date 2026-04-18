@@ -5,6 +5,7 @@ description: >
   code review feedback. Two modes: requesting (dispatch a reviewer subagent with focused
   context) and receiving (evaluate feedback technically before implementing — verify,
   push back if wrong, no performative agreement).
+next: [simplify, tdd]
 ---
 
 # Code Review

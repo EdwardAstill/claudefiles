@@ -29,6 +29,30 @@ af archetype match "<user intent>"   # does this task match a known shape?
 If a knowledge page already covers the ground, build on it rather than re-discovering.
 If a lesson contradicts what you're about to do, stop and reconcile.
 
+## Weekly improvement loop
+
+The self-improvement machinery only compounds if someone runs it. Schedule
+`af log review` + `af skill-usage summary` weekly (cron or calendar reminder)
+and act on the output:
+
+```cron
+# ~/.config/systemd/user/... or crontab -e
+0 9 * * 0  /home/you/.local/bin/af log review >> ~/.claude/logs/reviews/$(date +\%F).md
+```
+
+After the review, skim:
+
+- **`~/.claude/logs/observations.md`** — anomalies and lessons drafted by
+  `af log review`. Promote any recurring pattern to a skill edit or a
+  knowledge page (see the promotion rule in `research/knowledge/README.md`).
+- **`af skill-usage summary`** — "never loaded" list tells you what's dead
+  weight in the catalog; "top dispatch chains" suggests candidate trigger
+  wiring.
+
+If two consecutive weeks produce nothing worth acting on, that's still signal
+— log the "no-op review" in `research/lessons/` to avoid over-fitting the
+ritual.
+
 ---
 
 # agentfiles — Claude Code Guidance

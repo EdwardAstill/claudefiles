@@ -159,3 +159,38 @@ description: >
   Use when [triggering conditions]. Under 1024 chars.
 ---
 ```
+
+---
+
+## Workflow trigger chains
+
+SKILL.md frontmatter may carry an optional `next:` field listing 1–4 skills that
+commonly follow this one. It is a **hint, not a hard route** — consumers may
+ignore it, and users remain free to pick any skill at any time.
+
+```yaml
+---
+name: writing-plans
+description: Use when you have a spec or requirements for a multi-step task.
+next: [subagent-driven-development]
+---
+```
+
+**Rules:**
+
+- Values are skill names (e.g. `tdd`), not paths (`agentfiles/coding/quality/tdd`).
+- Listed skills must exist in the manifest — `af check` will flag stale names.
+- Keep the list short (1–4). This is a suggestion, not a pipeline definition.
+- Lives only in SKILL.md frontmatter. There is no corresponding manifest field.
+
+**Consumers:**
+
+- `executor` — can pre-warn about likely successor skills after a skill runs,
+  and can pre-load a chain when the task shape is obvious.
+- Users — can browse `next:` to discover the natural workflow around a skill
+  (e.g. `brainstorming` → `writing-plans` → `subagent-driven-development`).
+
+**Current coverage:** core planning, orchestration, and quality skills carry
+`next:`. Specialists (language experts, advisors, research agents) generally do
+not, because their successor depends entirely on the task. Add `next:` when a
+skill has a genuinely predictable follow-up; leave it off when it doesn't.

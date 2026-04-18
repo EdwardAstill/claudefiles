@@ -6,6 +6,7 @@ description: >
   trace, hypothesize, test, fix. NOT for writing new tests (tdd) or verifying
   completed work (verification-before-completion). Use this when something is
   broken and you don't know why.
+next: [verification-before-completion, tdd]
 ---
 
 # Systematic Debugging
