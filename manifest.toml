@@ -8,7 +8,8 @@ tools = []
 category = "management/meta"
 
 [skills.audit]
-tools = ["Bash", "Read", "Glob", "Grep"]
+# Thin dispatcher — real work runs in the `audit` subagent (see [agents.audit]).
+tools = ["Agent"]
 category = "management/meta"
 
 [skills.brainstorming]
@@ -61,7 +62,8 @@ tools = ["Read", "Write", "Bash"]
 category = "coding/quality"
 
 [skills.skill-tester]
-tools = ["Read", "Write", "Agent", "Bash", "Glob", "Grep", "WebSearch"]
+# Thin dispatcher — real work runs in the `skill-tester` subagent.
+tools = ["Agent"]
 category = "coding/quality"
 
 [skills.regex-expert]
@@ -201,7 +203,8 @@ cli = ["tinymist"]
 category = "coding/languages"
 
 [skills.security-review]
-tools = ["Bash", "Read", "Grep", "Glob"]
+# Thin dispatcher — real work runs in the `security-review` subagent.
+tools = ["Agent"]
 category = "coding/quality"
 
 [skills.database-expert]
@@ -253,6 +256,39 @@ category = "research"
 [skills.sci-hub]
 tools = ["Bash"]
 category = "research"
+
+[skills.youtube]
+tools = ["Bash", "Read", "Write"]
+cli = ["af", "ffmpeg"]
+category = "research"
+
+[skills.terminal-read]
+tools = ["Bash", "Read"]
+cli = ["af"]
+category = "research"
+
+[skills.web-scraper]
+tools = ["Bash", "Read", "Write", "Edit"]
+cli = ["af", "uv", "curl"]
+category = "research"
+
+[skills.reasoning]
+tools = []
+category = "reasoning"
+
+[skills.game-designer]
+tools = ["Read", "Write", "Edit"]
+category = "reasoning"
+
+[skills.logic-puzzle-designer]
+tools = ["Bash", "Read", "Write", "Edit"]
+cli = ["uv"]
+category = "reasoning"
+
+[skills.constraint-solver]
+tools = ["Bash", "Read", "Write", "Edit"]
+cli = ["uv"]
+category = "reasoning"
 
 # ── CLI tool registry ─────────────────────────────────────────────────────────
 # Tools installed via bun, uv, cargo, or rustup.
@@ -329,3 +365,64 @@ manager = "uv"
 package = "foxpilot"
 install = ["uv tool install /home/eastill/projects/foxpilot", "uv tool install git+https://github.com/EdwardAstill/foxpilot"]
 description = "Browser automation CLI — headless Firefox and Zen browser control via Marionette"
+
+[cli.ffmpeg]
+manager = "system"
+package = "ffmpeg"
+install = ["sudo pacman -S ffmpeg", "sudo apt install ffmpeg", "brew install ffmpeg"]
+description = "Media transcode / trim / mux — used by youtube skill for WAV/MP3 encoding and clip trimming"
+
+# ── Subagents ────────────────────────────────────────────────────────────────
+# Custom subagent definitions shipped with this repo. Installed into
+# ~/.claude/agents/<name>.md by `af install`. Invoked via the Agent tool with
+# subagent_type: <name>. See docs/reference/skills-vs-subagents.md.
+
+[agents.skill-tester]
+source = "agentfiles/agents/skill-tester.md"
+category = "evaluation"
+description = "Rubric-grades a skill against hard benchmark questions"
+
+[agents.audit]
+source = "agentfiles/agents/audit.md"
+category = "meta"
+description = "Manifest consistency audit, read-only"
+
+[agents.security-review]
+source = "agentfiles/agents/security-review.md"
+category = "quality"
+description = "OWASP + CVE + secrets scan, read-only"
+
+[agents.explore]
+source = "agentfiles/agents/explore.md"
+category = "builtin-copy"
+description = "Fast read-only codebase exploration (local copy of Claude Code built-in)"
+
+[agents.plan]
+source = "agentfiles/agents/plan.md"
+category = "builtin-copy"
+description = "Read-only research for implementation planning (local copy)"
+
+[agents.general-purpose]
+source = "agentfiles/agents/general-purpose.md"
+category = "builtin-copy"
+description = "Multi-step read+write agent for open-ended tasks (local copy)"
+
+[agents.code-architect]
+source = "agentfiles/agents/code-architect.md"
+category = "builtin-copy"
+description = "Designs feature architectures against existing patterns (local copy)"
+
+[agents.code-explorer]
+source = "agentfiles/agents/code-explorer.md"
+category = "builtin-copy"
+description = "Deep codebase analysis and execution tracing (local copy)"
+
+[agents.code-reviewer]
+source = "agentfiles/agents/code-reviewer.md"
+category = "builtin-copy"
+description = "Focused code review with confidence filtering (local copy)"
+
+[agents.code-simplifier]
+source = "agentfiles/agents/code-simplifier.md"
+category = "builtin-copy"
+description = "Behavior-preserving code simplification (local copy)"

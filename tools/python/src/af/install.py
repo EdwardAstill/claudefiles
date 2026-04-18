@@ -118,9 +118,30 @@ def _list_categories(agentfiles_dir: Path) -> list[str]:
     """Return available top-level categories."""
     cats = set()
     for d in agentfiles_dir.iterdir():
-        if d.is_dir() and not d.name.startswith("."):
+        if d.is_dir() and not d.name.startswith(".") and d.name != "agents":
             cats.add(d.name)
     return sorted(cats)
+
+
+# ── Agent discovery ─────────────────────────────────────────────────────────
+
+
+def _discover_all_agents(agentfiles_dir: Path) -> dict[str, Path]:
+    """Return {agent_name: agent_md_path} for all subagent defs in agentfiles/agents/."""
+    agents_dir = agentfiles_dir / "agents"
+    if not agents_dir.is_dir():
+        return {}
+    agents: dict[str, Path] = {}
+    for md_path in sorted(agents_dir.glob("*.md")):
+        for line in md_path.read_text().splitlines():
+            if line.startswith("name:"):
+                name = line.split(":", 1)[1].strip()
+                agents[name] = md_path
+                break
+        else:
+            # No name frontmatter — fall back to filename
+            agents[md_path.stem] = md_path
+    return agents
 
 
 # ── Symlink helpers ──────────────────────────────────────────────────────────
@@ -363,15 +384,18 @@ def install_cmd(
             Path.home() / ".claude" / "skills",
             Path.home() / ".gemini" / "skills",
         ]
+        agent_targets = [Path.home() / ".claude" / "agents"]
     else:
         project = Path(project_path) if project_path else Path.cwd()
         targets = [
             project / ".claude" / "skills",
             project / ".gemini" / "skills",
         ]
+        agent_targets = [project / ".claude" / "agents"]
 
-    # Discover skills
+    # Discover skills and agents
     all_skills = _discover_all_skills(agentfiles_dir)
+    all_agents = _discover_all_agents(agentfiles_dir)
 
     # Determine which skills to install/remove
     if skill_name:
@@ -395,6 +419,11 @@ def install_cmd(
             for name in sorted(selected):
                 _do_remove(target / name, dry_run)
             _do_remove(target / "hooks", dry_run)
+        if not skill_name and not category:
+            click.echo(f"Removing {len(all_agents)} agent(s) {scope}...")
+            for agent_target in agent_targets:
+                for name in sorted(all_agents):
+                    _do_remove(agent_target / f"{name}.md", dry_run)
         raise SystemExit(0)
 
     # Install mode
@@ -410,6 +439,16 @@ def install_cmd(
         for name in sorted(selected):
             skill_dir = selected[name]
             _do_symlink(skill_dir, target / name, dry_run)
+
+    # Agents (only on full install — skill_name and category scopes skip agents)
+    if all_agents and not skill_name and not category:
+        click.echo(f"\nInstalling {len(all_agents)} subagent(s) {scope}...")
+        for agent_target in agent_targets:
+            if agent_target.is_symlink() and not agent_target.is_dir():
+                agent_target.unlink()
+            agent_target.mkdir(parents=True, exist_ok=True)
+            for name in sorted(all_agents):
+                _do_symlink(all_agents[name], agent_target / f"{name}.md", dry_run)
 
     # Hooks (global only, unless explicitly installing per-project)
     if global_mode:
