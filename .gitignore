@@ -5,3 +5,6 @@ __pycache__/
 dist/
 .venv/
 .env
+
+# Plan execution state (per-plan runtime, not source)
+docs/plans/*.state.json

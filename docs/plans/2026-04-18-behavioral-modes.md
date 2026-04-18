@@ -1,6 +1,7 @@
 # Behavioral Modes — Implementation Plan
 
 **Status:** MVP shipped (2026-04-18) — primitive, CLI, hook, and two modes (token-efficient + caveman) live.
+**Machine plan:** [`2026-04-18-behavioral-modes.yaml`](./2026-04-18-behavioral-modes.yaml) (retrospective sidecar, all 10 nodes marked done).
 **Inspired by:** `SuperClaude_Framework` — see `research/projects/skill-suites/superclaude-framework.md`
 
 ## Status

@@ -1,0 +1,80 @@
+# Retrospective YAML sidecar for docs/plans/2026-04-18-behavioral-modes.md.
+# Written after the plan shipped (2026-04-18) to dogfood the plan-YAML
+# pipeline against real content. All nodes marked `done` in the state file.
+# `files:` entries intentionally omitted — the plan is retrospective, so the
+# create-before-exists invariant doesn't apply. Forward plans should include them.
+version: 1
+plan:
+  slug: behavioral-modes
+  prose: docs/plans/2026-04-18-behavioral-modes.md
+  goal: >
+    Introduce a Modes primitive (posture switches distinct from skills) with
+    modes/<name>/MODE.md, a generic hook dispatcher, and an `af mode` CLI.
+    Port `caveman` as the first real mode; ship `token-efficient` alongside.
+
+nodes:
+  - id: primitive_dir
+    type: implement
+    description: Create agentfiles/modes/ + authoring README.
+
+  - id: mode_token_efficient
+    type: implement
+    depends_on: [primitive_dir]
+    description: First real mode — softer than caveman-full.
+
+  - id: mode_caveman
+    type: implement
+    depends_on: [primitive_dir]
+    description: Port caveman to the new primitive, level-keyed reminders.
+
+  - id: cli_mode
+    type: implement
+    depends_on: [mode_token_efficient, mode_caveman]
+    description: >
+      `af mode list | on | off | status` with --active, --level, and clean
+      conflict-detection errors.
+
+  - id: generic_hook
+    type: implement
+    depends_on: [cli_mode]
+    description: >
+      hooks/modes.py — multi-mode dispatcher. Reads ~/.claude/modes/,
+      concatenates reminders in category-priority order, emits one
+      UserPromptSubmit payload. Zero external deps.
+
+  - id: caveman_alias
+    type: implement
+    depends_on: [cli_mode, mode_caveman]
+    description: >
+      Rewrite af caveman as a backwards-compat alias: writes to the new
+      state dir, migrates the legacy ~/.claude/caveman-mode file on first
+      use.
+
+  - id: hooks_json_swap
+    type: implement
+    depends_on: [generic_hook]
+    description: >
+      Swap caveman-mode.py → modes.py in hooks.json. Keep caveman-mode.py
+      as a one-release shim delegating to modes.py.
+
+  - id: tests
+    type: implement
+    depends_on: [cli_mode, generic_hook, caveman_alias]
+    description: >
+      test_mode.py — 13+ tests (discovery, parse, activate/deactivate,
+      CLI list/on/off/status, unknown-mode/level, priority ordering,
+      caveman alias, hook subprocess integration).
+
+  - id: verify_all_green
+    type: verify
+    depends_on: [tests, hooks_json_swap]
+    description: Full suite + audit stay clean.
+    verify:
+      - uv run --directory tools/python pytest -q
+      - uv run --project tools/python af audit
+
+  - id: quality_review
+    type: review
+    reviewer: code_quality
+    depends_on: [verify_all_green]
+    description: Final sweep — no breakage in af caveman, modes hook ergonomics.
