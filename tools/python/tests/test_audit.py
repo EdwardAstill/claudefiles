@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 from af.audit import app as audit_app
 from af.audit import (
     _audit_hooks,
+    _audit_plan_pairs,
     _dep_package_name,
     _parse_shebang,
     _parse_uv_script_deps,
@@ -128,3 +129,98 @@ def test_hooks_json_missing_command_flagged(tmp_path):
     issues = _audit_hooks(repo)
     joined = "\n".join(issues)
     assert "does-not-exist" in joined
+
+
+# ── Check 10: plan pair drift ────────────────────────────────────────────────
+
+
+_CLEAN_YAML = """\
+version: 1
+id: sample-plan
+nodes:
+  - id: t1
+    type: implement
+    prose_ref: task-1-do-the-thing
+    spec: do the thing
+"""
+
+_CLEAN_MD = """\
+# Sample Plan
+
+### Task 1: Do the thing
+
+Write some code.
+"""
+
+
+def _plans_repo(root: Path) -> Path:
+    """Build a minimal agentfiles repo with a docs/plans/ dir."""
+    (root / "manifest.toml").write_text("")
+    (root / "agentfiles").mkdir()
+    (root / "docs" / "plans").mkdir(parents=True)
+    return root
+
+
+def test_plan_pairs_clean_returns_no_issues(tmp_path):
+    repo = _plans_repo(tmp_path)
+    (repo / "docs" / "plans" / "sample.yaml").write_text(_CLEAN_YAML)
+    (repo / "docs" / "plans" / "sample.md").write_text(_CLEAN_MD)
+
+    issues, count = _audit_plan_pairs(repo)
+    assert issues == []
+    assert count == 1
+
+
+def test_plan_pairs_drift_flagged(tmp_path):
+    repo = _plans_repo(tmp_path)
+    # prose_ref points at an anchor that does not exist in the .md
+    drifted_yaml = _CLEAN_YAML.replace(
+        "task-1-do-the-thing", "task-1-does-not-exist-in-prose"
+    )
+    (repo / "docs" / "plans" / "sample.yaml").write_text(drifted_yaml)
+    (repo / "docs" / "plans" / "sample.md").write_text(_CLEAN_MD)
+
+    issues, count = _audit_plan_pairs(repo)
+    assert count == 1
+    joined = "\n".join(issues)
+    assert "sample.yaml" in joined
+    assert "task-1-does-not-exist-in-prose" in joined
+
+
+def test_plan_pairs_no_plans_dir(tmp_path):
+    # No docs/plans/ at all — check should be a no-op, not an error.
+    (tmp_path / "manifest.toml").write_text("")
+    (tmp_path / "agentfiles").mkdir()
+    issues, count = _audit_plan_pairs(tmp_path)
+    assert issues == []
+    assert count == 0
+
+
+def test_audit_cli_reports_check_10(tmp_path, monkeypatch):
+    """End-to-end: `af audit` invocation includes CHECK 10 in its summary."""
+    repo = _plans_repo(tmp_path)
+    (repo / "docs" / "plans" / "sample.yaml").write_text(_CLEAN_YAML)
+    (repo / "docs" / "plans" / "sample.md").write_text(_CLEAN_MD)
+    # Minimal skills/ so registry check doesn't choke.
+    (repo / "skills").mkdir()
+
+    monkeypatch.chdir(repo)
+    result = runner.invoke(audit_app, [])
+    assert "CHECK 10" in result.stdout
+    assert "10/10" in result.stdout or "10 checks" in result.stdout
+
+
+def test_audit_cli_fails_on_plan_drift(tmp_path, monkeypatch):
+    """Deliberate drift causes `af audit` to exit non-zero."""
+    repo = _plans_repo(tmp_path)
+    drifted_yaml = _CLEAN_YAML.replace(
+        "task-1-do-the-thing", "bogus-anchor-not-in-prose"
+    )
+    (repo / "docs" / "plans" / "sample.yaml").write_text(drifted_yaml)
+    (repo / "docs" / "plans" / "sample.md").write_text(_CLEAN_MD)
+    (repo / "skills").mkdir()
+
+    monkeypatch.chdir(repo)
+    result = runner.invoke(audit_app, [])
+    assert result.exit_code == 1
+    assert "bogus-anchor-not-in-prose" in result.stdout

@@ -14,6 +14,7 @@ Checks:
   8. skills/ registry symlinks are valid and complete
   9. hook script health (shebangs resolve, declared deps resolvable,
      bash binaries on PATH, hooks.json commands executable)
+ 10. plan pair drift (docs/plans/*.yaml <-> .md stay in sync)
 """
 
 from __future__ import annotations
@@ -296,6 +297,35 @@ def _audit_hooks(repo_root: Path) -> list[str]:
     return issues
 
 
+def _audit_plan_pairs(repo_root: Path) -> tuple[list[str], int]:
+    """Run the same drift logic as `af check plans`, scoped to docs/plans.
+
+    Returns (issues, pair_count). Reuses `af.check.check_plan_pair` — no
+    duplicated drift logic.
+    """
+    from af import check as _check  # local import avoids circular concerns
+
+    plans_dir = repo_root / "docs" / "plans"
+    if not plans_dir.is_dir():
+        return [], 0
+
+    issues: list[str] = []
+    pairs: list[tuple[Path, Path]] = []
+    for yaml_path in sorted(plans_dir.glob("*.yaml")):
+        md_path = yaml_path.with_suffix(".md")
+        if md_path.exists():
+            pairs.append((yaml_path, md_path))
+
+    for yaml_path, md_path in pairs:
+        for msg in _check.check_plan_pair(yaml_path, md_path):
+            issues.append(
+                f"  ✗ plan '{yaml_path.name}' — {msg}\n"
+                f"    → fix: reconcile {yaml_path.name} with {md_path.name} "
+                f"(see `af check plans`)"
+            )
+    return issues, len(pairs)
+
+
 def _extract_hook_commands(cfg: dict) -> list[str]:
     """Flatten hooks.json into a list of command strings."""
     out: list[str] = []
@@ -399,6 +429,17 @@ def audit(
             )
         passed.append(f"CHECK 9 (hook script health): ✓ all {n_hooks} hooks resolve")
 
+    # Check 10: plan pair drift
+    plan_issues, plan_pair_count = _audit_plan_pairs(repo_root)
+    issues.extend(plan_issues)
+    if not plan_issues:
+        if plan_pair_count == 0:
+            passed.append("CHECK 10 (plan pair drift): ✓ no plan pairs to check")
+        else:
+            passed.append(
+                f"CHECK 10 (plan pair drift): ✓ all {plan_pair_count} pair(s) in sync"
+            )
+
     # ── --fix mode: repair safely-repairable drift ──────────────────────────
     if fix:
         fixed: list[str] = []
@@ -447,7 +488,7 @@ def audit(
         for line in issues:
             typer.echo(line)
 
-    total_checks = 9
+    total_checks = 10
     failed_checks = sum([
         bool(missing_in_manifest),
         bool(orphan_skill_entries),
@@ -458,6 +499,7 @@ def audit(
         bool(missing_cli),
         bool(registry_problems or missing_registry),
         bool(hook_issues),
+        bool(plan_issues),
     ])
     typer.echo("")
     typer.echo(f"SUMMARY: {total_checks - failed_checks}/{total_checks} checks passed, {len(issues)} issue(s)")
