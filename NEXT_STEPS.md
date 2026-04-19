@@ -60,8 +60,8 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 3 / 12
-- `last_tick`: iter 3 @ 3f577e7 — shipped 3-5 (plan-exec state scoping spec)
+- `iteration`: 4 / 12
+- `last_tick`: iter 4 @ 02fa8bc — shipped S-1 (skill-tree generator + regen)
 - `cron_mode`: self-paced (10m cron replaced; ScheduleWakeup 60s on finish)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
@@ -87,6 +87,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `86a537a` | 3-4 | Weekly `af log review` systemd timer — units + idempotent installer (iter 1) |
 | `d490c5f` | 3-3 | research/projects/education-and-showcases/ +5 entries: anthropics-courses, claude-agent-sdk-demos, anthropics/skills, wshobson/agents, florianbruniaux guide (iter 2) |
 | `3f577e7` | 3-5 | Ratify plan-exec global node-id namespace + mark scope; new reference doc (iter 3) |
+| `02fa8bc` | S-1 | Skill-tree generator (`hooks/tools/gen-skill-tree.py`) + regenerated doc — 73 skills, 6 top-level categories, all A2 descriptions + computer-control now reflected (iter 4) |
 
 ---
 
@@ -97,9 +98,8 @@ at the current pick. Move it down as items finish.
 
 ### Session-surfaced follow-ups
 
-- **⭐ NEXT  S-1** `[small]` Regenerate `docs/skill-tree.md` via `af tree --regenerate` — stale (omits `computer-control`, possibly others after A2 + renames).
+- **⭐ NEXT  S-2** `[medium]` New `af audit` CHECK 11 — validate `[modes.*]` manifest section the same way CHECK 1 validates `[skills.*]`.
 - **S-6** `[small]` `af install` doesn't prune symlinks that no longer correspond to manifest entries. Confirmed on 2026-04-19: after the `skill-manager` → `agentfiles-manager` rename, `af install --global` created the new symlink but left the stale `~/.claude/skills/skill-manager` alias. Add a prune step that removes any `~/.claude/skills/*` symlink whose basename is absent from the manifest's `[skills.*]` keys.
-- **S-2** `[medium]` New `af audit` CHECK 11 — validate `[modes.*]` manifest section the same way CHECK 1 validates `[skills.*]`.
 - **S-3** `[medium]` `af check modes` — MODE.md frontmatter validator. Pending from behavioral-modes design plan.
 - **S-4** `[small]` Upgrade `research` dispatcher description to full trigger-spec (currently brief prose; only dispatcher that hasn't been rewritten).
 - **S-5** `[small]` Copy `feature-dev` slash command locally. NEXT_STEPS's original C2 assumption was wrong — `feature-dev` is a slash command, not a subagent. Would live under `commands/`.
