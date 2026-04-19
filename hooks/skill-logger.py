@@ -135,12 +135,16 @@ def main():
         or "unknown"
     )
 
-    # Resolve tool and input/output. Helper handles the flat-vs-nested
-    # `tool_name`/`tool` variance; keep the `tool_input`/`input` and
-    # `tool_output`/`output` fallback chains as-is for behavior parity.
+    # Resolve tool and input/output. The canonical Claude Code hook schema
+    # uses `tool_response` (per hooks/hook_types.py / N3 typed-payloads work);
+    # `tool_output` / `output` remain as legacy fallbacks for older payloads.
     tool_name = hook_types.tool_name(payload) or ""
     tool_input = payload.get("tool_input") or payload.get("input") or {}
-    tool_output = payload.get("tool_output") or payload.get("output", "")
+    tool_output = (
+        payload.get("tool_response")
+        or payload.get("tool_output")
+        or payload.get("output", "")
+    )
 
     # --- Layer 1: Session trace (all tool calls) ---
     session_entry = {
