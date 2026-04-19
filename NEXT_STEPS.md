@@ -60,8 +60,8 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 1 / 12
-- `last_tick`: iter 1 @ 86a537a — shipped 3-4 (weekly af log review systemd timer)
+- `iteration`: 2 / 12
+- `last_tick`: iter 2 @ d490c5f — shipped 3-3 (education-and-showcases +5 entries)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
 
@@ -84,6 +84,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `dcca1f1` | 1-1 | Never-loaded skill review — verdict KEEP all 11 (6 dispatchers + 4 niche leaves + 1 brand-new). The A2 rewrite already did the real pruning work (never-loaded count fell 32 → 11). |
 | `23589ba` | — | Resolve `agentfiles-manager` name drift (dir rename + alias removal) |
 | `86a537a` | 3-4 | Weekly `af log review` systemd timer — units + idempotent installer (iter 1) |
+| `d490c5f` | 3-3 | research/projects/education-and-showcases/ +5 entries: anthropics-courses, claude-agent-sdk-demos, anthropics/skills, wshobson/agents, florianbruniaux guide (iter 2) |
 
 ---
 
@@ -94,8 +95,7 @@ at the current pick. Move it down as items finish.
 
 ### Tier 3 (practical)
 
-- **⭐ NEXT  3-3** `[small]` Populate `research/projects/education-and-showcases/`. Only 3 entries today. Candidates: anthropic/courses, specific agent demos, tutorial repos the session browsed.
-- **3-5** `[small]` `StateFile.mark` loop-body id handling spec decision. Phase 2A noted `mark` accepts ids inside `LoopNode.body`; spec is silent. Decide allow (current) or scope to parent loop. Document in writing-plans.
+- **⭐ NEXT  3-5** `[small]` `StateFile.mark` loop-body id handling spec decision. Phase 2A noted `mark` accepts ids inside `LoopNode.body`; spec is silent. Decide allow (current) or scope to parent loop. Document in writing-plans.
 
 ### Session-surfaced follow-ups
 
