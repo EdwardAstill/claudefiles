@@ -60,8 +60,9 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 2 / 12
-- `last_tick`: iter 2 @ d490c5f — shipped 3-3 (education-and-showcases +5 entries)
+- `iteration`: 3 / 12
+- `last_tick`: iter 3 @ 3f577e7 — shipped 3-5 (plan-exec state scoping spec)
+- `cron_mode`: self-paced (10m cron replaced; ScheduleWakeup 60s on finish)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
 
@@ -85,6 +86,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `23589ba` | — | Resolve `agentfiles-manager` name drift (dir rename + alias removal) |
 | `86a537a` | 3-4 | Weekly `af log review` systemd timer — units + idempotent installer (iter 1) |
 | `d490c5f` | 3-3 | research/projects/education-and-showcases/ +5 entries: anthropics-courses, claude-agent-sdk-demos, anthropics/skills, wshobson/agents, florianbruniaux guide (iter 2) |
+| `3f577e7` | 3-5 | Ratify plan-exec global node-id namespace + mark scope; new reference doc (iter 3) |
 
 ---
 
@@ -93,13 +95,9 @@ that ticks every 10 min for 2 hours — see §0.
 Each entry has a size tag the SOP consumes. The `⭐ NEXT` marker points
 at the current pick. Move it down as items finish.
 
-### Tier 3 (practical)
-
-- **⭐ NEXT  3-5** `[small]` `StateFile.mark` loop-body id handling spec decision. Phase 2A noted `mark` accepts ids inside `LoopNode.body`; spec is silent. Decide allow (current) or scope to parent loop. Document in writing-plans.
-
 ### Session-surfaced follow-ups
 
-- **S-1** `[small]` Regenerate `docs/skill-tree.md` via `af tree --regenerate` — stale (omits `computer-control`, possibly others after A2 + renames).
+- **⭐ NEXT  S-1** `[small]` Regenerate `docs/skill-tree.md` via `af tree --regenerate` — stale (omits `computer-control`, possibly others after A2 + renames).
 - **S-2** `[medium]` New `af audit` CHECK 11 — validate `[modes.*]` manifest section the same way CHECK 1 validates `[skills.*]`.
 - **S-3** `[medium]` `af check modes` — MODE.md frontmatter validator. Pending from behavioral-modes design plan.
 - **S-4** `[small]` Upgrade `research` dispatcher description to full trigger-spec (currently brief prose; only dispatcher that hasn't been rewritten).
