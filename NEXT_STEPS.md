@@ -60,9 +60,10 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 0 / 12
-- `last_tick`: —
+- `iteration`: 1 / 12
+- `last_tick`: iter 1 @ 86a537a — shipped 3-4 (weekly af log review systemd timer)
 - `consecutive_failures`: 0
+- `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
 
 ---
 
@@ -82,6 +83,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `34eedf3` | — | New `computer-control` skill (Hyprland / dotool / hyprctl / grim / slurp / wl-copy) |
 | `dcca1f1` | 1-1 | Never-loaded skill review — verdict KEEP all 11 (6 dispatchers + 4 niche leaves + 1 brand-new). The A2 rewrite already did the real pruning work (never-loaded count fell 32 → 11). |
 | `23589ba` | — | Resolve `agentfiles-manager` name drift (dir rename + alias removal) |
+| `86a537a` | 3-4 | Weekly `af log review` systemd timer — units + idempotent installer (iter 1) |
 
 ---
 
@@ -92,8 +94,7 @@ at the current pick. Move it down as items finish.
 
 ### Tier 3 (practical)
 
-- **⭐ NEXT  3-4** `[medium]` **Weekly `af log review` cron or scheduled trigger.** The self-improvement loop exists (`af log review` → retrospective → promotion) but nothing runs the crank. Pick: shell cron, systemd timer, or the `schedule` skill. Lowest-friction: `systemctl --user` timer invoking `af log review`.
-- **3-3** `[small]` Populate `research/projects/education-and-showcases/`. Only 3 entries today. Candidates: anthropic/courses, specific agent demos, tutorial repos the session browsed.
+- **⭐ NEXT  3-3** `[small]` Populate `research/projects/education-and-showcases/`. Only 3 entries today. Candidates: anthropic/courses, specific agent demos, tutorial repos the session browsed.
 - **3-5** `[small]` `StateFile.mark` loop-body id handling spec decision. Phase 2A noted `mark` accepts ids inside `LoopNode.body`; spec is silent. Decide allow (current) or scope to parent loop. Document in writing-plans.
 
 ### Session-surfaced follow-ups
@@ -141,6 +142,7 @@ systemd state outside the repo.
 - `systemctl --user enable --now dotoold` — activate input daemon for `computer-control`. Without it, `dotool` silently fails.
 - `./hooks/install-hooks.sh` — re-sync `~/.claude/settings.json` to the new `modes.py`. The old `caveman-mode.py` is deleted; hook silently no-ops until the user re-installs.
 - `rm ~/.claude/skills/skill-manager` — purge the stale alias symlink left over from the `agentfiles-manager` rename.
+- `bash hooks/install-log-review-timer.sh` — install the weekly `af log review` systemd timer shipped in 3-4. Edit the `WorkingDirectory=` line first if the checkout isn't at `~/projects/agentfiles`.
 
 ---
 
