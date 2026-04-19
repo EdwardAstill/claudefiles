@@ -1,0 +1,69 @@
+{
+  "note": "Each grade is a separate 1-5 judgement per (eval, condition, criterion), with a 1-2 sentence evidence string. Scores anchored against the evals.json reference_answer. Halo effects mitigated by grading one criterion at a time against reference.",
+  "grades": {
+    "tdd-empirical-evidence": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All reference points covered accurately: 8 SLRs named, 54%/3% overlap figure correct, Rafique & Misic 2013 effect size (0.25-0.3) correct, Muller & Hagner 2002 finding correctly characterized, Nagappan Microsoft study cited, Ghafari 2020 methodological critique correctly summarized. Claim-type table adds precision." },
+        "completeness":  { "score": 5, "evidence": "Covers consensus (test count/coverage), moderate (defect reduction effect size), contested (productivity long-term, design quality), plus 5 failure modes, SLR overlap problem, process conformance weakness, population confounds, Coplien/DHH steelman. Exceeds reference by including Fucci replication pointer." },
+        "structure":     { "score": 5, "evidence": "Follows the skill's prescribed output format exactly — depth calibration, claim-type audit, Consensus, Nuances, Known Pitfalls, Contradictions/Open Questions, Recommended Direction, Further Investigation. Confidence summary block at end is well-organized." },
+        "clarity":       { "score": 4, "evidence": "Very dense — tables, multiple confidence tiers, per-section subheaders. Content is precise but takes focused reading; the claim-type table especially rewards careful scanning over casual reading." },
+        "actionability": { "score": 5, "evidence": "Concrete alternative framings (opt-in pilot, measure baseline, require tests in PRs as weaker intervention), specific papers to read with arxiv IDs, measurement protocol for a pilot. Tech lead can act directly." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "Core claims correct (8 SLRs overlap, Rafique & Misic effect size, productivity cost, Ghafari critique). Misses the specific 54%/3% overlap figures and the Fucci replication. No factual errors but slightly less precise than with-skill." },
+        "completeness":  { "score": 3, "evidence": "Covers the main axes (what's supported, contradictions, recommendation) but pitfalls list is shorter (4 vs 5), no explicit claim-type audit, no confidence-summary breakdown, less detail on population confounds and process conformance." },
+        "structure":     { "score": 4, "evidence": "Clear sections (evidence, messiness, contradictions, recommendation, watch-outs). Readable but lacks the prescribed output-format layers — no explicit Consensus/Nuances/Contradictions block and no confidence levels stated per finding." },
+        "clarity":       { "score": 5, "evidence": "Shorter, more scannable, minimal redundancy. Easy to read end-to-end; reads like a well-edited summary." },
+        "actionability": { "score": 4, "evidence": "Clear recommendation (don't mandate, use opt-in pilot, target coverage directly) and cites Ghafari 2020 + Rafique & Misic. Slightly less specific than with-skill on measurement protocol and missing the Fucci replication." }
+      }
+    },
+    "microservices-vs-modular-monolith": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "Team-size heuristics match reference, Amazon Prime Video 2023 cited correctly, 30-40% cost overhead attributed to vendor surveys (not peer-reviewed) — a critical accuracy point. Real triggers (deploy cadence, scaling profile, runtime, regulatory) match the reference." },
+        "completeness":  { "score": 5, "evidence": "10 failure modes enumerated with explanations (reference asks for failure modes; with_skill exceeds it). Distributed monolith flagged as #1 with the ~50% first-migration failure rate. Resume-driven architecture explicitly called out. DORA metrics and extraction path suggested." },
+        "structure":     { "score": 5, "evidence": "Full skill output format: claim-type audit, consensus, nuances, 10 enumerated pitfalls, contradictions, source-quality note, recommended direction, steelman, further investigation, confidence summary. Very disciplined." },
+        "clarity":       { "score": 4, "evidence": "1,379 words is substantial; claim-type audit + consensus + nuances + 10-item failure list is information-dense. Each section is clean but the reader has to consume a lot. The numbered pitfall list is easy to scan." },
+        "actionability": { "score": 5, "evidence": "Concrete script for pushing back: ask leadership what pain they're solving, enumerate real triggers, offer strangler-extraction as compromise, run DORA metrics. Specific books (Newman, Skelton & Pais) and blog post named. Immediately usable in a meeting." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 5, "evidence": "All key facts correct: team-size heuristics match reference, Amazon Prime Video cited, 30-40% overhead attributed to vendor/practitioner sources. Correctly notes academic research is sparse. No factual errors." },
+        "completeness":  { "score": 3, "evidence": "10 failure modes listed but with less explanation than with-skill; no claim-type audit; no confidence summary; strangler/extraction pattern named but less detailed; missing DORA metrics recommendation detail and resume-driven architecture callout's depth." },
+        "structure":     { "score": 4, "evidence": "Readable sections (when microservices pay off, industry shift, failure modes, what to propose, caveats, steelman, measurement). Lacks the explicit claim-type and confidence layers that make with-skill easier to verify." },
+        "clarity":       { "score": 5, "evidence": "Tight prose, 677 words, no filler. Reads faster than with_skill for the same basic recommendation; list of failure modes is scannable." },
+        "actionability": { "score": 4, "evidence": "Clear recommendation to push back, enumerates triggers to check, suggests DDD/modularity investments, names Newman and Skelton & Pais. Slightly less specific framing for the actual conversation with leadership — doesn't spell out the cost math." }
+      }
+    },
+    "rust-vs-go-network-services": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All key numbers accurate: Discord 5x/10x attribution correct (and appropriately framed as 'adversarial case for Go's GC'), Pingora ~1T req/day, memory 2-4x, developer velocity times (1wk/1mo vs 1mo/3-6mo). Critically distinguishes average throughput (comparable) from tail latency (real Rust win). Correctly flags that 'memory safety over Go' is overstated because Go is also memory-safe." },
+        "completeness":  { "score": 5, "evidence": "Covers all reference points plus more: where Rust's advantage is real AND where overstated (two separate lists), where Go wins AND loses, failure modes per language, polyglot option, source-quality tiering, steelmans, crossover point by p99 target. Exceeds reference." },
+        "structure":     { "score": 5, "evidence": "Full skill format: claim-type audit, consensus tiers, nuances with multi-angle (real/overstated/Go-wins/Go-loses), failure modes per language, contradictions table, recommendation, steelmans, source-quality, further investigation, confidence summary." },
+        "clarity":       { "score": 4, "evidence": "1,439 words — densest response. 4 distinct 'where X wins/loses' subsections plus claim-type audit requires focused reading. Each sub-section is well-organized but the overall document takes effort." },
+        "actionability": { "score": 5, "evidence": "Specific p99 decision rule (sub-ms → Rust, 5-50ms → Go), polyglot option, 2-week-each prototype recommendation, Pingora blog post cited as reference architecture. Engineer leading the decision can act directly." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 5, "evidence": "All numbers and attributions correct: Discord 5x/10x, Pingora, memory 2-4x, developer velocity. Correctly labels the '10x faster' generalization as marketing from microbenchmarks. Correctly notes Go is also memory-safe." },
+        "completeness":  { "score": 4, "evidence": "Covers the core trade-off, production cases, failure modes per language, polyglot option, honest source-quality note. Missing: the explicit claim-type audit, some of the finer-grained 'where Rust advantage is overstated' nuances (e.g., cloud-native ecosystem, long-term productivity). Crossover point by p99 target is present." },
+        "structure":     { "score": 4, "evidence": "Clean section progression (performance, overstated, Go wins, Go loses, case studies, decision framework, failure modes, polyglot, source quality, recommendation). Lacks confidence summary and claim-type layer." },
+        "clarity":       { "score": 5, "evidence": "688 words, well-paced, reads quickly. The decision framework (by p99 target) is the clearest part of either response and is positioned prominently." },
+        "actionability": { "score": 4, "evidence": "Clear decision rule by p99, prototype recommendation, Pingora reference. Slightly less specific than with-skill on the ecosystem trade-offs, hiring-pool multiplier, and the explicit polyglot pattern." }
+      }
+    },
+    "creatine-cognition-healthy-adults": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All key findings correctly characterized: Xu 2024 positive meta-analysis, EFSA 2024 methodological rejection, Prokopidis 2023 modest memory effect, Rae 2003 vegetarian result, Forbes 2022 older adults, effect sizes g=0.2-0.3. Correctly identifies population-dependence as the key nuance. Caffeine effect-size comparison is apt." },
+        "completeness":  { "score": 5, "evidence": "Covers all reference points plus: dose/timing details (3-5g maintenance, loading, 2-4 week saturation), effect-size interpretation with comparison, explicit hype-cycle analysis, 6 enumerated pitfalls, steelman on both sides, self-trial protocol. Exceeds reference." },
+        "structure":     { "score": 5, "evidence": "Full skill output format. Population-dependent effect treated as central nuance. EFSA critique placed prominently as its own sub-section. Confidence summary closes with 5 tiered claims." },
+        "clarity":       { "score": 4, "evidence": "1,270 words; content is well-organized into tight sub-sections but the reader processes multiple tables, tiered confidence levels, and both steelmans. Reads slower than without-skill but rewards the attention." },
+        "actionability": { "score": 5, "evidence": "Concrete recommendation differentiated by user context (already taking creatine / starting for cognition / vegetarian or sleep-poor / over 60). Specific self-trial protocol (3-5g/day, 8-12wk, n-back or working-memory task). Specific papers to read. examine.com pointer. Ready to act." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 5, "evidence": "All facts correct: EFSA 2024 critique of Xu 2024, Prokopidis, Forbes, Rae 2003 on vegetarians, effect sizes, caffeine comparison absent but present in spirit ('smaller than caffeine'). Population-dependence identified correctly." },
+        "completeness":  { "score": 3, "evidence": "Covers core evidence, EFSA critique, population effects, recommendation, both steelmans. Missing: dose/timing specifics, effect-size comparison with caffeine, explicit self-trial protocol, 6-pitfall enumeration — these are present in with-skill but not here." },
+        "structure":     { "score": 4, "evidence": "Clear sections (what meta-analyses show, methodological caveat, strongest/weakest evidence, supported/not, hype cycle, recommendation, steelmans, further reading). Lacks claim-type audit and tiered confidence summary." },
+        "clarity":       { "score": 5, "evidence": "610 words, tight, scannable. Reads end-to-end quickly; supported-vs-not-supported lists are the clearest version of that distinction in either response." },
+        "actionability": { "score": 4, "evidence": "Recommendation differentiated by user type (already taking / starting for cognition / vegetarian or older). Points to Prokopidis, Forbes, Xu, EFSA, examine.com. Missing explicit self-trial protocol and dose specifics that with-skill provides." }
+      }
+    }
+  }
+}

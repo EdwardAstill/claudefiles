@@ -1,0 +1,69 @@
+{
+  "note": "Each grade is a separate 1-5 judgement per (eval, condition, criterion), with a 1-2 sentence evidence string. Scores anchored against the evals.json reference_answer.",
+  "grades": {
+    "architecture-layers-af-cli": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All reference facts present: _SUBCOMMANDS registry, _run() intercepts for install/research, per-module Typer app pattern, install.py click-vs-Typer distinction, and the domain/infra split. No technical errors — even notes __init__.py and the module count." },
+        "completeness":  { "score": 5, "evidence": "Covers all 5 layers with an explicit table, per-layer in/out contract, execution flow, 5 named abstractions, a concrete 'add a subcommand' checklist, 3 pitfalls including the silent ModuleNotFoundError guard and the dual-registry (_SUBCOMMANDS + manifest.toml) gotcha." },
+        "structure":     { "score": 5, "evidence": "Follows the skill's 5-step process (orient, layers, execution path, abstractions, summary + stop). Uses table for layers and a numbered execution path; sections are labeled as per the skill methodology." },
+        "clarity":       { "score": 4, "evidence": "Dense but well-paced. The layer-2 file list (2b) is a long comma-separated list that reads slower than the rest of the response; everything else is tight." },
+        "actionability": { "score": 5, "evidence": "Concrete 'add a subcommand' checklist with four steps, pitfalls section names the two-registry gotcha, and the 'when to stop' section gives three actionable questions the reader can now answer." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 5, "evidence": "Core facts are all correct: dispatcher pattern, _SUBCOMMANDS list, _run() intercept, per-module Typer app, install.py click not Typer. No technical errors." },
+        "completeness":  { "score": 3, "evidence": "Covers the main structure and names the layers informally, but misses: no per-layer in/out contract, no explicit call to manifest.toml as the second registry, no pitfalls section, no 'when to stop' checklist. Closer to a summary than a mental model." },
+        "structure":     { "score": 4, "evidence": "Clear section headers (entry, subcommand modules, domain, infrastructure, adding a subcommand) but flat — no table, no execution-path numbering, no explicit fork points." },
+        "clarity":       { "score": 5, "evidence": "Short, skimmable, no filler. Would let someone orient in under a minute." },
+        "actionability": { "score": 4, "evidence": "The 'add a subcommand' 4-step checklist is concrete and matches the reference. Missing: pitfalls callout (the silent-swallow of missing `app`, the dual-registry requirement)." }
+      }
+    },
+    "trace-plan-exec-path": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All 15 numbered steps match the code: Typer dispatch, _load_or_die, yaml.safe_load, _coerce_node recursion, 7-invariant validator (enumerated a-g), Kahn's algorithm twice, StateFile semantics, JSON-line handoff. Correctly flags that dispatch does NOT happen here (phase 2C disclaimer in module docstring)." },
+        "completeness":  { "score": 5, "evidence": "Covers all 5 forks (verb, repo_root, interactive, state-presence, cycle short-circuit), all external-call categories (reads, writes, absence of network/subprocess/git), VALID enums, 5 named abstractions, hook integration as orthogonal, and a 'when to stop' with 3 answerable questions." },
+        "structure":     { "score": 5, "evidence": "Follows the 5-step skill layout with a layers table, numbered execution path, explicit fork enumeration, abstractions list, and stop criteria. The phase-2A/phase-2C disclaimer is surfaced up-front where it belongs." },
+        "clarity":       { "score": 4, "evidence": "The numbered execution path at 15 steps with letter-suffix sub-invariants is dense and takes reading to scan. No filler but a lot of information per paragraph." },
+        "actionability": { "score": 5, "evidence": "The fork enumeration, external-call categorization, and 3 'when to stop' worked examples give the reader concrete answers without further research." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "Core flow correct. Does surface the important phase-2A disclaimer. Minor gaps: doesn't enumerate the 7 validator invariants individually (groups them), and the validate vs toposort cycle-detection asymmetry is not called out." },
+        "completeness":  { "score": 3, "evidence": "Names the key subcommands and forks but sparsely: 'fork points' gets one sentence, external calls get one sentence, abstractions aren't named individually. No 'when to stop' and no per-command data-transform breakdown." },
+        "structure":     { "score": 3, "evidence": "Numbered list covers the primary path, then a short paragraph per other subcommand, a 'where it stops' note, and a one-line external-calls summary. Flat — no table, no abstractions layer, no fork enumeration." },
+        "clarity":       { "score": 5, "evidence": "Short and readable. Reader can get the shape of the flow fast." },
+        "actionability": { "score": 3, "evidence": "Knows where things are, but a reader who needs to extend validation or add a new command would have to derive the 7 invariants from the code themselves. No worked 'where would I add X' examples." }
+      }
+    },
+    "abstractions-hooks-system": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "All 5 abstractions accurate with precise details: TypedDict total=False semantics, parse() fail-safe guarantee, hooks.json matcher scoping (Bash vs .*), uv-run script contract, 5MB rolling vs 7-day retention, escalation rule encoded on literal 'manager'/'executor'. Matches reference answer almost verbatim on facts." },
+        "completeness":  { "score": 5, "evidence": "All 5 abstractions defined with file, shape, purpose, and 3+ consumers. Adds an execution-path section showing how they compose, an additional-observations section (fail-safe, async/sync, matcher cost, two installers), and 3 pitfalls with concrete examples." },
+        "structure":     { "score": 5, "evidence": "5-step skill process followed, each abstraction has a consistent sub-structure (defines / shape / for / consumers), then a composition section and a stop-criteria section. Very scannable." },
+        "clarity":       { "score": 4, "evidence": "Information-dense. The abstraction 4 (logging pipeline) packs layer1/layer2/state/cleanup/rotation into one sub-section; readable but requires attention." },
+        "actionability": { "score": 5, "evidence": "3 'when to stop' worked examples include the non-obvious 'rename hook_types.py' pitfall. Concrete pitfalls list names the escalation-rule string-literal gotcha." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "All 5 abstractions correctly identified. Minor compression: doesn't explicitly state the parse()-returns-{}-never-raises invariant, doesn't mention that matcher Bash is only on safety-gate, and the escalation rule isn't surfaced." },
+        "completeness":  { "score": 3, "evidence": "Names each abstraction and one file per, but consumers are 1-2 names only, no shape-level detail (TypedDict names, retention values, log paths). No composition section, no pitfalls, no 'when to stop'." },
+        "structure":     { "score": 4, "evidence": "Consistent numbered abstractions, each with a short paragraph. Clean but lacks sub-structure (defines / shape / for / consumers) and lacks the composition section." },
+        "clarity":       { "score": 5, "evidence": "Very readable, no padding." },
+        "actionability": { "score": 3, "evidence": "A reader now knows the 5 abstractions exist, but wouldn't know e.g. that renaming hook_types.py breaks stdlib imports, or that the escalation rule is hardcoded to specific skill names. Must dig into the code for the gotchas." }
+      }
+    },
+    "where-to-change-skill-loading": {
+      "with_skill": {
+        "correctness":   { "score": 5, "evidence": "Correctly identifies the critical reframe: agentfiles has no runtime skill-loader — Claude Code reads SKILL.md directly, so the installer is the touch point. All file/function targets correct (manifest.toml, _parse_manifest, _discover_all_skills, _fetch_remote_skill, find_repo_root in includes.py, _find_skills_root in skill_find.py). Correctly notes plan_exec does NOT need changes." },
+        "completeness":  { "score": 5, "evidence": "10 ordered steps covering every layer, plus tests (5 test cases named), docs (3 files), security (4 options with a pragmatic default), and a CLI-surface section. Includes 'when to stop' with 4 answerable questions. Option (a) vs (b) decision framework for includes." },
+        "structure":     { "score": 5, "evidence": "Follows the 5-step skill layout: orient (with the critical reframe up-front), layers table, ordered change list with why/change-type per entry, cross-cutting concerns grouped, summary + stop criteria. Layer table + numbered list + stop criteria all present." },
+        "clarity":       { "score": 4, "evidence": "Dense but well-paced. The 10-item change list is long but each entry has a consistent Why/Change-type structure that keeps it scannable. Security and CLI subsections could be tighter." },
+        "actionability": { "score": 5, "evidence": "Order of touch is explicit, pseudocode for _fetch_remote_skill is given, test cases enumerated, security options listed with pragmatic default, CLI flag suggestions concrete. Reader could start writing the patch immediately." }
+      },
+      "without_skill": {
+        "correctness":   { "score": 4, "evidence": "All primary files identified correctly: manifest.toml, install.py (_parse_manifest, _discover_all_skills), includes.py, skill_find.py. Correctly flags plan_exec doesn't need changes. Does not explicitly call out that agentfiles has no runtime loader — leaves this implicit." },
+        "completeness":  { "score": 3, "evidence": "Covers the major touches but briefly. No ordering rationale ('entry point is manifest.toml'), no pseudocode, security is one bullet, no test case enumeration, no worked 'when to stop' examples. Option (a) vs (b) for includes not surfaced." },
+        "structure":     { "score": 4, "evidence": "Five numbered file sections plus cross-cutting concerns plus one-line order. Clean but no layers table, no explicit design-anchor callout." },
+        "clarity":       { "score": 5, "evidence": "Short, every bullet is direct." },
+        "actionability": { "score": 3, "evidence": "Names the files but a reader writing the patch would have to derive the fetch-then-discover ordering, the cache path convention, and the checksum-as-pragmatic-default themselves. No pseudocode, no test cases named." }
+      }
+    }
+  }
+}

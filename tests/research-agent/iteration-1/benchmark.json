@@ -1,0 +1,59 @@
+{
+  "skill_name": "research-agent",
+  "skill_path": "agentfiles/research/research-agent/SKILL.md",
+  "iteration": 1,
+  "evals_run": [
+    "tdd-empirical-evidence",
+    "microservices-vs-modular-monolith",
+    "rust-vs-go-network-services",
+    "creatine-cognition-healthy-adults"
+  ],
+  "per_criterion_averages": {
+    "with_skill": {
+      "correctness": 5.00,
+      "completeness": 5.00,
+      "structure": 5.00,
+      "clarity": 4.00,
+      "actionability": 5.00,
+      "total": 24.00
+    },
+    "without_skill": {
+      "correctness": 4.75,
+      "completeness": 3.25,
+      "structure": 4.00,
+      "clarity": 5.00,
+      "actionability": 4.00,
+      "total": 21.00
+    },
+    "delta": {
+      "correctness": 0.25,
+      "completeness": 1.75,
+      "structure": 1.00,
+      "clarity": -1.00,
+      "actionability": 1.00,
+      "total": 3.00
+    }
+  },
+  "per_eval_totals": {
+    "tdd-empirical-evidence":              { "with_skill": 24, "without_skill": 20, "delta": 4 },
+    "microservices-vs-modular-monolith":   { "with_skill": 24, "without_skill": 21, "delta": 3 },
+    "rust-vs-go-network-services":         { "with_skill": 24, "without_skill": 22, "delta": 2 },
+    "creatine-cognition-healthy-adults":   { "with_skill": 24, "without_skill": 21, "delta": 3 }
+  },
+  "token_cost": {
+    "note": "Estimated from word count (words * 1.35). Response-only; prompt side not counted.",
+    "with_skill":    { "total_tokens_estimated": 6914, "mean_tokens_per_response": 1728 },
+    "without_skill": { "total_tokens_estimated": 3392, "mean_tokens_per_response":  848 },
+    "delta_tokens_per_response": 880
+  },
+  "efficiency": {
+    "tokens_per_rubric_point": {
+      "with_skill":    72.0,
+      "without_skill": 40.4,
+      "delta":         31.6
+    },
+    "interpretation": "With-skill responses are ~2.0x more verbose per response; on a per-rubric-point basis the multiplier narrows to ~1.8x because the with-skill responses also score higher. Clarity is the only criterion where without-skill wins (brevity advantage). Correctness nearly ties at ceiling because the no-skill baseline handles these questions well given the model's general knowledge — the real separation is on completeness and actionability."
+  },
+  "verdict": "recommend",
+  "rationale": "Total delta +3.00 / 25, driven by completeness (+1.75), structure (+1.00), and actionability (+1.00); correctness barely separates (+0.25) because both conditions recover the main facts. Clarity is -1.00 against the skill due to ~2x verbosity. The skill's structured output format (claim-type audit, consensus/nuances/contradictions blocks, explicit confidence tiers, steelman of alternatives) adds defensible rigor that is valuable specifically when the user needs to act on contested claims or relay the reasoning to others — the modal trigger for this skill. For casual one-shot research, the without-skill responses are correct, tight, and faster to read, so the cost is real. Recommend activating for contested / multi-source / decision-support queries; the ~880 extra tokens per response is justified by the completeness and actionability gains, which are the criteria that most translate to user-facing value for this skill."
+}

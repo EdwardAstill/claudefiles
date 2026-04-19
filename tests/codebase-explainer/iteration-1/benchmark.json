@@ -1,0 +1,61 @@
+{
+  "skill_name": "codebase-explainer",
+  "skill_path": "agentfiles/research/codebase-explainer/SKILL.md",
+  "iteration": 1,
+  "target_repo": "/home/eastill/projects/agentfiles",
+  "evals_run": [
+    "architecture-layers-af-cli",
+    "trace-plan-exec-path",
+    "abstractions-hooks-system",
+    "where-to-change-skill-loading"
+  ],
+  "per_criterion_averages": {
+    "with_skill": {
+      "correctness":   5.00,
+      "completeness":  5.00,
+      "structure":     5.00,
+      "clarity":       4.00,
+      "actionability": 5.00,
+      "total":        24.00
+    },
+    "without_skill": {
+      "correctness":   4.25,
+      "completeness":  3.00,
+      "structure":     3.75,
+      "clarity":       5.00,
+      "actionability": 3.25,
+      "total":        19.25
+    },
+    "delta": {
+      "correctness":    0.75,
+      "completeness":   2.00,
+      "structure":      1.25,
+      "clarity":       -1.00,
+      "actionability":  1.75,
+      "total":          4.75
+    }
+  },
+  "per_eval_totals": {
+    "architecture-layers-af-cli":      { "with_skill": 24, "without_skill": 21, "delta": 3 },
+    "trace-plan-exec-path":            { "with_skill": 24, "without_skill": 18, "delta": 6 },
+    "abstractions-hooks-system":       { "with_skill": 24, "without_skill": 19, "delta": 5 },
+    "where-to-change-skill-loading":   { "with_skill": 24, "without_skill": 19, "delta": 5 }
+  },
+  "token_cost": {
+    "note": "Estimated from word count (words * 1.35). Response-only; prompt side not counted.",
+    "with_skill":    { "total_tokens_estimated": 6396, "mean_tokens_per_response": 1599, "words_per_response": [898, 1155, 1338, 1347] },
+    "without_skill": { "total_tokens_estimated": 1539, "mean_tokens_per_response":  385, "words_per_response": [293, 277, 337, 233] },
+    "delta_tokens_per_response": 1214
+  },
+  "efficiency": {
+    "tokens_per_rubric_point": {
+      "with_skill":    66.6,
+      "without_skill": 20.0,
+      "delta":         46.6
+    },
+    "marginal_tokens_per_marginal_rubric_point": 255.6,
+    "interpretation": "With-skill is ~4.2x more verbose per rubric point but wins strictly on 4 of 5 criteria (correctness, completeness, structure, actionability). Clarity is the sole loss, driven entirely by verbosity — the without-skill answers read fast because they are short, not because they convey the material better."
+  },
+  "verdict": "recommend",
+  "rationale": "Consistent +3 / +5 / +5 / +6 eval-level deltas across architecture mapping, execution tracing, abstraction surfacing, and change-scoping — the three skill pillars plus a cross-cutting change question. The +4.75/25 aggregate delta is identical to the dsa-expert iteration-1 run, a useful calibration. The with-skill responses consistently (a) open with a 'critical reframe' up-front (e.g., plan_exec does NOT dispatch; agentfiles has no runtime loader) that the without-skill answers bury or omit, (b) carry a fork-point enumeration that a reader can rely on, and (c) end with a 'when to stop' stop-criteria section answering concrete 'where would I add X / what breaks / what depends on Y' questions. Token overhead is real (~4.2x per response) but the target use case — onboarding to an unfamiliar repo — is a one-shot cost that produces reusable documentation, so the verbosity is appropriate. The narrowest eval-level delta (+3 on architecture-layers) is the one where the without-skill answer was already very strong on correctness (5/5) and clarity (5/5); the skill's gain there comes from completeness and actionability pitfalls, which the baseline agent would typically need a follow-up to surface."
+}
