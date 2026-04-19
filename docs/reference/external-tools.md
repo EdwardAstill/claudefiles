@@ -34,7 +34,7 @@ This registry lists external CLI tools and services that `agentfiles` uses for i
 |------|---------|---------|---------------|
 | `foxpilot` | Browser automation (all browser tasks) | `uv tool install /home/eastill/projects/foxpilot` | `~/projects/foxpilot` |
 | `geckodriver` | Firefox WebDriver bridge for foxpilot | `sudo pacman -S geckodriver` | [Mozilla](https://github.com/mozilla/geckodriver) |
-| `Playwright` | Backend for `af screenshot` | `npm install -g playwright` | [Website](https://playwright.dev/) |
+| `Playwright` | Backend for [`shotty`](https://github.com/EdwardAstill/shotty) (browser screenshots) | `npm install -g playwright` | [Website](https://playwright.dev/) |
 | `Tailwind CSS` | Utility-first CSS framework | — | [Website](https://tailwindcss.com/) |
 | `shadcn/ui` | Accessible component library | `npx shadcn@latest init` | [Website](https://ui.shadcn.com/) |
 

@@ -81,9 +81,9 @@ Read the screenshot to see the actual rendered page.
 2. **Capture multiple viewports** — responsive behavior matters
 
 ```bash
-# af screenshot for local dev server viewport capture
-af screenshot http://localhost:3000 --width 1440 --height 900 --out /tmp/site-desktop.png
-af screenshot http://localhost:3000 --mobile --out /tmp/site-mobile.png
+# shotty for local dev server viewport capture
+shotty http://localhost:3000 --width 1440 --height 900 --out /tmp/site-desktop.png
+shotty http://localhost:3000 --mobile --out /tmp/site-mobile.png
 ```
 
 3. **Inspect the DOM** — understand structure, not just appearance
@@ -785,7 +785,7 @@ components from `npx shadcn@latest info` — don't import what isn't there.
 ## Phase 4 — Screenshot Verification
 
 ```bash
-af screenshot http://localhost:3000
+shotty http://localhost:3000
 ```
 
 Use Read on the PNG path to view it visually. If output doesn't match:
@@ -891,7 +891,7 @@ grid gap-4 sm:grid-cols-2 lg:grid-cols-3
 | Importing from `shadcn/ui` npm | Import from `@/components/ui/` — it's local |
 | Fixed px widths | Use `max-w-*`, `container`, responsive prefixes |
 | No mobile layout | Always add `sm:` / `md:` breakpoints in spec |
-| Skipping screenshot verification | Run `af screenshot` after implementation — trust your eyes |
+| Skipping screenshot verification | Run `shotty` after implementation — trust your eyes |
 | Describing designs in text | Use preview server — visual beats verbal |
 | Guessing colors from a reference site | Use `getComputedStyle()` to extract actual values |
 | Analyzing only the homepage | Ask which pages to analyze — forms, settings, empty states differ |
