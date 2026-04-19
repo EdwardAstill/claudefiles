@@ -8,6 +8,7 @@ docs/skills-drafts/. 'promote' only prints shell commands — never moves files.
 from __future__ import annotations
 
 import json
+import os
 import re
 from collections import Counter
 from datetime import datetime, timezone
@@ -31,8 +32,11 @@ WRITEY = {"Write", "Edit", "replace"}
 def _session_files() -> list[Path]:
     if not SESSION_LOG_DIR.exists():
         return []
-    return sorted(SESSION_LOG_DIR.glob("session-*.jsonl"),
-                  key=lambda f: f.stat().st_mtime, reverse=True)
+    # Exclude the currently-active session (mid-write, moving target).
+    active_sid = os.environ.get("CLAUDE_SESSION_ID", "").strip()
+    active_name = f"session-{active_sid}.jsonl" if active_sid else ""
+    files = [p for p in SESSION_LOG_DIR.glob("session-*.jsonl") if p.name != active_name]
+    return sorted(files, key=lambda f: f.stat().st_mtime, reverse=True)
 
 
 def _load(path: Path) -> list[dict]:
@@ -92,7 +96,13 @@ def _step(e: dict) -> str:
 
 
 _DATE_PREFIX = re.compile(r"^\d{4}-\d{2}-\d{2}-")
-_STOP_TOKENS = {"ls", "cat", "cd", "rm", "mv", "cp", "wc", "echo", "grep", "head", "tail"}
+_STOP_TOKENS = {
+    "ls", "cat", "cd", "rm", "mv", "cp", "wc", "echo", "grep", "head", "tail",
+    # Shell redirection fragments: both fused (2>/dev/null) and split
+    # (after whitespace-split: '2', '>', '/dev/null') forms.
+    "2>", ">/dev/null", "2>/dev/null", "2>&1", ">&1", ">&2", "&>", "&>/dev/null",
+    ">", "<", "|", "&", "2", "1", "dev", "null",
+}
 # Generic stem names that leak directory context rather than topic content.
 _GENERIC_STEMS = {
     "skill", "readme", "index", "__init__", "init", "main", "agents",
@@ -169,6 +179,20 @@ def _title(entries: list[dict], idx: list[int]) -> tuple[str, str]:
                 if tok.startswith("-"):
                     continue
                 if low in _STOP_TOKENS:
+                    continue
+                # Apply the same noise-cleanup used for slugs to the raw title
+                # text — stops path fragments ('/home/user/projects/foo') and
+                # redirection garbage ('2>/dev/null') leaking into the
+                # description field.
+                if "/" in tok or tok.startswith((".", "~")):
+                    # Treat as path: keep only a meaningful basename stem.
+                    stem = _clean_stem(tok)
+                    if stem and stem.lower() not in _PATH_NOISE:
+                        kw.append(stem)
+                    if len([k for k in kw if k]) >= 2:
+                        break
+                    continue
+                if low in _PATH_NOISE:
                     continue
                 kw.append(tok)
                 if len([k for k in kw if k]) >= 2:
