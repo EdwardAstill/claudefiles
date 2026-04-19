@@ -1,10 +1,18 @@
 ---
 name: infrastructure-expert
 description: >
-  Use when writing Dockerfiles, docker-compose configs, Kubernetes manifests,
-  Terraform or Pulumi IaC, cloud configuration (AWS/GCP), or Nginx and reverse
-  proxy setups. Covers containerization, orchestration, infrastructure-as-code,
-  and deployment configuration. Medium-priority — invoke for any infra work.
+  Use for Dockerfiles, docker-compose, Kubernetes manifests, Terraform or
+  Pulumi, cloud configuration (AWS/GCP/Azure), and reverse-proxy setup
+  (Nginx, Caddy). Trigger phrases: "write a Dockerfile for this", "my
+  container won't build", "set up docker-compose for dev", "write the
+  k8s Deployment manifest", "Terraform module for X", "configure Nginx
+  as a reverse proxy", "deploy this to AWS/GCP", "my pod keeps
+  OOMKilled", "add an Ingress", "multi-stage build for smaller image".
+  Produces reproducible, minimal, version-controlled infrastructure. Do
+  NOT use for GitHub Actions workflow YAML (use github-actions-expert),
+  database server tuning (use database-expert), application-level
+  security (use security-review), or app code performance (use
+  performance-profiling).
 ---
 
 # Infrastructure Expert

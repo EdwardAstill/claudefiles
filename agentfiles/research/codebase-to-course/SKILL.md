@@ -1,16 +1,19 @@
 ---
 name: codebase-to-course
 description: >
-  Turn any codebase into a self-contained interactive HTML course that
-  teaches how the code works to non-engineers. Use when the user says
-  "turn this repo into a course", "make a tutorial from this codebase",
-  "explain this project interactively", "teach me this code", "build a
-  walkthrough from this repo", or "codebase as a course". Produces a
-  directory with styled HTML/CSS/JS that opens in a browser with zero
-  setup — scroll-based modules, embedded mermaid diagrams, quizzes, and
-  plain-English side-by-side code translations. Complements
-  codebase-explainer (which produces a markdown architecture summary for
-  engineers); this skill produces a teaching artefact for vibe coders.
+  Use when turning a codebase into a self-contained interactive HTML course
+  that teaches non-engineers (vibe coders, collaborators, portfolio readers)
+  how the code works. Trigger phrases: "turn this repo into a course", "make
+  a tutorial from this codebase", "explain this project interactively", "teach
+  me this code", "build a walkthrough from this repo", "codebase as a course",
+  "onboard non-devs to this project", "make a scroll-through explainer for
+  this app", "generate a zero-setup HTML lesson for this repo", "teach a vibe
+  coder how this works". Produces a directory of styled HTML/CSS/JS with
+  scroll-based modules, mermaid diagrams, quizzes, and side-by-side
+  plain-English code translations. Do NOT use for an engineer-facing markdown
+  architecture summary (use codebase-explainer), for runnable Python/JSX docs
+  in a readrun folder (use readrun), or for library API reference (use
+  docs-agent).
 ---
 
 # codebase-to-course

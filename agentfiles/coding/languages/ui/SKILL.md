@@ -1,11 +1,18 @@
 ---
 name: ui-expert
 description: >
-  Use for building, iterating on, or reviewing UI — React, Tailwind, shadcn/ui,
-  responsive layouts, or visual verification. Three modes: (1) analyze a URL to
-  extract design patterns; (2) produce a component spec from mockups; (3) hand off
-  a spec to typescript-expert. ui-expert owns how it looks; typescript-expert owns
-  the code. Also for screenshot verification.
+  Use for web UI design, layout, or review in the React + Tailwind +
+  shadcn/ui stack — including visual verification via screenshots.
+  Trigger phrases: "design a UI for this", "analyze this site's design
+  and mimic it", "build this from the mockup", "pick shadcn components
+  for X", "Tailwind classes for this layout", "make this responsive",
+  "does the rendered page match the design", "take a screenshot and
+  verify", "spec out the component from this Figma", "review this UI
+  for visual polish". Three modes: analyze a URL, spec from mockups,
+  hand off to typescript-expert for implementation. Do NOT use for
+  writing the TypeScript/JSX itself (use typescript-expert), terminal
+  UI (use tui-expert or storm-tui), or accessibility-specific audits
+  (use accessibility).
 ---
 
 # UI Expert

@@ -1,9 +1,17 @@
 ---
 name: using-agentfiles
 description: >
-  Use when starting any conversation — establishes how skills work, the default
-  routing rule (executor for new tasks), and when to invoke specialist skills.
-  Follow-up messages within ongoing work do not re-invoke executor.
+  Use at session start as the primer that establishes how skills work, the
+  default routing rule (executor for every new task), and the new-task vs
+  follow-up distinction. Trigger phrases: "session start", "hello",
+  "beginning of a new conversation", "how do skills work here", "what's the
+  default routing", "how do I use agentfiles", "remind me the rules",
+  "onboard me to this skill system", "what should I invoke first", "primer".
+  Fires automatically at conversation start; follow-up messages within an
+  ongoing task do NOT re-invoke it. Do NOT use once a task is already
+  underway (use executor for a genuinely new task), for browsing the skill
+  list (use skill-catalog), or for installing skills (use
+  agentfiles-manager).
 ---
 
 # Using Agentfiles

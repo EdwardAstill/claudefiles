@@ -1,8 +1,15 @@
 ---
 name: skill-catalog
 description: >
-  Use when the user wants to see all available agentfiles skills. Lists the full
-  skill catalog grouped by category with invocation names and use cases.
+  Use when the user wants to browse the full list of available agentfiles
+  skills. Trigger phrases: "what skills are available", "list all skills",
+  "show me the skill catalog", "what can agentfiles do", "which skills exist",
+  "browse the skill tree", "give me the full skill list", "what are all the
+  skills I can invoke", "show me the catalogue", "what skills ship with
+  agentfiles". Renders the catalog grouped by category with invocation names
+  and one-line use cases. Do NOT use for viewing only installed skills in the
+  current project (use agentfiles-manager), for writing a new skill (use
+  writing-skills), or for manifest-consistency checks (use audit).
 ---
 
 # agentfiles Skills

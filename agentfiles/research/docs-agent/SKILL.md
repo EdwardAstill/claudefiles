@@ -1,11 +1,17 @@
 ---
 name: docs-agent
 description: >
-  Technical reference lookup specialist. Answers "how do I use X?" — exact API
-  signatures, config options, working code examples. Use when you need current
-  documentation for a library, framework, SDK, API, or CLI tool. NOT for "should
-  I use X?" (research-agent) or "how does this codebase work?" (codebase-explainer).
-  Searches web docs and leverages context7 for versioned library docs.
+  Use when the user needs exact API reference, config options, or a working
+  code example for a specific library, framework, SDK, or CLI tool. Trigger
+  phrases: "how do I use X", "what's the correct API for Y", "show me the
+  config options for Z", "give me a working example of W", "has this function
+  signature changed", "what version introduced this", "docs for library X",
+  "syntax for this CLI flag", "what parameters does this accept", "I need the
+  exact call signature". Pulls current docs via context7 for versioned library
+  lookups and falls back to web search. Do NOT use when the user is choosing
+  between options or weighing trade-offs (use research-agent), understanding
+  an unfamiliar repo (use codebase-explainer), or designing an API contract
+  from scratch (use api-architect).
 ---
 
 # Docs Agent

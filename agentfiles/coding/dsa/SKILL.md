@@ -1,11 +1,17 @@
 ---
 name: dsa-expert
 description: >
-  Data structures and algorithms expert. Use for choosing between data structures
-  (hash map vs trie, BTree vs skip list), analyzing complexity, designing efficient
-  solutions, or implementing classic algorithms. Triggers on complexity questions,
-  algorithm selection, search/sort/graph problems, or any situation where the right
-  choice materially affects correctness or performance.
+  Use when picking a data structure or algorithm, or analyzing complexity.
+  Trigger phrases: "hash map or trie", "BTree vs skip list", "what's the
+  Big-O of this", "is there a better algorithm for X", "this needs to be
+  O(log n)", "how should I represent this graph", "which sort do I want
+  here", "LRU cache implementation", "how do I do top-K efficiently",
+  "algorithmic approach for this problem". Works in pseudocode by
+  default; hands off to python-expert, rust-expert, or
+  typescript-expert for production implementation. Do NOT use for SQL
+  query planning (use database-expert), profiling already-slow code
+  before you know what's wrong (use performance-profiling), or system
+  topology decisions (use system-architecture-expert).
 ---
 
 # Data Structures & Algorithms Expert

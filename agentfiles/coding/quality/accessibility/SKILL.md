@@ -1,10 +1,16 @@
 ---
 name: accessibility
 description: >
-  Use when building or reviewing web UI for accessibility compliance. Covers
-  WCAG 2.1 AA, semantic HTML, ARIA attributes, keyboard navigation, screen
-  reader testing, and color contrast requirements. Tools: axe-core, Lighthouse.
-  Low-priority — invoke when a11y is the stated requirement or during UI review.
+  Use when building or reviewing web UI against WCAG 2.1 AA —
+  semantic HTML, ARIA, keyboard navigation, screen-reader support, and
+  color contrast. Trigger phrases: "make this accessible", "a11y audit
+  this component", "keyboard nav isn't working", "screen reader can't
+  find the label", "ARIA attributes for this widget", "color contrast
+  check", "WCAG compliance for X", "run axe-core on this page",
+  "Lighthouse a11y score", "set up a11y tests in CI". Do NOT use for
+  backend/API work (no UI surface), CLI tool accessibility (different
+  concerns), visual design / layout decisions (use ui-expert), or UI
+  rendering performance (use performance-profiling).
 ---
 
 # Accessibility

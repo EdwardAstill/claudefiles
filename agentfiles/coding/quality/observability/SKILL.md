@@ -1,10 +1,19 @@
 ---
 name: observability
 description: >
-  Use when adding structured logging, distributed tracing (OpenTelemetry),
-  metrics instrumentation, or alerting to an application. Covers the three
-  pillars of observability: logs, traces, and metrics. Not for print debugging.
-  Low-priority — invoke when observability is the stated task.
+  Use for structured logging, distributed tracing (OpenTelemetry),
+  metrics instrumentation, and alerting rules in an application.
+  Trigger phrases: "add structured logging to X", "instrument with
+  OpenTelemetry", "add a span around this call", "emit a counter /
+  histogram / gauge for Y", "set up an alert for error rate", "trace
+  this request end-to-end", "replace print statements with logs",
+  "debug a prod issue I can't reproduce locally", "ship logs to Loki /
+  ELK / CloudWatch", "design alert thresholds for this service". Do
+  NOT use for local-only debugging with breakpoints (use
+  systematic-debugging), CPU/memory profiling (use
+  performance-profiling), host-level uptime monitoring (use
+  infrastructure-expert), or compliance/audit logging (use
+  security-review).
 ---
 
 # Observability

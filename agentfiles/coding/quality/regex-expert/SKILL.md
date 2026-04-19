@@ -1,11 +1,17 @@
 ---
 name: regex-expert
 description: >
-  High-performance codebase manipulation using regex. Use when you need to
-  perform mass search and replace, refactor symbol names across many files,
-  or clean up structured data. Leverages `sd` for intuitive find/replace
-  and `ripgrep` (rg) for lightning-fast multi-file search. Much safer and
-  faster than `sed` or custom Python scripts for text manipulation.
+  Use for mass search-and-replace or regex-driven text manipulation
+  across a codebase, using `sd` and `ripgrep` (rg). Trigger phrases:
+  "rename X to Y across the repo", "find every occurrence of this
+  pattern", "mass search and replace", "refactor this symbol name
+  everywhere", "strip these imports from every file", "convert this
+  regex for sd", "write a ripgrep pattern for X", "clean up this
+  structured text", "migrate all calls from old API to new", "one-shot
+  codemod with sd/rg". Do NOT use for language-aware refactoring that
+  needs AST understanding (use the relevant language expert with LSP),
+  deliberate multi-step pattern refactoring (use refactoring-patterns),
+  or general cleanup of recent code (use simplify).
 ---
 
 # Regex Expert

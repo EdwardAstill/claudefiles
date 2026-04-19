@@ -1,14 +1,19 @@
 ---
 name: constraint-solver
 description: >
-  Take a natural-language problem (scheduling, packing, assignment,
-  timetable, cryptarithm, graph-colouring, puzzle) and produce a runnable
-  solver. Encode to OR-Tools CP-SAT (for large combinatorial / optimisation
-  problems) or Z3 (for exact logical / arithmetic constraints). Always
-  report the encoding choice, the model's decision variables, each
-  constraint in plain English, the returned solution, and alternative
-  solutions when asked. Use when the problem can be stated declaratively
-  ("I need X such that Y") rather than procedurally.
+  Use when the user describes a declarative "find X such that Y" problem —
+  scheduling, assignment, packing, timetabling, graph-colouring,
+  cryptarithms, small routing, or mixed logic+arithmetic satisfaction.
+  Trigger phrases: "solve this scheduling problem", "assign N tasks to M
+  people", "pack these items into bins", "timetable these shifts", "find all
+  solutions where...", "encode this to OR-Tools", "use Z3 to prove", "is this
+  satisfiable", "optimise this assignment", "route over these N cities".
+  Encodes to OR-Tools CP-SAT (combinatorial / optimisation) or Z3 SMT (exact
+  arithmetic, find-all-models) and returns variables, constraints in plain
+  English, and the solution. Do NOT use for continuous optimisation or ML
+  fits (out of scope — SciPy / CVXPY), for generating puzzles with
+  uniqueness guarantees (use logic-puzzle-designer), or for writing a
+  procedural algorithm from scratch (use dsa-expert).
 ---
 
 # constraint-solver

@@ -1,10 +1,19 @@
 ---
 name: refactoring-patterns
 description: >
-  Use when restructuring existing code at scale — not quick cleanups of recent
-  changes (that's simplify), but deliberate large-scale refactoring. Covers
-  strangler fig, extract method, introduce parameter object, replace conditional
-  with polymorphism, parallel change, and other proven patterns. Medium-priority.
+  Use for deliberate large-scale restructuring of existing code — not
+  quick cleanup, but a multi-step transformation that keeps tests green
+  throughout. Trigger phrases: "refactor this module", "apply strangler
+  fig to migrate off X", "extract this method", "break up this god
+  object", "replace this conditional with polymorphism", "introduce a
+  parameter object", "parallel change to swap implementations", "feature
+  work is blocked by structural debt", "split this file into smaller
+  modules", "migrate from pattern A to pattern B without a rewrite". Do
+  NOT use for recently written messy code (use simplify), for code
+  that works and doesn't need to change (leave it alone), for
+  performance (use performance-profiling), for bugs (use
+  systematic-debugging), or for greenfield rewrites (use the strangler
+  fig pattern here instead).
 ---
 
 # Refactoring Patterns

@@ -1,11 +1,20 @@
 ---
 name: health-advisor
 description: >
-  Integrated health coach for diet, exercise, and biochemistry/medication questions.
-  Synthesises across the personal knowledge base to produce action-oriented protocols,
-  not just retrieved summaries. Use when you want a plan, recommendation, or protocol —
-  not just information. Covers nutrition, training, supplementation, hormones, sleep,
-  recovery, and drug/supplement interactions.
+  Use when the user wants an actionable health protocol (diet, training,
+  supplementation, hormonal / recovery / sleep plan) synthesised across the
+  personal knowledge base — not just a retrieved summary. Trigger phrases:
+  "what should I eat for X goal", "build me a training protocol for Y", "how
+  should I stack supplements for Z", "I'm taking X — what should I know",
+  "optimise my recovery", "what does my hormonal profile suggest I change",
+  "give me a cutting / bulking plan", "dose this compound", "how do I
+  periodise my training", "I want a protocol, not just information". Searches
+  the KB first, synthesises across nutrition + training + biochemistry +
+  lifestyle, and emits a numbered protocol with doses, timings, mechanisms,
+  interactions, and evidence tiers. Do NOT use for pure retrieval or
+  note-summarisation (use knowledge-base), for evidence-quality audit of
+  existing beliefs (use kb-critic), or for general open-web research outside
+  the KB (use research-agent).
 ---
 
 # Health Advisor

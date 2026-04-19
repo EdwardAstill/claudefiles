@@ -1,9 +1,15 @@
 ---
 name: agentfiles-manager
 description: >
-  Use when the user wants to set up skills for a project, see what is installed,
-  install or remove skills, or understand their Claude Code skill setup. Also
-  the entry point for new projects — invoke with "set up this project" or /setup.
+  Use when setting up or modifying which skills are installed for a project.
+  Trigger phrases: "set up this project", "/setup", "what skills do I need",
+  "install a skill", "af install", "remove a skill", "uninstall X", "which
+  skills are active here", "af agents", "show installed skills", "bootstrap
+  agentfiles in this repo", "add python-expert to this project". Drives af
+  install / af agents / af setup and maps project descriptions to a curated
+  skill selection. Do NOT use for listing every skill that exists in the repo
+  (use skill-catalog), for writing a new skill (use writing-skills), or for
+  verifying manifest integrity (use audit).
 ---
 
 # Agentfiles Manager

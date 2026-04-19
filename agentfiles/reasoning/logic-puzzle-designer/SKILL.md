@@ -1,13 +1,18 @@
 ---
 name: logic-puzzle-designer
 description: >
-  Generate valid logic puzzles with guaranteed uniqueness and a target
-  difficulty — Sudoku, nonograms, Kakuro, Nurikabe, KenKen, cryptarithms,
-  Slitherlink, ASCII mazes. Use when the user says "make me a puzzle",
-  "generate N Sudokus at hard difficulty", "build a nonogram from this
-  image", "create a cryptarithm". Always verify uniqueness by running the
-  solver to completion; reject puzzles with >1 solution. NOT for solving
-  puzzles the user already has (that's a pure solver task).
+  Use when generating uniquely-solvable logic puzzles at a target difficulty —
+  Sudoku, nonograms, Kakuro, Nurikabe, KenKen, cryptarithms, Slitherlink,
+  Masyu, ASCII mazes. Trigger phrases: "make me a sudoku", "generate N puzzles
+  at hard difficulty", "build a nonogram from this image", "create a
+  cryptarithm whose answer is X", "I need puzzles for a puzzle book", "give me
+  a kakuro", "design a slitherlink", "generate an easy / medium / hard puzzle",
+  "build a logic puzzle where the solution encodes this word". Always runs the
+  solver to confirm exactly one solution and grades difficulty by minimum
+  technique required. Do NOT use for solving a puzzle the user already has
+  (use constraint-solver or dsa-expert directly), for non-deductive word games
+  like crosswords / word-search (needs dictionaries, out of scope), or for
+  designing videogames / board games (use game-designer).
 ---
 
 # logic-puzzle-designer

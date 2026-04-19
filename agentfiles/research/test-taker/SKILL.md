@@ -1,11 +1,19 @@
 ---
 name: test-taker
 description: >
-  Use when given a set of questions to answer using provided reference material.
-  Takes a questions path, an information path, a strictness level (rough-guide,
-  strong-guide, or only-information), and an output path. Produces a single
-  answers.md with all questions answered. For calculation questions (math, physics,
-  etc.) creates and runs Python scripts, including computed output in the answers.
+  Use when the user hands over a question set plus reference material and
+  wants every question answered in one file, with configurable strictness on
+  how closely to follow the source. Trigger phrases: "answer these questions
+  using this material", "take this test for me", "do this problem set against
+  these notes", "answer the quiz from this PDF", "go through these questions
+  with the textbook", "rough-guide / strong-guide / only-information answers
+  for this test", "work through these exam questions", "fill in this question
+  sheet from the provided info", "solve this problem set and show the math",
+  "write up answers for this assignment". Collects questions path,
+  information path, strictness level, and output path; produces `answers.md`
+  plus one executed Python script per calculation question. Do NOT use for
+  open-ended "should I" analysis (use research-agent) or for plain library
+  API lookups (use docs-agent).
 ---
 
 # Test Taker

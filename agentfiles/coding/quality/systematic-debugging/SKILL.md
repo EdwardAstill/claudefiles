@@ -1,11 +1,18 @@
 ---
 name: systematic-debugging
 description: >
-  Use when encountering any bug, test failure, or unexpected behavior — before
-  proposing fixes. Finds root cause through structured investigation: reproduce,
-  trace, hypothesize, test, fix. NOT for writing new tests (tdd) or verifying
-  completed work (verification-before-completion). Use this when something is
-  broken and you don't know why.
+  Use when something is broken and the root cause isn't known yet — bugs,
+  test failures, unexpected behavior, production issues, build breakage.
+  Trigger phrases: "this test is failing", "why is X happening", "there's
+  a bug in Y", "reproduce this and tell me why it's wrong", "trace this
+  flow and find the bug", "intermittent failure — help me pin it down",
+  "the build broke, I don't know why", "this worked yesterday", "hunt
+  down this regression", "integration test is flaky". Enforces
+  reproduce → trace → hypothesize → test → fix with root cause before
+  any patch. Do NOT use for writing new tests for new code (use tdd),
+  for verifying completed work after the fix (use
+  verification-before-completion), or for performance issues on
+  correct code (use performance-profiling).
 next: [verification-before-completion, tdd]
 ---
 

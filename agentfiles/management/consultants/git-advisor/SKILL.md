@@ -1,10 +1,16 @@
 ---
 name: git-advisor
 description: >
-  Use when manager needs to decide git strategy for multi-agent work: whether to use
-  worktrees, branches, or direct commits; PR strategy; commit structure. Single mandate:
-  answer "how should this work be structured in git?" Loaded inline by manager during
-  planning — never dispatched as a subagent.
+  Use when manager is deciding git strategy for multi-agent work. Trigger
+  phrases: "worktree or branch", "should this be a worktree", "branching
+  strategy for this", "how do we structure this in git", "commit directly or
+  PR", "one PR or many", "how should agents share git state", "do parallel
+  agents need isolation", "PR strategy for this plan", "commit structure for
+  this work". Single mandate: answer "how should this work be structured in
+  git?" Loaded inline by manager during planning — never dispatched as a
+  subagent. Do NOT use for whether a plan needs design (use design-advisor),
+  for task parallelisation (use coordination-advisor), or for actually executing
+  a worktree workflow (use git-worktree-workflow).
 ---
 
 # Git Advisor

@@ -1,12 +1,18 @@
 ---
 name: skill-tester
 description: >
-  Tests and evaluates agentfiles skills by running them against hard benchmark
-  questions and grading outputs on a rubric. Use when you want to measure
-  whether a skill adds value, after running `af test-skill <name>`, or when
-  asked to test, evaluate, benchmark, or grade a skill. Triggers on: "test
-  this skill", "does this skill help", "evaluate the skill", "benchmark",
-  "run evals", "grade the skill", or any request to measure skill quality.
+  Use when measuring whether an agentfiles skill actually adds value —
+  running it against hard benchmark questions and grading outputs on a
+  rubric. Trigger phrases: "test this skill", "does this skill help",
+  "evaluate the X skill", "benchmark the skill", "run the evals for
+  X", "grade the skill against the rubric", "did my changes improve
+  the skill", "run af test-skill <name>", "iterate on the skill until
+  it passes", "compare skill vs baseline". Dispatches a subagent (see
+  agentfiles/agents/skill-tester.md) that runs parallel eval +
+  grading, returns a verdict + rubric delta, and writes
+  docs/testing/<skill>.md. Do NOT use for authoring a new skill
+  (write the SKILL.md directly), for general code review (use
+  code-review), or for unit-testing project code (use tdd).
 ---
 
 # Skill Tester (dispatcher)

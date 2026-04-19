@@ -1,10 +1,15 @@
 ---
 name: coordination-advisor
 description: >
-  Use when manager needs to decide how to structure agent teams: which tasks run in
-  parallel vs sequentially, what dependencies exist, how to split complex work across
-  multiple agents. Single mandate: answer "how should agents be coordinated for this
-  plan?" Loaded inline by manager during planning — never dispatched as a subagent.
+  Use when manager is deciding how to structure agent teams for a multi-agent plan.
+  Trigger phrases: "should these run in parallel", "can we parallelise this", "what
+  depends on what", "how do I split this across agents", "map the dependency graph",
+  "which tasks block which", "team composition for this plan", "coordination pattern
+  for this work", "how many agents do I need", "sequence or parallel". Single mandate:
+  answer "how should agents be coordinated for this plan?" Loaded inline by manager
+  during planning — never dispatched as a subagent. Do NOT use for single-agent
+  sequential work (use executor), for whether a plan needs a spec first (use
+  design-advisor), or for git branching strategy (use git-advisor).
 ---
 
 # Coordination Advisor

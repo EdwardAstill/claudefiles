@@ -1,13 +1,17 @@
 ---
 name: game-designer
 description: >
-  Take a game concept and turn it into a concrete, implementable design doc.
-  Use when the user says "design a game about X", "help me with game mechanics",
-  "balance this combat/economy", "pitch me a roguelike / tower defence / puzzle
-  / deckbuilder / …", or wants a prototype spec before any engine is chosen.
-  Works at the systems-design level (MDA, core loop, progression, economy) —
-  not engine code and not narrative prose. Pairs with writing-plans to go from
-  design to implementation.
+  Use when turning a rough game concept into an implementable systems-design
+  doc (pillars, core loop, MDA, progression, economy, MVP scope) before any
+  engine is chosen. Trigger phrases: "design a game about X", "help me with
+  game mechanics", "balance this combat / economy", "what should the core loop
+  be", "pitch me a roguelike / tower defence / deckbuilder", "this mechanic
+  feels shallow", "what's the MVP prototype for this idea", "how do I make
+  this game fun", "design a card game where...", "sketch the progression curve
+  for my game". Produces a design.md handed off to writing-plans. Do NOT use
+  for engine-specific implementation code (use the relevant language skill),
+  for narrative / lore writing (out of scope), or for generating playable
+  logic puzzles with uniqueness proofs (use logic-puzzle-designer).
 ---
 
 # game-designer

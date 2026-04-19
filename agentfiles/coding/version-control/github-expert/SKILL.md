@@ -1,10 +1,17 @@
 ---
 name: github-expert
 description: >
-  GitHub and gh CLI specialist. Use when browsing GitHub repos, reviewing PRs,
-  managing issues, checking Actions/CI status, cloning or forking repos, comparing
-  branches across forks, or any task that involves GitHub — whether for the current
-  project or an external repo. Expert with gh CLI commands and GitHub concepts.
+  Use for any GitHub-hosted operation via the `gh` CLI — PRs, issues,
+  releases, Actions status, browsing/cloning external repos, forks, and
+  cross-fork comparisons. Trigger phrases: "open a PR for this", "what's
+  the status of PR #123", "list open issues", "close this issue", "check
+  the CI status on my branch", "view the latest release", "clone owner/
+  repo", "fork this repo", "search GitHub for repos matching X", "view
+  the diff of this PR in the terminal". Covers the current project's
+  remote and arbitrary external repos. Do NOT use for local git work —
+  branches, merges, worktrees, history (use git-expert), for authoring
+  Actions workflow YAML (use github-actions-expert), or for the full
+  start-to-merge worktree flow (use git-worktree-workflow).
 ---
 
 # GitHub Expert

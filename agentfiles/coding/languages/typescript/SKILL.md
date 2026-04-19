@@ -1,11 +1,17 @@
 ---
 name: typescript-expert
 description: >
-  TypeScript toolchain and conventions specialist. Use when you need
-  typescript-language-server LSP diagnostics, bun/npm tooling, biome linting,
-  or strict typing patterns — the tooling integration the base model doesn't
-  enforce. Covers strict typing, generics, type narrowing, bun/npm tooling,
-  and live code introspection via the typescript-language-server LSP.
+  Use when writing, reviewing, or debugging TypeScript/JavaScript with
+  strict typing, bun/npm tooling, and the typescript-language-server.
+  Trigger phrases: "write this in TypeScript", "tsc is complaining",
+  "fix this type error", "narrow this union", "write a generic for X",
+  "should I use unknown or any", "set up bun for this project", "add a
+  biome config", "strict tsconfig flags for a new project", "this type
+  inference is wrong". Covers strict tsconfig, generics, narrowing,
+  discriminated unions, and LSP-driven fixes. Do NOT use for React/UI
+  design decisions (use ui-expert), TUI design (use tui-expert or
+  storm-tui), npm library API lookup (use docs-agent / context7), or
+  bundler infrastructure (use infrastructure-expert).
 includes:
   - typescript/tsc-strict
 ---

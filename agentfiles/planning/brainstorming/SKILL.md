@@ -1,10 +1,20 @@
 ---
 name: brainstorming
 description: >
-  Use when creating features, adding functionality, building components, or modifying
-  behavior — before any implementation begins. Use when requirements aren't fully
-  defined or the approach isn't decided. Required before touching code for any new
-  feature, regardless of perceived simplicity.
+  Use when starting work on a feature or change where requirements and
+  approach are not fully defined — BEFORE any code, scaffolding, or
+  implementation skill runs. Turns an idea into an approved spec via
+  clarifying-question dialogue, 2-3 alternative approaches, a sectioned
+  design, and a reviewed `docs/specs/YYYY-MM-DD-<topic>-design.md`. Trigger
+  phrases: "I want to build X", "add a feature that does Y", "let's design
+  a new component for Z", "help me figure out how to approach this", "I have
+  an idea but haven't designed it yet", "kick off a new feature", "what
+  should we build here", "brainstorm this with me", "I'm not sure what the
+  requirements are", "start a new project / subsystem". Required before
+  touching code for any new feature, however simple. Do NOT use when an
+  approved spec already exists (use writing-plans), when executing a written
+  plan (use subagent-driven-development), or for pure research / tradeoff
+  analysis with no feature intent (use research-agent).
 next: [writing-plans]
 ---
 

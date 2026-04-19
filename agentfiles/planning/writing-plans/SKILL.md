@@ -1,6 +1,20 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: >
+  Use when an approved spec / requirements doc exists and needs to become a
+  bite-sized, TDD-structured implementation plan — prose markdown at
+  `docs/plans/YYYY-MM-DD-<feature>.md` plus a YAML sidecar when the plan has
+  ≥3 tasks, a human gate, or a loop. Trigger phrases: "write the
+  implementation plan for this spec", "turn this design into tasks", "break
+  this feature into TDD steps", "plan out how to build X from the spec", "I
+  have a spec — what's the plan", "create the plan document", "scaffold tasks
+  for this design", "give me a bite-sized plan", "convert the approved design
+  into a plan", "plan the implementation of <feature>". Runs the plan-document
+  reviewer loop and hands off to subagent-driven-development or
+  executing-plans. Do NOT use when there is no approved spec yet (use
+  brainstorming first), when executing an existing plan (use
+  subagent-driven-development or executing-plans), or for single-edit bugfixes
+  that don't need a multi-step plan.
 next: [subagent-driven-development]
 ---
 

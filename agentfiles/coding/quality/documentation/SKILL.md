@@ -1,12 +1,16 @@
 ---
 name: documentation
 description: >
-  Use when writing, updating, or reviewing project documentation — READMEs,
-  API docs, architecture guides, changelogs, migration guides, or inline code
-  comments. Triggers on: "write docs for this", "update the README", "document
-  this API", "add a changelog entry", "write a migration guide", "this needs
-  better docs", or any task where the primary output is documentation rather
-  than code.
+  Use when the primary output is documentation prose — READMEs, API
+  docs, architecture guides, ADRs, changelogs, migration guides, or
+  module-level comments. Trigger phrases: "write docs for this", "update
+  the README", "document this API", "add a changelog entry", "write a
+  migration guide", "this needs better docs", "write an ADR for this
+  decision", "document how this module works", "rewrite this section
+  clearer", "CONTRIBUTING.md for this repo". Do NOT use for OpenAPI
+  specs of an API being designed (use api-architect), design docs about
+  service topology (use system-architecture-expert), or the code itself
+  (use the relevant language expert).
 ---
 
 # Documentation

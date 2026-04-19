@@ -1,6 +1,18 @@
 ---
 name: verification-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: >
+  Use right before claiming any work is complete, fixed, or passing —
+  mandatory gate before committing, opening a PR, or telling the user
+  you're done. Trigger phrases: "I'm done with X", "this should be
+  fixed", "tests should pass now", "ready to commit", "ready to merge",
+  "let me finish up and move on", "I think that's it", "confirm this
+  works", "about to open a PR", "wrap this task up". Enforces a gate
+  function: identify the proving command → run it fresh in this
+  message → read full output → only then state the claim with
+  evidence. Do NOT use for mid-implementation checks (run tests
+  casually), for debugging an active failure (use
+  systematic-debugging), or as a substitute for code-review or
+  security-review.
 next: [code-review, git-worktree-workflow]
 ---
 

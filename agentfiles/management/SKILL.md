@@ -1,11 +1,17 @@
 ---
 name: management
 description: >
-  Category dispatcher for orchestration and skill system tooling. Use when the
-  task involves single-agent execution (executor), multi-agent coordination (manager),
-  sequential plan execution with review gates (subagent-driven-development),
-  managing installed skills (agentfiles-manager), or authoring a skill (writing-skills).
-  For design and implementation planning, use the planning category instead.
+  Category dispatcher for orchestration and skill-system tooling. Use when the
+  user is asking about how agents are run, coordinated, or how the skill
+  system itself is managed. Trigger phrases: "orchestrate this work",
+  "dispatch agents", "run this task", "coordinate parallel work", "execute
+  this plan step by step", "manage the skills in this repo", "write a new
+  skill", "audit the skill system", "how should we structure this run",
+  "skill-system meta question". Routes to executor, manager,
+  subagent-driven-development, agentfiles-manager, writing-skills, audit, or
+  the relevant planning advisor. Do NOT use for design or implementation
+  planning itself (use the planning category), for coding-category tasks
+  (use coding), or for information gathering (use research).
 ---
 
 # Management

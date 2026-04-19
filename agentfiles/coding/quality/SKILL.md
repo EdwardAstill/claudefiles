@@ -1,12 +1,17 @@
 ---
 name: coding-quality
 description: >
-  Sub-category dispatcher for code quality. Use when writing new features
-  (tdd), encountering a bug or test failure (systematic-debugging), about to
-  claim work is complete (verification-before-completion), completing
-  implementation before merging (requesting-code-review), acting on review
-  feedback (receiving-code-review), or cleaning up after implementation
-  (simplify).
+  Sub-category dispatcher for code quality workflows. Use when the user is
+  about to start, finish, debug, review, or clean up an implementation and
+  the right sub-skill isn't yet chosen. Trigger phrases: "start a new
+  feature the right way", "something's broken, what do I do", "before I
+  mark this done", "ready to request review", "got review feedback", "this
+  code is tangled, clean it up", "how do I test this properly", "document
+  this module". Routes to tdd, systematic-debugging,
+  verification-before-completion, code-review, simplify, or documentation.
+  Do NOT use as a leaf skill — always dispatch downward. Do NOT use for
+  security audits (use security-review) or performance tuning (use
+  performance-profiling).
 ---
 
 # Coding Quality

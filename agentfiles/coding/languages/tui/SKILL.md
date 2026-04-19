@@ -1,14 +1,19 @@
 ---
 name: tui-expert
 description: >
-  Use when building, iterating on, or reviewing terminal user interfaces (TUIs).
-  Covers design specification for terminal apps — layout in character grids,
-  terminal color palettes, keyboard interaction design, component states — then
-  hands off to the appropriate language expert (python-expert, rust-expert,
-  typescript-expert) for implementation. Knows the widget catalogs and patterns
-  of Textual, Ratatui, Ink, and Bubbletea so specs reference real component
-  names. tui-expert owns what the TUI should look like and how it should behave;
-  language experts own the code.
+  Use for designing, specifying, or reviewing a terminal user interface
+  (TUI) — what it looks like and how it behaves, before code is written.
+  Trigger phrases: "design a TUI for this", "which TUI framework should
+  I use", "Ratatui vs Textual vs Ink vs Bubbletea", "lay out this
+  dashboard in the terminal", "keyboard shortcuts for this TUI", "what
+  widget do I use for X", "terminal color palette for this", "pick a
+  TUI component for a form", "spec out the TUI screens", "review this
+  TUI UX". Knows the widget catalogs of Textual, Ratatui, Ink, and
+  Bubbletea so specs reference real component names, then hands off to
+  python-expert / rust-expert / typescript-expert for implementation
+  (or storm-tui if the project uses @orchetron/storm). Do NOT use for
+  writing the actual implementation code (use the language expert) or
+  for web/React UI design (use ui-expert).
 ---
 
 # TUI Expert

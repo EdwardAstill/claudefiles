@@ -1,6 +1,18 @@
 ---
 name: storm-tui
-description: Use when building TUI apps with @orchetron/storm — a React-based compositor-driven terminal UI framework. Covers setup, rendering model, components, hooks, AI widgets, DevTools, and performance patterns.
+description: >
+  Use when the TUI is being built specifically with @orchetron/storm —
+  the React-based compositor-driven terminal UI framework. Trigger
+  phrases: "build a TUI with storm", "using @orchetron/storm",
+  "requestRender at 60fps in storm", "storm components and hooks",
+  "storm AI widgets", "storm DevTools", "cell-level diff renderer",
+  "storm performance tuning", "migrate Ink app to storm", "storm
+  setup with tsx". Covers storm's rendering model (cell-level diff,
+  dual-speed React + requestRender), component catalog, hooks, AI
+  widgets, and DevTools. Do NOT use for generic TUI design choices
+  across frameworks (use tui-expert), for Ink/Ratatui/Textual/Bubbletea
+  (use tui-expert then the relevant language expert), or for writing
+  the underlying TypeScript (use typescript-expert).
 ---
 
 # Storm TUI

@@ -1,10 +1,18 @@
 ---
 name: database-expert
 description: >
-  Use when designing database schemas, writing migrations, optimizing queries,
-  choosing indexing strategies, or working with ORMs (SQLAlchemy, Prisma, Diesel).
-  Covers relational and document databases, safe migration patterns, N+1 detection,
-  and transaction safety. High-priority for any data-layer work.
+  Use for schema design, migrations, query optimization, indexing, and
+  ORM work (SQLAlchemy, Prisma, Diesel). Trigger phrases: "design the
+  schema for X", "write a migration for this change", "this query is
+  slow", "add an index for this lookup", "SQL or NoSQL for this feature",
+  "I'm seeing N+1 queries", "is this migration safe for production",
+  "what isolation level do I need", "should this be a foreign key or
+  denormalized", "reviewing these SQLAlchemy/Prisma models". Covers
+  relational and document databases, reversible/online migration
+  patterns, and transaction safety. Do NOT use for general CPU/memory
+  profiling (use performance-profiling), database server install /
+  replication (use infrastructure-expert), API endpoint shape (use
+  api-architect), or SQL injection review (use security-review).
 ---
 
 # Database Expert

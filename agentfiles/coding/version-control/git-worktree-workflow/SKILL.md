@@ -1,10 +1,20 @@
 ---
 name: git-worktree-workflow
 description: >
-  Use when starting isolated feature work (creates a git worktree with safety
-  verification and a clean test baseline) or when implementation is complete
-  and you need to merge, create a PR, or clean up. Covers the full worktree
-  lifecycle: setup through completion.
+  Use for the full git-worktree lifecycle — starting isolated feature
+  work in a new worktree and, later, merging/PR'ing/cleaning up when the
+  work is done. Trigger phrases: "start a new feature in a worktree",
+  "set up an isolated workspace for this", "spin up a worktree for
+  parallel work", "I'm done with this worktree — merge and clean up",
+  "create a PR from this worktree", "finalize and remove the
+  worktree", "verify tests pass before merging the worktree", "split
+  off parallel agent work", "which worktree am I supposed to be in",
+  "bootstrap the worktree with a clean test baseline". Handles
+  directory selection, safety verification on create, and
+  verify→present-options→execute+cleanup on finish. Do NOT use for
+  one-off git commands / history / branches (use git-expert), for
+  GitHub-side operations like opening the PR itself (use
+  github-expert), or for CI config (use github-actions-expert).
 ---
 
 # Git Worktree Workflow

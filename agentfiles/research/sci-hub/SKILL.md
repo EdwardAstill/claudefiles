@@ -1,9 +1,17 @@
 ---
 name: sci-hub
 description: >
-  Use when downloading academic papers, journal articles, or research papers by
-  title, DOI, or URL. Downloads via Sci-Hub (sci-hub.st) using curl, with
-  browser fallback if curl is blocked.
+  Use when the user wants to obtain the full PDF of an academic paper, journal
+  article, or preprint identified by title, DOI, author+year, or URL. Trigger
+  phrases: "download this paper", "get me the PDF of X", "pull this study",
+  "find the full text of this article", "I need paper DOI 10.xxxx", "grab
+  this journal article", "can you fetch this study for me", "find the paper
+  behind this citation", "download this research paper", "sci-hub this for me".
+  Resolves DOI via CrossRef, downloads via Sci-Hub (sci-hub.st) using curl,
+  falls back to browser-control if curl is blocked; for arXiv links uses the
+  direct PDF URL instead. Do NOT use for reading trade-off / consensus
+  summaries of a topic (use research-agent) or for generic file downloads that
+  are not academic papers (use web-scraper or curl directly).
 ---
 
 Download research papers via Sci-Hub. URL pattern: `https://sci-hub.st/{DOI}`

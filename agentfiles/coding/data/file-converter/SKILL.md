@@ -1,10 +1,18 @@
 ---
 name: file-converter
 description: >
-  File format conversion and extraction expert. Use for converting PDFs, images,
-  or other complex file types into AI-friendly markdown or structured formats using
-  `cnv` (convert2). Covers text extraction, layout recovery, chunking for RAG, and
-  knowledge graph generation from documents.
+  Use when converting a file already on disk (PDF, image, document) into
+  AI-friendly markdown, RAG chunks, a Karpathy-style wiki folder, or a
+  knowledge-graph JSON. Trigger phrases: "convert this PDF to markdown",
+  "extract the text from this document", "chunk this for RAG", "rip the
+  tables out of this PDF", "preserve the multi-column layout", "build a
+  knowledge graph from these docs", "I have a scanned document — get the
+  text", "turn this file into markdown", "extract images from this PDF",
+  "prep this doc for embedding". Runs via the `cnv` CLI (convert2) with
+  XY-Cut++ layout recovery. Do NOT use for fetching a remote web page
+  (use web-scraper or browser-control), for YouTube transcripts/audio
+  (use youtube), or for packing a whole repo into a single file (use
+  repomix).
 ---
 
 # file-converter

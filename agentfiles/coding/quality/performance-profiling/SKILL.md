@@ -1,10 +1,18 @@
 ---
 name: performance-profiling
 description: >
-  Use when code is correct but slow, or when optimizing for latency, throughput,
-  or memory usage. Covers profiling tools (py-spy, perf, flamegraphs), algorithmic
-  complexity analysis, memory profiling, and benchmark-driven optimization.
-  Medium-priority — invoke when performance is a stated requirement or a measured problem.
+  Use when code is correct but too slow or memory-hungry, and you need to
+  find the real bottleneck with measurement. Trigger phrases: "this is
+  slow — where's the bottleneck", "profile this with py-spy / perf",
+  "generate a flamegraph", "memory is growing over time — leak",
+  "latency p99 is too high", "benchmark before and after", "CPU pegged
+  at 100%", "this endpoint got slower after the change", "is this
+  algorithm the bottleneck or is it IO", "establish a perf baseline".
+  Covers profiling tools, flamegraph reading, allocation profiling, and
+  benchmark-driven optimization. Do NOT use when code is incorrect (use
+  systematic-debugging first), for slow SQL (use database-expert), for
+  slow CI builds (use github-actions-expert), or for algorithmic
+  redesign once the hotspot is found (use dsa-expert).
 ---
 
 # Performance Profiling

@@ -1,11 +1,17 @@
 ---
 name: rust-expert
 description: >
-  Rust toolchain and conventions specialist. Use when you need rust-analyzer
-  LSP diagnostics, cargo/clippy/rustfmt tooling, or Rust-specific patterns
-  (ownership, lifetimes, error handling) that benefit from structured guidance.
-  Covers ownership, borrowing, lifetimes, error handling, cargo toolchain,
-  and live code introspection via the rust-analyzer LSP.
+  Use when writing, reviewing, or debugging Rust with attention to
+  ownership, lifetimes, error handling, and the cargo/clippy/rustfmt
+  toolchain. Trigger phrases: "write this in Rust", "the borrow checker
+  is yelling at me", "cannot borrow X as mutable", "what lifetime
+  annotation do I need", "should this be &str or String", "Result or
+  Option here", "convert this to async with tokio", "fix this clippy
+  warning", "cargo won't build", "derive macros for this struct". Uses
+  rust-analyzer LSP diagnostics for borrow/lifetime/type errors. Do NOT
+  use for crate API lookup (use docs-agent / docs.rs WebFetch),
+  algorithmic choice (use dsa-expert), or system-level architecture
+  (use system-architecture-expert).
 includes:
   - rust/clippy
 ---

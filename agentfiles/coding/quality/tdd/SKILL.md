@@ -1,6 +1,18 @@
 ---
 name: tdd
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: >
+  Use before writing any production code — every new feature, bug fix,
+  refactor, or behavior change starts with a failing test. Trigger
+  phrases: "implement X", "add a feature for Y", "fix this bug", "I'm
+  about to write code for Z", "write the test first", "red-green-
+  refactor this", "start the TDD loop", "watch the test fail before
+  I code", "add a unit test then make it pass", "test-drive this
+  change". Enforces: write test → watch it fail → write minimal code
+  → pass → refactor. Do NOT use for debugging a failing existing test
+  (use systematic-debugging), for claiming work is done (use
+  verification-before-completion), for cleanup after the fact (use
+  simplify), or for pure configuration files and throwaway prototypes
+  (ask the user).
 next: [simplify, verification-before-completion]
 ---
 

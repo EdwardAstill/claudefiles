@@ -1,10 +1,16 @@
 ---
 name: planning
 description: >
-  Category dispatcher for the design-plan-execute lifecycle. Use when starting
-  work on an idea without a design yet (brainstorming), or when you have an
-  approved spec and need an implementation plan (writing-plans). For same-session
-  execution with subagents and review gates, use subagent-driven-development.
+  Use when the user is somewhere in the design → plan → execute lifecycle but
+  unsure which phase-skill to pick. Routes to brainstorming (idea, no design
+  yet) or writing-plans (approved spec, no implementation plan yet). Trigger
+  phrases: "help me plan this feature", "I have an idea — where do I start",
+  "walk me through designing and planning X", "what's the next planning step",
+  "I don't know if I need a spec or a plan", "route me to the right planning
+  skill", "I'm new to this team's planning flow". Do NOT use when the phase
+  is already known — invoke brainstorming or writing-plans directly. Do NOT
+  use for same-session plan execution (use subagent-driven-development) or
+  for research / tradeoff investigation (use research-agent).
 ---
 
 # Planning

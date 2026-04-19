@@ -1,10 +1,17 @@
 ---
 name: simplify
 description: >
-  Use when implementation is working and tests pass, to review recently changed
-  code for unnecessary complexity. Covers DRY violations, dead code,
-  over-engineering, poor naming, long functions, and clever-but-opaque logic.
-  Does not add features or change behavior — only makes correct code clearer.
+  Use after an implementation is working and tests pass, to clean up
+  recently changed code without changing behavior. Trigger phrases:
+  "simplify this code", "this feels tangled, clean it up", "did I
+  over-engineer this", "this function grew too long", "the naming is
+  confusing", "clever but opaque — make it clearer", "reduce this
+  duplication", "dead code in my recent changes", "polish before PR",
+  "the review said this is hard to follow". Scoped to recent diffs
+  only — no roaming, no drive-by improvements. Do NOT use when tests
+  are failing (use systematic-debugging first), for large deliberate
+  restructures (use refactoring-patterns), for adding capability (use
+  tdd), or for old code that wasn't recently touched.
 next: [verification-before-completion]
 ---
 

@@ -1,10 +1,20 @@
 ---
 name: kb-critic
 description: >
-  Critical thinking analyst for the personal knowledge base. Evaluates evidence quality,
-  surfaces contradictions between notes, identifies where beliefs rest on weak foundations,
-  and flags gaps. Use when you want your KB audited rather than searched — "is what I
-  believe actually well-supported?" not "what do I believe about X?".
+  Use when the user wants the personal knowledge base audited adversarially —
+  evidence quality, contradictions between notes, weak foundations, staleness,
+  cognitive biases — rather than having it searched or summarised. Trigger
+  phrases: "is my understanding of X actually well-supported", "do I have
+  contradictory notes about Y", "what's the weakest part of my belief about
+  Z", "audit my notes on topic", "I've been acting on belief X — is it
+  backed up", "what do I think I know that I might be wrong about", "check
+  my KB for bias", "are my notes on X outdated", "stress-test my beliefs
+  about Y", "find the holes in my knowledge of Z". Produces belief map,
+  evidence tiers, contradictions, staleness flags, bias flags, and
+  confidence rating. Do NOT use for retrieving or synthesising notes (use
+  knowledge-base), for building an action protocol from the KB (use
+  health-advisor), or for open-web evidence research outside the KB (use
+  research-agent).
 ---
 
 # KB Critic

@@ -1,10 +1,16 @@
 ---
 name: documentation-maintainer
 description: >
-  Use when adding, removing, or renaming skills, when docs feel stale, when the
-  user asks to update or check documentation, or after any structural change to
-  the skill hierarchy. Triggers on: "update the docs", "check documentation",
-  "docs are stale", "add this to the README", "sync the skill tree".
+  Use when repo documentation needs to be synced with the actual skill
+  hierarchy, CLI surface, or manifest after a structural change. Trigger
+  phrases: "update the docs", "check documentation", "docs are stale", "add
+  this to the README", "sync the skill tree", "fix the skill catalog", "update
+  docs after renaming this skill", "document the new af subcommand", "docs
+  don't match the code", "refresh the reference docs". Walks a fixed
+  checklist covering registry files, skill tree, CLI reference, and
+  cross-links. Do NOT use for manifest consistency checks (use audit), for
+  writing a new skill (use writing-skills), or for session-log-driven
+  improvements (use retrospective).
 ---
 
 # Documentation Maintainer

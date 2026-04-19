@@ -1,6 +1,15 @@
 ---
 name: audit
-description: Use when verifying the agentfiles manifest is consistent — ensure every skill on disk is in manifest.toml, every manifest entry exists on disk, cli/mcp tools are properly wired, and registry symlinks point correctly so af install works.
+description: >
+  Use when verifying the agentfiles manifest is consistent with what is on disk.
+  Trigger phrases: "run the audit", "af audit", "check the manifest", "is the
+  manifest in sync", "are all skills registered", "check for orphaned skills",
+  "verify cli wiring", "any missing manifest entries", "registry symlinks
+  correct", "does af install work end to end". Dispatched as a read-only
+  subagent that reports pass/fail per check with fix hints. Do NOT use for
+  editing or fixing the manifest (route to writing-skills or agentfiles-manager),
+  for documentation drift (use documentation-maintainer), or for session-log
+  pattern analysis (use retrospective).
 ---
 
 # Audit (dispatcher)

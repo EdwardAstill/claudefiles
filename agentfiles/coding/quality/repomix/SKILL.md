@@ -1,9 +1,19 @@
 ---
 name: repomix
 description: >
-  Pack a repo or directory into a single AI-friendly file for LLM context.
-  Use when feeding a codebase to an AI, auditing a remote repo, or compressing
-  context before a large task. Key flag: --compress cuts ~70% tokens via Tree-sitter.
+  Use when packing a whole repo or directory into a single AI-friendly
+  file for LLM context. Trigger phrases: "pack this repo for an AI",
+  "dump the codebase into one file", "repomix this directory", "audit
+  this remote repo without cloning", "compress the codebase for
+  context", "feed this repo to a model", "token-count tree before I
+  include", "generate a single-file snapshot of the project", "strip
+  impl with --compress", "build a minimal context bundle". Uses
+  repomix with --compress (Tree-sitter, ~70% token reduction),
+  --remote for GitHub repos, and include/ignore filters. Do NOT use
+  for explaining a codebase the user wants to understand themselves
+  (use codebase-explainer), scraping arbitrary websites (use
+  web-scraper), or converting a single file on disk (use
+  file-converter).
 ---
 
 Pack repo into single file for AI context. Use `--compress` to strip impl details, keep structure.

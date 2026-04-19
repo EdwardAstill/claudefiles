@@ -1,9 +1,16 @@
 ---
 name: typst-expert
 description: >
-  Typst document expert. Use when writing or debugging Typst documents —
-  markup, custom functions, styling, packages, and compilation. Uses the
-  tinymist LSP for live introspection and typst.app/docs for reference.
+  Use when writing, styling, or debugging Typst documents. Trigger
+  phrases: "write this document in Typst", "Typst template for a
+  report", "custom Typst function for X", "Typst won't compile", "how
+  do I do footnotes in Typst", "import a Typst package", "style a
+  heading in Typst", "convert this LaTeX to Typst", "Typst math
+  formula for X", "tinymist LSP error". Uses tinymist for live
+  diagnostics and fetches reference from typst.app/docs. Do NOT use
+  for LaTeX (the model handles that directly), general markdown /
+  README writing (use documentation), or PDF post-processing (use
+  file-converter).
 includes:
   - typst/tinymist
 ---

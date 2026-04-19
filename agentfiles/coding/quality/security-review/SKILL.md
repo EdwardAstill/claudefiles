@@ -1,10 +1,18 @@
 ---
 name: security-review
 description: >
-  Use when reviewing code for security vulnerabilities, hardening an application,
-  or before deploying to production. Covers OWASP top 10, dependency CVEs, secrets
-  exposure, injection vectors, auth/authz issues, and cryptographic misuse.
-  High-priority — invoke before any code reaches production.
+  Use when scanning code for security vulnerabilities, hardening an app
+  before production, or auditing a specific threat surface. Trigger
+  phrases: "security review this code", "audit for OWASP top 10", "check
+  for SQL injection / XSS / SSRF", "scan for exposed secrets", "is this
+  auth flow safe", "review the crypto usage here", "CVE check on my
+  deps", "is this input validation enough", "harden this before we
+  deploy", "run a security pass on the repo". Dispatches a restricted
+  read-only subagent (see agentfiles/agents/security-review.md) that
+  returns grouped findings by severity with file:line + fix. Do NOT use
+  for general dependency bumps (use dependency-management), for code
+  correctness bugs (use systematic-debugging), or for observability /
+  audit logging beyond compliance (use observability).
 ---
 
 # Security Review (dispatcher)

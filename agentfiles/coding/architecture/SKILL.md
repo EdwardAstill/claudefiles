@@ -1,11 +1,19 @@
 ---
 name: system-architecture-expert
 description: >
-  System architecture expert. Use for decisions about how an application or
-  system is structured: monolith vs microservices, layering, caching, message
-  queues, service boundaries, scaling. Covers greenfield and evolution of
-  existing systems. Not for: data structure choice (dsa-expert), API contracts
-  (api-architect), schema (database-expert), deployment (infrastructure-expert).
+  Use when deciding how a system fits together at the service / layer /
+  boundary level. Trigger phrases: "monolith or microservices", "how
+  should I structure this app", "where should this logic live", "split
+  these services", "what belongs in the frontend vs backend", "sync or
+  async between these", "REST or gRPC or events", "plan a caching layer",
+  "we need to scale — what changes", "draw the service boundaries".
+  Covers greenfield architecture and restructuring existing systems,
+  including cross-cutting concerns (auth strategy, error handling, config
+  management). Do NOT use for data structure/algorithm choice (use
+  dsa-expert), API endpoint contracts (use api-architect), database
+  schema (use database-expert), Docker/K8s/Terraform (use
+  infrastructure-expert), or understanding an existing codebase (use
+  codebase-explainer).
 ---
 
 # System Architecture Expert

@@ -1,14 +1,18 @@
 ---
 name: readrun
 description: >
-  Use when creating or editing readrun documentation — folders of Markdown rendered as
-  interactive websites with runnable Python (Pyodide) and live JSX/React visualisations.
-  Trigger on: "make readrun docs for X", "add a readrun page", "write an interactive
-  tutorial", "document this with JSX widgets", "build a lesson with runnable code",
-  "turn these notes into a readrun site", "scaffold a .readrun folder", "add a live
-  visualisation to this page". This skill replaces note-taker: any markdown-with-runnable-
-  code request lands here. For pure reference / LLM-optimised notes without runnable code,
-  still use this skill and skip the executable fences.
+  Use when creating or editing readrun documentation — folders of Markdown rendered
+  by the `rr` CLI as interactive sites with runnable Python (Pyodide) and
+  auto-mounting JSX/React visualisations. Trigger phrases: "make readrun docs
+  for X", "add a readrun page", "write an interactive tutorial", "document this
+  with JSX widgets", "build a lesson with runnable code", "turn these notes into
+  a readrun site", "scaffold a .readrun folder", "add a live visualisation to
+  this page", "outline exactly how this works as an interactive doc", "make a
+  runnable explainer". Also use for pure-markdown reference notes — plain
+  Markdown is a first-class readrun site; just skip the executable fences. Do
+  NOT use for a static architecture writeup aimed at engineers (use
+  codebase-explainer) or for a standalone HTML course for non-engineers (use
+  codebase-to-course).
 ---
 
 # readrun

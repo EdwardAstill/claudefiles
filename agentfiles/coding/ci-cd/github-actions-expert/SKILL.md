@@ -1,10 +1,18 @@
 ---
 name: github-actions-expert
 description: >
-  Use when writing, debugging, or reviewing GitHub Actions workflows. Also use
-  when a workflow is failing, a job is unexpectedly skipped, secrets or permissions
-  are misconfigured, matrix builds are behaving oddly, or Actions cache is stale.
-  Expert with workflow syntax, runner environments, and gh CLI for CI operations.
+  Use when writing, debugging, or reviewing GitHub Actions workflows.
+  Trigger phrases: "write a CI workflow", "my GitHub Actions is failing",
+  "why did this job get skipped", "fix the matrix build", "permissions
+  error in Actions", "cache is always missing", "pin the action version",
+  "set up a release workflow", "the workflow passes locally but fails on
+  CI", "debug this run-id", "how do I pass secrets into this step".
+  Covers workflow YAML syntax, runner environments, permissions/secrets,
+  matrix builds, caching, artifacts, and debugging with `gh run view
+  --log-failed`. Do NOT use for Dockerfile / K8s / Terraform (use
+  infrastructure-expert), for git history or branches (use git-expert),
+  or for reviewing a PR that happens to include a workflow change (use
+  code-review).
 ---
 
 # GitHub Actions Expert

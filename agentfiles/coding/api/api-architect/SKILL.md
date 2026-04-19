@@ -1,10 +1,18 @@
 ---
 name: api-architect
 description: >
-  API design and review specialist. Use when designing new API endpoints from a feature
-  description or user story, or when reviewing existing API code for consistency, best
-  practices, versioning, or security issues. Uses LSP tools to inspect existing types and
-  interfaces directly. Outputs API contracts as OpenAPI or structured markdown.
+  Use when designing or reviewing an API contract — the shape of endpoints,
+  request/response payloads, status codes, auth, versioning, and error
+  contracts. Trigger phrases: "design an API for X", "review this API",
+  "what should the endpoints look like", "spec out a REST interface", "is
+  this API consistent", "write the OpenAPI for this", "should this be POST
+  or PUT", "how do I version this endpoint", "what status code for X",
+  "design the request/response shape". Uses LSP tools to read existing
+  types directly and emits OpenAPI or structured markdown. Do NOT use for
+  overall service topology / monolith-vs-microservices (use
+  system-architecture-expert), for implementing the handlers (use the
+  relevant language expert), or for scanning an API for vulnerabilities
+  (use security-review).
 ---
 
 # API Architect

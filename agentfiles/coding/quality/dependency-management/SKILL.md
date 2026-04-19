@@ -1,10 +1,18 @@
 ---
 name: dependency-management
 description: >
-  Use when bumping dependency versions, analyzing breaking changes, scanning for
-  CVEs, managing lock files, or configuring automated update tools (Dependabot,
-  Renovate). Covers npm, pip/uv, cargo, and general lock file hygiene.
-  Low-priority — invoke when dependency work is the primary task.
+  Use for bumping dependency versions, analyzing breaking changes, CVE
+  remediation, lock-file hygiene, and automated update tooling
+  (Dependabot, Renovate). Trigger phrases: "bump these dependencies",
+  "CVE alert on package X", "update to the latest major of Y", "lock
+  file is conflicting", "audit my dependency tree", "set up Dependabot /
+  Renovate", "why is my bundle so big", "find a lighter alternative to
+  X", "is this patch version safe", "handle the breaking change from
+  vN to vN+1". Covers npm, pip/uv, and cargo. Do NOT use for broader
+  application security (use security-review), performance caused by
+  picking a library (use performance-profiling), for choosing which
+  library to adopt (use research-agent), or for writing code that uses
+  a library (use the language expert).
 ---
 
 # Dependency Management

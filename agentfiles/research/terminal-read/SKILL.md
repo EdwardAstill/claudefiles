@@ -1,10 +1,16 @@
 ---
 name: terminal-read
 description: >
-  Use when the user references something that just happened in their terminal
-  outside the conversation — "look at what setup.fish just printed", "see the
-  error I got", "check the output of that command". Captures the live shell
-  scrollback (tmux / screen / piped stdin) so the agent can Read it.
+  Use when the user references output that happened in their shell outside
+  the conversation and hasn't pasted it in. Trigger phrases: "look at what
+  setup.fish just printed", "see the error I got", "check the output of that
+  command", "what did the test say", "I just ran X, now fix it", "read my
+  terminal", "grab my scrollback", "look at the last thing that happened in
+  my shell", "the install failed, look at the log in my terminal", "I ran the
+  build — what went wrong". Runs `af terminal` to dump tmux / screen /
+  piped-stdin scrollback to a file which the agent then Reads. Do NOT use to
+  execute commands (use the Bash tool directly) or to read a log file the
+  user already has on disk (use Read).
 ---
 
 # terminal-read

@@ -1,9 +1,16 @@
 ---
 name: retrospective
 description: >
-  Use when reviewing session logs to find routing failures, self-loops, wasted
-  skill loads, and recovery patterns — then apply fixes to skills, hooks, and
-  CLI tooling. Run periodically or after noticing degraded behavior.
+  Use when analysing session logs to surface routing failures, self-loops,
+  wasted skill loads, and recovery patterns — then apply fixes to skills,
+  hooks, and CLI tooling. Trigger phrases: "run a retrospective", "review
+  session logs", "why did the session feel loopy", "af log looks weird",
+  "which skills are firing too often", "find routing failures in recent
+  sessions", "weekly skill system review", "analyse af log stats", "the skill
+  system feels off", "self-improvement pass on skills". Do NOT use for
+  one-shot manifest integrity checks (use audit), for syncing docs after a
+  known rename (use documentation-maintainer), or for authoring a new skill
+  from scratch (use writing-skills).
 ---
 
 # Retrospective

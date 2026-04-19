@@ -1,10 +1,18 @@
 ---
 name: design-advisor
 description: >
-  Use when manager needs to decide whether a task requires a design or spec phase
-  before implementation begins. Single mandate: answer "does this need brainstorming
-  or a written plan first, and what execution approach fits?" Loaded inline by manager
-  during planning — never dispatched as a subagent.
+  Use when manager is deciding whether a task needs brainstorming or a written
+  plan before implementation begins. Trigger phrases: "do we need a spec first",
+  "does this need brainstorming", "is the design clear enough to start", "should
+  we write a plan before coding", "requirements feel fuzzy", "unclear what to
+  build", "should we design this first", "skip straight to implementation or
+  plan", "what execution approach fits", "design phase or just build it".
+  Single mandate: answer "does this need brainstorming or a written plan first,
+  and what execution approach fits?" Loaded inline by manager during planning —
+  never dispatched as a subagent. Do NOT use for coordinating multiple agents
+  (use coordination-advisor), for git strategy (use git-advisor), or for
+  running an actual brainstorming or planning session (use brainstorming or
+  writing-plans).
 ---
 
 # Design Advisor

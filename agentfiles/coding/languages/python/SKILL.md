@@ -1,11 +1,18 @@
 ---
 name: python-expert
 description: >
-  Python toolchain and conventions specialist. Use when you need pyright LSP
-  diagnostics, uv package management, ruff linting, or pytest patterns — the
-  tooling integration and project conventions that the base model doesn't enforce.
-  Not for general Python knowledge (the model already has that). Covers type hints,
-  testing with pytest, and live code introspection via the pyright LSP.
+  Use when writing, reviewing, or debugging Python with attention to the
+  real project toolchain: pyright LSP diagnostics, uv packaging, ruff
+  lint/format, pytest conventions. Trigger phrases: "write this in
+  Python", "add type hints to X", "pyright is complaining", "set up uv
+  for this project", "add a ruff rule", "write pytest tests for this",
+  "fix the mypy error", "parametrize this test", "convert this to use
+  async", "the import is not resolving in pyright". Covers idiomatic
+  typed Python, pytest shape, and live LSP introspection via pyright.
+  Do NOT use for library/framework API lookup (use docs-agent /
+  context7), database work that happens to be in Python (use
+  database-expert), or algorithmic complexity questions (use
+  dsa-expert).
 includes:
   - python/pyright
   - python/uv

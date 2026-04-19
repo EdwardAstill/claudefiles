@@ -1,11 +1,19 @@
 ---
 name: coding
 description: >
-  Category dispatcher for coding tasks. Use when the task involves writing,
-  reviewing, or improving code. Routes to: coding-quality (tdd, debugging,
-  verification, code-review), version-control (git-expert for local git,
-  github-expert for GitHub/gh CLI), ci-cd (github-actions-expert for workflows),
-  or api-architect (API design and review).
+  Category dispatcher for coding work. Use when the task shape is "write,
+  review, improve, debug, or version-control code" and the right specialist
+  isn't yet chosen. Trigger phrases: "help me code this", "I need to build
+  X", "review my code", "fix this bug", "set up CI", "design this API",
+  "clean this up", "ship a feature". Routes into coding-quality (tdd,
+  systematic-debugging, verification-before-completion, code-review,
+  simplify), version-control (git-expert, github-expert,
+  git-worktree-workflow), ci-cd (github-actions-expert), api-architect,
+  system-architecture-expert, dsa-expert, or a language expert
+  (python-expert, typescript-expert, rust-expert, typst-expert). Do NOT
+  use as a leaf skill — always dispatch downward. Do NOT use for pure
+  research or trade-off analysis (use research-agent) or for exploring an
+  unfamiliar repo (use codebase-explainer).
 ---
 
 # Coding

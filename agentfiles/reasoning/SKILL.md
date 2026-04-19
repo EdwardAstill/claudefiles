@@ -1,10 +1,16 @@
 ---
 name: reasoning
 description: >
-  Category dispatcher for formal problem-solving skills. Routes to
-  game-designer (turn a concept into a design doc), logic-puzzle-designer
-  (generate Sudoku / nonograms / Kakuro with uniqueness guarantees), or
-  constraint-solver (encode a problem to OR-Tools or Z3 and solve it).
+  Use when the user asks a formal problem-solving question that dispatches to
+  a specialist: designing a game, generating a logic puzzle, or solving a
+  declarative constraint problem. Trigger phrases: "design a game", "generate
+  a puzzle", "make me a sudoku", "solve this scheduling problem", "encode this
+  to a solver", "help me pick between game / puzzle / constraint approaches",
+  "I have a reasoning problem but I don't know the family", "route me to the
+  right solver skill". Routes to game-designer, logic-puzzle-designer, or
+  constraint-solver. Do NOT use when the sub-skill is already known — invoke
+  that skill directly. Do NOT use for open-ended research or tradeoff analysis
+  (use research-agent) or codebase mental-model building (use codebase-explainer).
 ---
 
 # Reasoning

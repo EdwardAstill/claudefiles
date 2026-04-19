@@ -1,10 +1,18 @@
 ---
 name: code-review
 description: >
-  Use when requesting a code review of completed work, or when receiving and processing
-  code review feedback. Two modes: requesting (dispatch a reviewer subagent with focused
-  context) and receiving (evaluate feedback technically before implementing — verify,
-  push back if wrong, no performative agreement).
+  Use when either requesting a code review of completed work or acting on
+  review feedback you've received. Trigger phrases: "review this PR",
+  "review my changes", "dispatch a reviewer on this commit range",
+  "check this before I merge", "got code review feedback, help me act on
+  it", "address this review comment", "the reviewer says X, are they
+  right", "push back on this review if it's wrong", "process these PR
+  comments", "review before merge to main". Requesting mode dispatches
+  a reviewer subagent with focused commit-range context; receiving mode
+  evaluates feedback technically (verify, push back when wrong, no
+  performative agreement). Do NOT use for security-focused reviews
+  (use security-review), for verifying your own completion claims (use
+  verification-before-completion), or for pre-write planning (use tdd).
 next: [simplify, tdd]
 ---
 

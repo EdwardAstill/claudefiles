@@ -1,10 +1,18 @@
 ---
 name: git-expert
 description: >
-  Version control context manager. Use when any task involves git operations: creating
-  feature branches, setting up isolated worktrees for parallel agents, reviewing what's
-  changed, merging completed work, or cleaning up finished worktrees. Also use when other
-  agents need to know where they should be making changes.
+  Use for local git operations — branching, worktrees, merging, diffing,
+  history, and repo state assessment. Trigger phrases: "what's the git
+  situation", "create a feature branch", "set up a worktree for this
+  work", "what's changed since main", "how do I merge this", "resolve
+  this conflict", "rebase this branch onto X", "clean up this finished
+  worktree", "am I ahead or behind origin", "where should I be making
+  this change". Always starts with `af status --write` to produce a
+  full repo map before acting. Do NOT use for GitHub-hosted operations
+  — PRs, issues, gh CLI, browsing external repos (use github-expert),
+  CI workflows (use github-actions-expert), or the full worktree
+  lifecycle when it's about starting/merging a feature (use
+  git-worktree-workflow).
 ---
 
 # Git Expert
