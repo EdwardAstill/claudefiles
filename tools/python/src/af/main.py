@@ -20,7 +20,6 @@ _SUBCOMMANDS = [
     ("setup", "setup"),
     ("tools", "tools_cmd"),
     ("tree", "tree"),
-    ("secrets", "secrets"),
     ("preview", "preview"),
     ("test-skill", "test_skill"),
     ("hub", "hub"),
