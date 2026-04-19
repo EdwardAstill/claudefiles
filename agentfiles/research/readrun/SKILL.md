@@ -186,13 +186,27 @@ commands, config snippets, or pseudo-code that must not execute.
 
 ### Links between pages
 
-Standard Markdown links with `.md` targets. readrun rewrites them for site nav:
+**Prefer wikilinks** for internal cross-references — they're name-resolved and
+survive file moves or renames at docset scale:
 
 ```markdown
-See [internals](./internals.md) or go back to the [overview](../welcome.md).
+See [[internals]] or go back to [[welcome]].
 ```
 
-Absolute URLs (`https://…`) are left alone.
+Use `[[folder/page]]` only when two pages share a basename and you need to
+disambiguate. For a different display label: `[[internals|the internals page]]`.
+
+**Fall back to standard Markdown links** `[text](./page.md)` when:
+
+- The target renderer can't resolve wikilinks (e.g. raw GitHub preview for a
+  tutorial published as a repo README)
+- You want an explicit relative path for tool-chain reasons
+
+Both syntaxes may coexist in the same doc — pick what fits the target, but
+default to wikilinks for intra-docset references. Absolute URLs (`https://…`)
+are left alone in either style.
+
+readrun rewrites both forms for site nav at build time.
 
 ### Math
 
@@ -303,7 +317,7 @@ Verification checklist before handing the docs back:
 - [ ] Every `:::filename.ext` has a matching file in `.readrun/scripts/` or `.readrun/images/`.
 - [ ] Every Python block `print`s something; every JSX block calls `render()`.
 - [ ] No orphaned scripts or images in `.readrun/` that nothing references.
-- [ ] Internal `[text](./page.md)` links resolve to real files.
+- [ ] Internal links (`[[page]]` wikilinks preferred, `[text](./page.md)` as fallback) resolve to real files.
 - [ ] `rr validate <folder>` exits clean.
 - [ ] Start `rr <folder>`, click through the pages, confirm JSX widgets mount and
       Python blocks run without uncaught errors.
