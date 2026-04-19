@@ -28,10 +28,8 @@ from af.context import app as context_app
 from af.log import app as log_app
 from af.skill_usage import app as skill_usage_app
 from af.status import app as status_app
-from af.terminal import app as terminal_app
 from af.tree import app as tree_app
 from af.versions import app as versions_app
-from af.webscraper import app as webscraper_app
 
 # tests/test_cli_smoke.py → tools/python/tests → tools/python → tools → agentfiles
 REPO = Path(__file__).parent.parent.parent.parent
@@ -157,16 +155,6 @@ def test_log_help():
 
 def test_mode_help():
     result = runner.invoke(get_command(mode_app), ["--help"])
-    assert result.exit_code == 0, result.output
-
-
-def test_terminal_help():
-    result = runner.invoke(get_command(terminal_app), ["--help"])
-    assert result.exit_code == 0, result.output
-
-
-def test_webscraper_help():
-    result = runner.invoke(get_command(webscraper_app), ["--help"])
     assert result.exit_code == 0, result.output
 
 
