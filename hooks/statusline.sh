@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # agentfiles statusline — shows cwd, git state, model, context %, 5h rate limit,
-# and active caveman level. Installed into ~/.claude/settings.json by install-hooks.sh.
+# and active modes / com-style. Installed into ~/.claude/settings.json by install-hooks.sh.
 
 input=$(cat)
 
@@ -62,24 +62,74 @@ if git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   git_display="${git_branch} ${git_indicator}"
 fi
 
-# Caveman mode indicator — read state file if hook is enabled.
-# New canonical location is ~/.claude/modes/caveman; fall back to legacy path
-# for one release in case a stale state file is still around.
-caveman_display=""
-CAVEMAN_STATE="$HOME/.claude/modes/caveman"
-if [ ! -f "$CAVEMAN_STATE" ] && [ -f "$HOME/.claude/caveman-mode" ]; then
-  CAVEMAN_STATE="$HOME/.claude/caveman-mode"
-fi
-if [ -f "$CAVEMAN_STATE" ]; then
-  caveman_level=$(tr -d '[:space:]' < "$CAVEMAN_STATE")
-  [ -z "$caveman_level" ] && caveman_level="full"
-  case "$caveman_level" in
-    lite)           caveman_tag="cv:lite" ;;
-    full)           caveman_tag="cv:full" ;;
-    actual-caveman) caveman_tag="cv:actual" ;;
-    *)              caveman_tag="cv:$caveman_level" ;;
+# Active modes + com-style indicator — walk ~/.claude/modes/ and group by category.
+# Com-style: caveman, token-efficient. Mode: planner, verify-first, rubber-duck, deep-research.
+# Legacy fallback: if the old ~/.claude/caveman-mode file is present and the new
+# ~/.claude/modes/caveman isn't, surface caveman from the legacy path for one release.
+com_modes=""
+mode_modes=""
+
+_append() {
+  local existing="$1"
+  local tag="$2"
+  if [ -z "$existing" ]; then
+    printf '%s' "$tag"
+  else
+    printf '%s,%s' "$existing" "$tag"
+  fi
+}
+
+_tag_for() {
+  local name="$1"
+  local level="$2"
+  case "$name" in
+    caveman)
+      case "$level" in
+        lite|on)           printf 'cv-lite' ;;
+        full)              printf 'cv-full' ;;
+        actual-caveman)    printf 'cv-actual' ;;
+        *)                 printf 'cv-%s' "$level" ;;
+      esac
+      ;;
+    token-efficient)       printf 'te' ;;
+    planner)               printf 'pl' ;;
+    verify-first)          printf 'vf' ;;
+    rubber-duck)           printf 'rd' ;;
+    deep-research)         printf 'dr' ;;
+    *)                     printf '%s' "$name" ;;
   esac
-  caveman_display="$caveman_tag"
+}
+
+_category_for() {
+  # Which group a mode name belongs to: "com" for com-style, "mode" for the rest.
+  case "$1" in
+    caveman|token-efficient) printf 'com' ;;
+    *)                       printf 'mode' ;;
+  esac
+}
+
+MODES_DIR="$HOME/.claude/modes"
+if [ -d "$MODES_DIR" ]; then
+  for f in "$MODES_DIR"/*; do
+    [ -f "$f" ] || continue
+    name=$(basename "$f")
+    level=$(tr -d '[:space:]' < "$f" 2>/dev/null)
+    [ -z "$level" ] && level="on"
+    tag=$(_tag_for "$name" "$level")
+    cat=$(_category_for "$name")
+    if [ "$cat" = "com" ]; then
+      com_modes=$(_append "$com_modes" "$tag")
+    else
+      mode_modes=$(_append "$mode_modes" "$tag")
+    fi
+  done
+fi
+
+# Legacy caveman-mode fallback (one-release grace period).
+if [ -z "$com_modes" ] && [ -f "$HOME/.claude/caveman-mode" ]; then
+  legacy_level=$(tr -d '[:space:]' < "$HOME/.claude/caveman-mode")
+  [ -z "$legacy_level" ] && legacy_level="full"
+  com_modes=$(_tag_for "caveman" "$legacy_level")
 fi
 
 # Build context progress bar (20 chars wide)
@@ -114,14 +164,16 @@ COL_GIT='\033[0;34m'       # blue
 COL_MODEL='\033[0;33m'     # yellow
 COL_CTX='\033[0;32m'       # green
 COL_USAGE='\033[0;35m'     # magenta
-COL_CAVEMAN='\033[0;31m'   # red — flag that a persistent mode is active
+COL_COM='\033[0;31m'       # red — com-style (caveman, token-efficient) is loud
+COL_MODE='\033[1;33m'      # bright yellow — behavioral modes
 RESET='\033[0m'
 
 # Compose
 parts="${COL_CWD}${short_cwd}${RESET}"
 [ -n "$git_display" ] && parts="${parts}  ${COL_GIT}(${git_display})${RESET}"
 parts="${parts}  ${COL_MODEL}${model}${RESET}"
-[ -n "$caveman_display" ] && parts="${parts}  ${COL_CAVEMAN}[${caveman_display}]${RESET}"
+[ -n "$com_modes" ]  && parts="${parts}  ${COL_COM}[cs:${com_modes}]${RESET}"
+[ -n "$mode_modes" ] && parts="${parts}  ${COL_MODE}[mode:${mode_modes}]${RESET}"
 parts="${parts}  ${COL_CTX}${ctx_display}${RESET}  ${COL_USAGE}${usage_display}${RESET}"
 
 printf "%b\n" "$parts"

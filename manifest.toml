@@ -73,6 +73,7 @@ category = "coding/quality"
 
 [skills.git-worktree-workflow]
 tools = ["Bash"]
+cli = ["gwt"]
 category = "coding/version-control"
 
 [skills.executor]
@@ -190,6 +191,7 @@ category = "coding/languages"
 
 [skills.ui-expert]
 tools = ["Bash", "Read", "Write"]
+cli = ["shotty"]
 mcp = ["context7", "firefox-devtools"]
 category = "coding/languages"
 
@@ -260,17 +262,17 @@ category = "research"
 
 [skills.youtube]
 tools = ["Bash", "Read", "Write"]
-cli = ["af", "ffmpeg"]
+cli = ["yt-tool", "ffmpeg"]
 category = "research"
 
 [skills.terminal-read]
 tools = ["Bash", "Read"]
-cli = ["af"]
+cli = ["termread"]
 category = "research"
 
 [skills.web-scraper]
 tools = ["Bash", "Read", "Write", "Edit"]
-cli = ["af", "uv", "curl"]
+cli = ["webscraper", "uv", "curl"]
 category = "research"
 
 [skills.reasoning]
@@ -412,6 +414,40 @@ manager = "system"
 package = "ffmpeg"
 install = ["sudo pacman -S ffmpeg", "sudo apt install ffmpeg", "brew install ffmpeg"]
 description = "Media transcode / trim / mux — used by youtube skill for WAV/MP3 encoding and clip trimming"
+
+# ── Extracted standalone CLIs (Tier 4 per docs/reference/what-belongs-here.md) ─
+# These were previously af subcommands; now live in their own repos under
+# EdwardAstill/. Install either editable (from a local clone) or from git.
+
+[cli.yt-tool]
+manager = "uv"
+package = "yt-tool"
+install = ["uv tool install --editable /home/eastill/projects/yt-tool", "uv tool install git+https://github.com/EdwardAstill/yt-tool"]
+description = "YouTube CLI — transcripts / audio / video (MP4) / summaries / channel / playlists / search. Used by the youtube skill."
+
+[cli.webscraper]
+manager = "uv"
+package = "webscraper"
+install = ["uv tool install --editable /home/eastill/projects/webscraper", "uv tool install git+https://github.com/EdwardAstill/webscraper"]
+description = "Pure-HTTP web scraping — inspect / fetch / scaffold / cache. Used by the web-scraper skill."
+
+[cli.termread]
+manager = "uv"
+package = "termread"
+install = ["uv tool install --editable /home/eastill/projects/termread", "uv tool install git+https://github.com/EdwardAstill/termread"]
+description = "Capture tmux / screen / stdin terminal scrollback so an agent can read it. Used by the terminal-read skill."
+
+[cli.shotty]
+manager = "uv"
+package = "shotty"
+install = ["uv tool install --editable /home/eastill/projects/shotty", "uv tool install git+https://github.com/EdwardAstill/shotty"]
+description = "Playwright browser screenshot CLI — viewports, mobile, full-page, custom widths. Used by ui-expert recipes."
+
+[cli.gwt]
+manager = "uv"
+package = "gwt"
+install = ["uv tool install --editable /home/eastill/projects/gwt", "uv tool install git+https://github.com/EdwardAstill/gwt"]
+description = "Git worktree helper — creates worktree, allocates a free port, optional --launch hook. Used by the git-worktree-workflow skill."
 
 # ── Subagents ────────────────────────────────────────────────────────────────
 # Custom subagent definitions shipped with this repo. Installed into
