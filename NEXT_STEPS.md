@@ -1,200 +1,160 @@
 # Next Steps
 
-Handoff doc for picking up agentfiles after the 2026-04-18 session.
-
-Read this before touching anything. The repo is in its best shape of the
-session — no open regressions, no half-shipped features, everything
-committed and pushed. What follows is ranked optional work.
+Handoff + live backlog for agentfiles. Also drives an in-session loop
+that ticks every 10 min for 2 hours — see §0.
 
 ---
 
-## 1. State at session end
+## 0. Cron-bot charter
 
-**Commits:** `e28f736` → `6e33bd2` (14 commits, all on `main`, all pushed).
+**Each time the loop fires (every 10 min):**
 
-**Verification:**
+1. Read this file end-to-end before acting. State lives here.
+2. Increment `§1.iteration` counter. Log wall-clock time to `§1.last_tick`.
+3. Evaluate stop conditions (below). If any match → run the stop protocol.
+4. Pick the item tagged `⭐ NEXT` in §3. If no item is tagged, pick the top unticked item in §3 and tag it.
+5. Execute per SOP (below). One item per iteration. Do NOT try to batch.
+6. Verify: `af audit` must stay 10/10, `pytest` (from `tools/python/`) must stay 209 passed 1 skipped (or higher if tests were added).
+7. Commit + push in a single self-contained commit. Message format: `<type>(<scope>): <what> (<code>)` where `<code>` is the backlog id (e.g. `3-4`, `5-1`).
+8. Update this file: move the shipped item from §3 to §2, move `⭐ NEXT` to the new top of §3, add any newly surfaced work as fresh §3 entries (use the next free code in the right tier).
+9. End turn.
 
-```
-pytest: 201 passed, 1 skipped
-af audit: 9/9 checks passed, 0 issues
-af check plans: 1 pair clean, no drift
-safety-gate tests: 18/18 passed
-plugin validator: .claude-plugin/{plugin,marketplace}.json both valid
-```
+**Stop conditions (any match → stop):**
 
-**Scale:**
+- `§1.iteration >= 12` (12 × 10 min = 2 hours)
+- Wall clock ≥ `§1.stop_by`
+- `§3` contains only items tagged `[speculative]` or `[needs-human]`
+- 3 consecutive iterations failed verification
 
-- **73 skills** registered across 4 top-level categories
-- **10 subagents** in `agentfiles/agents/` (3 custom: skill-tester, audit, security-review; 7 local copies of Claude Code built-ins)
-- **2 behavioral modes** (token-efficient, caveman)
-- **5 knowledge pages** (K-001..K-005) in `research/knowledge/`
-- **6 includes/ fragments** across python, typescript, rust, typst
-- **9 audit checks** (skill/agent/cli registry + hook script health)
+**Stop protocol:**
 
-**CLI surface** (24 top-level subcommands, plus install/research):
+- Write a one-line entry in `§4` capturing what ran and what's left.
+- Commit this file as `chore(cron): stop after N iterations`.
+- Push. End turn with a summary to the user.
+- Do NOT schedule another /loop.
 
-```
-af ak {list,show,grep}
-af archetype {match,show,list}
-af audit [--fix]
-af caveman {on,off,status}       # backwards-compat alias → af mode caveman
-af check {distinct,plans}
-af context / af status / af versions / af routes / af tree
-af include {list,show,expand,check}
-af learn {propose,list,promote}
-af log {session,analyze,anomalies,review}
-af metrics
-af mode {list,on,off,status}
-af note / af read / af init
-af plan-exec {validate,list,next,mark,reset,status}
-af plan-scaffold
-af skill-find
-af skill-usage {summary,rank,sessions}
-af test-skill
-af terminal / af webscraper / af youtube {transcript,audio,summary,channel,playlists,search}
-af hub / af repo / af setup / af tools / af secrets / af preview / af screenshot / af worktree
-```
+**SOP per item:**
 
----
-
-## 2. What shipped this session
-
-One-liner per commit, bottom-up (newest last):
-
-| Hash | Message |
+| Size hint in §3 | Execution |
 |---|---|
-| `e28f736` | Removed 46 broken self-referential symlinks inside skill dirs |
-| `da71e8a` | Added local subagent library (3 custom + 7 local copies of built-ins) |
-| `c0d5715` | Landed youtube/terminal-read/web-scraper/reasoning suite |
-| `625ca23` | Deleted make-quiz, folded quiz authoring into readrun |
-| `114e68f` | Renamed `wiki/` → `research/` with distilled `knowledge/` subdir + `af ak` CLI |
-| `b7650f8` | `af youtube search` + artist → WAV workflow |
-| `2518a75` | Research pass: claude-mem + anthropic-best-practices + refreshed hermes/archon |
-| `1762736` | Implemented 5 research gaps (Plan Mode, batch loop, SessionStart enrichment, AskUserQuestion, K-NNN ids) |
-| `c020595` | 18-item backlog: `af audit`, `af skill-usage`, `af learn`, `af metrics`, `af skill-find`, `af include`, trigger-spec descriptions, `.claude-plugin` manifest, hooks/README, smoke tests |
-| `1a89644` | Fixed 3 verification gaps (slug, promote name-drift, plugin schema) |
-| `cbf5be6` | Safety-gate: whitelist → blacklist (catastrophic-only) |
-| `82bb30c` | 3 parallel agents: includes/ migration, behavioral modes MVP, dsa-expert skill-tester run |
-| `043c187` | Tier-6 rough edges: slug generator, hook-dep validation, promote pipeline test |
-| `0b311ac` | N3 typed hook payloads (4 hooks + shared hook_types module) |
-| `8f16e15` | N4 phase 1 (plan YAML core loader + validator + toposort) |
-| `4143616` | N4 phase 2 (CLI + writing-plans + skill wiring + drift watchdog) |
-| `6e33bd2` | N4 phase 3 (first real YAML sidecar dogfooded end-to-end) |
+| `[trivial]` (<10 min, one file) | Inline: Read → Edit → verify → commit |
+| `[small]` (one module or a handful of files) | Inline, possibly one parallel Agent for heavy I/O |
+| `[medium]` (cross-file, requires discovery) | Single Agent dispatch with focused context |
+| `[large]` (split across domains, parallelizable) | Multiple parallel Agents, reconcile after |
+| `[needs-human]` | Do not execute. Skip and pick next item. |
+| `[speculative]` | Do not execute. Skip and pick next item. |
+
+**Guard rails (do not violate):**
+
+- No destructive git operations without explicit user authorization. `push` and `push --force` are categorically different; only regular `push` is allowed in the loop.
+- Never skip hooks (`--no-verify`).
+- Never bulk-promote drafts under `docs/skills-drafts/`.
+- Never disable `af audit` checks. If a check fails, fix the underlying drift.
+- Never write to `~/.claude/` or any path outside this repo. Outside-repo work belongs in §5 for the user to do manually.
+- If an item looks like it needs scope discussion, re-tag it `[needs-human]` and skip.
 
 ---
 
-## 3. Open items — ranked by leverage
+## 1. Loop state
 
-### Tier A — Highest leverage (do these first)
+- `start_commit`: `23589ba`
+- `start_time`: 2026-04-19 (loop-start)
+- `stop_by`: start_time + 2 hours
+- `iteration`: 0 / 12
+- `last_tick`: —
+- `consecutive_failures`: 0
 
-| # | Item | Effort | Why |
-|---|---|---|---|
-| **1-1** | **Prune 32 never-loaded skills** | 4 hours | `af skill-usage summary --days 90` shows 32/73 skills have never been loaded. Run through each, archive/merge/reword. Biggest concrete catalog improvement remaining. Judgment-heavy — can't be done by an agent without review. |
-| **1-2** | **Rewrite remaining ~63 skill descriptions as trigger specs** | Half day (batchable in parallel agents) | Only top-10 were done this session. The routing-quality lift scales linearly. Per-skill: add 5–10 trigger phrases + 2–3 negative scope clauses. anthropics/skills-style. |
-| **1-3** | **Ship `skill-tester` on `codebase-explainer` and `research-agent`** | 1–2 hours wall-clock | Only dsa-expert has a real benchmark today. These two are the next-best candidates — concrete rubric-gradable outputs. Result goes in `docs/testing/`. |
+---
 
-### Tier B — Concrete follow-ups to items already shipped
+## 2. Shipped
 
-| # | Item | Effort | Why |
-|---|---|---|---|
-| **2-1** | **Ship 4 remaining behavioral modes** (deep-research, verify-first, rubber-duck, planner) | 1 hour each | MODE.md primitive already supports them. Each one is just a file + reminder text + category classification. See `docs/plans/2026-04-18-behavioral-modes.md`. |
-| **2-2** | **Retire old caveman SKILL.md + its manifest entry** | 30 min | The new `agentfiles/modes/caveman/MODE.md` is the real caveman now. Old SKILL.md still exists because several callers (marketplace blurb, `hooks/install-*.sh`, `docs/skill-tree.md`, `tools/python/tests/test_cli_smoke.py`) reference it. One-pass migration. |
-| **2-3** | **Delete `hooks/caveman-mode.py` shim** | 5 min | Was kept as one-release grace for cached plugin configs. Safe to delete now. |
-| **2-4** | **Fix `af learn` dogfooding issues** | 1 hour | Three related follow-ups flagged during N24 testing: (a) exclude `$CLAUDE_SESSION_ID` from session file scan so mid-session `af learn propose` doesn't hit a moving target; (b) clean path-noise tokens out of the `description` field (not just the slug); (c) add `2 > /dev/null` redirect tokens to `_STOP_TOKENS` to avoid slugs like `2-dev-null-…`. |
-| **2-5** | **Wire `af check plans` into pre-commit / CI** | 30 min | Drift watchdog exists but nothing invokes it automatically. Add to either `.git/hooks/pre-commit` or a new section of `af audit` check 10. |
+**This active session** (parallel sweep + cron follow-ups).
 
-### Tier C — Infrastructure polish
-
-| # | Item | Effort | Why |
-|---|---|---|---|
-| **3-1** | **Archive shipped design plans** | 15 min | `docs/plans/2026-04-18-{includes-fragments,behavioral-modes,typed-hook-payloads,plan-yaml-schema}.md` all shipped. Move to `docs/plans/archive/` to signal "done, don't re-plan." Keep the markdown header `**Status:** shipped YYYY-MM-DD`. |
-| **3-2** | **Copy remaining Claude Code built-in subagents locally** | 1 hour | Have 7 of 10. Missing: `feature-dev:feature-dev`, `feature-dev:code-reviewer`(?), `statusline-setup`. Check the session's opening system reminder for the canonical list. |
-| **3-3** | **Populate `research/projects/education-and-showcases/`** | 1 hour | Only 3 entries today. Candidates: anthropic/courses, specific agent demos, tutorial repos the session browsed. |
-| **3-4** | **Add monthly `af log review` cron or scheduled trigger** | 30 min | The self-improvement loop exists (`af log review` + retrospective skill + promotion rule). Nothing runs the crank. Options: shell cron, systemd timer, `schedule` skill. |
-| **3-5** | **StateFile.mark loop-body id handling** | 30 min | Phase 2A noted: `mark` accepts ids for nodes inside a `LoopNode.body`. Spec is silent on whether that's intentional. Decide: allow (current), or scope loop bodies to their parent loop's state. |
-
-### Tier D — Design candidates (these could become plans)
-
-None of these have written specs yet. Each could be written up and shipped if the need shows.
-
-| # | Item | Why it might matter |
+| Commit | Code | What |
 |---|---|---|
-| **4-1** | **Per-project modes** — `af mode on --project` writes to `.claude/modes/` in the repo. | Mentioned in `docs/plans/2026-04-18-behavioral-modes.md` §9 as deferred. Useful if you want a mode active only in one project. |
-| **4-2** | **Named mode bundles** — `af mode preset research-deepdive` activates a curated set. | Deferred per same plan. Lower priority until people are using modes more. |
-| **4-3** | **Retire `agentfiles/communication/caveman/SKILL.md`** fully | Already covered in 2-2 — noting here because the follow-ups chain. |
-| **4-4** | **Skill-tester workflow automation** — `af test-skill <name>` scaffolds workspace + dispatches subagent + renders report. | Already partially implemented, but the pipeline is manual-click today. |
-| **4-5** | **Per-skill `model:` frontmatter** (like anthropics/skills does) | Route cheap skills to haiku, expensive orchestration to opus. Would need hook-time routing change. |
-| **4-6** | **Eval-viewer for `skill-tester`** | anthropics/skills ships an eval-viewer in skill-creator. We have the data in `tests/<skill>/iteration-N/` — an HTML viewer would make reviewing benchmark deltas faster. |
-
-### Tier E — Small fixes / rough edges
-
-| # | Item | Effort |
-|---|---|---|
-| **5-1** | **`af audit` check 9 shell-binary scan is best-effort** — false positives on `command -v`-guarded binaries. Documented, not a bug; consider skipping binaries inside `command -v <bin>` contexts if noise grows. | 30 min |
-| **5-2** | **python-expert vs typescript-expert similarity 0.42** per `af check distinct`. Benign template pairing; revisit if routing actually confuses them. | 10 min |
-| **5-3** | **hooks/install-gemini-hooks.sh parity** should be audited periodically. Synced this session; drift will return. | 15 min |
-| **5-4** | **`skill-logger.py` reads `tool_output`/`output` but canonical schema uses `tool_response`** | 15 min |
-| **5-5** | **Gitignore `tools/python/tests/fixtures/plan_example.yaml.state.json`** if tests ever leak state | 5 min |
+| `e89417a` | 2-1, 2-2, 2-3, 3-1, 3-2 | Parallel backlog sweep — 4 behavioral modes, retire old caveman, delete hook shim, archive 4 shipped design plans, copy 4 missing built-in subagents |
+| `5a42bf9` | 1-3 | Skill-tester on codebase-explainer (+4.75/25) + research-agent (+3.00/25); both verdict: recommend |
+| `baf5567` | 5-5 | Gitignore plan-exec state files recursively |
+| `05c7e59` | 1-2 | 60 skill descriptions rewritten as trigger specs (coding 34 / mgmt 11 / research 6 / reasoning+coaches+planning 9) |
+| `9bce750` | 2-4 | 3 `af learn` dogfooding defects fixed (active-session skip, title path-noise, redirect STOP_TOKENS) |
+| `7b05ae0` | 2-5 | `af audit` CHECK 10 — plan-pair drift detection |
+| `033a917` | — | Rename backlog codes A1..E5 → 1-1..5-5 |
+| `34eedf3` | — | New `computer-control` skill (Hyprland / dotool / hyprctl / grim / slurp / wl-copy) |
+| `dcca1f1` | 1-1 | Never-loaded skill review — verdict KEEP all 11 (6 dispatchers + 4 niche leaves + 1 brand-new). The A2 rewrite already did the real pruning work (never-loaded count fell 32 → 11). |
+| `23589ba` | — | Resolve `agentfiles-manager` name drift (dir rename + alias removal) |
 
 ---
 
-## 4. How to pick this back up
+## 3. Remaining — ranked
 
-First 5 minutes:
+Each entry has a size tag the SOP consumes. The `⭐ NEXT` marker points
+at the current pick. Move it down as items finish.
 
-```bash
-cd ~/projects/agentfiles
-af metrics                       # overall health
-af audit                         # must be 9/9
-af skill-usage summary --days 30 # what's used, what's dead
-af ak list                       # what knowledge exists
-cat docs/plans/2026-04-18-next-round-backlog.md   # item-level backlog
-cat NEXT_STEPS.md                # this file
-```
+### Tier 3 (practical)
 
-Pick one item from the ranked list. Most tier-A/B items are <1 day and ship cleanly.
+- **⭐ NEXT  3-4** `[medium]` **Weekly `af log review` cron or scheduled trigger.** The self-improvement loop exists (`af log review` → retrospective → promotion) but nothing runs the crank. Pick: shell cron, systemd timer, or the `schedule` skill. Lowest-friction: `systemctl --user` timer invoking `af log review`.
+- **3-3** `[small]` Populate `research/projects/education-and-showcases/`. Only 3 entries today. Candidates: anthropic/courses, specific agent demos, tutorial repos the session browsed.
+- **3-5** `[small]` `StateFile.mark` loop-body id handling spec decision. Phase 2A noted `mark` accepts ids inside `LoopNode.body`; spec is silent. Decide allow (current) or scope to parent loop. Document in writing-plans.
+
+### Session-surfaced follow-ups
+
+- **S-1** `[small]` Regenerate `docs/skill-tree.md` via `af tree --regenerate` — stale (omits `computer-control`, possibly others after A2 + renames).
+- **S-2** `[medium]` New `af audit` CHECK 11 — validate `[modes.*]` manifest section the same way CHECK 1 validates `[skills.*]`.
+- **S-3** `[medium]` `af check modes` — MODE.md frontmatter validator. Pending from behavioral-modes design plan.
+- **S-4** `[small]` Upgrade `research` dispatcher description to full trigger-spec (currently brief prose; only dispatcher that hasn't been rewritten).
+- **S-5** `[small]` Copy `feature-dev` slash command locally. NEXT_STEPS's original C2 assumption was wrong — `feature-dev` is a slash command, not a subagent. Would live under `commands/`.
+
+### Tier 5 (small fixes)
+
+- **5-1** `[small]` `af audit` CHECK 9 false positives on `command -v`-guarded binaries. Add a parse step that skips binaries inside `command -v <bin>` contexts.
+- **5-2** `[trivial]` python-expert vs typescript-expert cosine similarity 0.42 per `af check distinct`. Benign template pairing; revisit only if routing confusion is observed. Tag `[needs-human]` unless routing data shows real confusion.
+- **5-3** `[small]` `hooks/install-gemini-hooks.sh` parity — synced this session but drift will return. Add an audit check or a shared source-of-truth.
+- **5-4** `[trivial]` `skill-logger.py` reads `tool_output`/`output` but canonical hook schema is `tool_response` (per N3 typed-payloads work). One-line fix.
+
+### Tier 4 (design candidates — mostly `[speculative]`)
+
+- **4-1** `[speculative]` Per-project modes — `af mode on --project` writes to `.claude/modes/` in the repo.
+- **4-2** `[speculative]` Named mode bundles — `af mode preset research-deepdive` activates a curated set.
+- **4-4** `[medium]` `af test-skill` automated pipeline — scaffolds workspace + dispatches subagent + renders report. Data-driven by existing `tests/<skill>/iteration-N/` layout.
+- **4-5** `[speculative]` Per-skill `model:` frontmatter routing. Needs hook-time dispatch change. Defer until cost signal.
+- **4-6** `[medium]` HTML eval-viewer for skill-tester. anthropics/skills ships one in skill-creator. We have raw data at `tests/<skill>/iteration-N/grades.json`.
+
+### Monitoring (30-day)
+
+- **M-1** `[needs-human]` Monitor 4 never-loaded leaves: `computer-control`, `dsa-expert`, `system-architecture-expert`, `agentfiles-manager`. If any stays zero-loads despite relevant tasks, re-open 1-1 for that skill.
 
 ---
 
-## 5. Guard rails
+## 4. Stop-run log
 
-Things to NOT do without thinking:
+One entry per loop run that terminates. Appended by the stop protocol.
+
+<!-- entries go here -->
+
+---
+
+## 5. Outside-repo (user must do manually)
+
+These cannot be automated by the loop — they touch `~/.claude/` or
+systemd state outside the repo.
+
+- `systemctl --user enable --now dotoold` — activate input daemon for `computer-control`. Without it, `dotool` silently fails.
+- `./hooks/install-hooks.sh` — re-sync `~/.claude/settings.json` to the new `modes.py`. The old `caveman-mode.py` is deleted; hook silently no-ops until the user re-installs.
+- `rm ~/.claude/skills/skill-manager` — purge the stale alias symlink left over from the `agentfiles-manager` rename.
+
+---
+
+## 6. Guard rails (persistent, session-agnostic)
 
 - **Don't bulk-promote every draft under `docs/skills-drafts/`.** The human-in-the-loop gate exists because the heuristic surfaces session replays, not distilled skills. N24's rejection proved this.
-- **Don't disable `af audit` checks.** Each one was added in response to real drift. The safety-gate hook similarly catches real blast radius.
-- **Don't convert skills to subagents proactively.** Per `docs/reference/skills-vs-subagents.md`, the 3-criteria rule says only convert when verbose-output + self-contained + benefit-from-tool-restriction all hold. We shipped 3 (skill-tester, audit, security-review); that's probably it.
-- **Don't add MCP servers / CLI tools preemptively.** The anti-bloat rule in `AGENTS.md` says capability, not surface area. Measure demand before adding.
+- **Don't disable `af audit` checks.** Each one was added in response to real drift.
+- **Don't convert skills to subagents proactively.** The 3-criteria rule (verbose-output + self-contained + tool-restriction) must all hold. 3 currently qualify (skill-tester, audit, security-review); that's probably it.
+- **Don't add MCP servers / CLI tools preemptively.** The anti-bloat rule in `AGENTS.md` says capability, not surface area. Measure demand first.
+- **Don't bulk-rewrite README files.** Users rely on current phrasing for search/muscle-memory; rewrites erase that context.
 
 ---
 
-## 6. Unused but installed
-
-Things wired up but not actively used — watch for whether they earn their weight.
-
-- **`af learn`** — works, shipped drafts, none yet promoted. First real promotion will stress-test the flow beyond scratch.
-- **`af plan-exec`** — pipeline proven end-to-end, but only one sidecar (retrospective behavioral-modes). Next forward plan should have a YAML from day one.
-- **`af skill-find`** — keyword search; low-traffic until the catalog grows.
-- **`af check plans`** — drift watchdog; only 1 pair today.
-- **`af metrics`** — dashboard; nothing consumes its output yet.
-
----
-
-## 7. Design plans — all shipped
-
-| Plan | Shipped |
-|---|---|
-| `docs/plans/2026-04-18-includes-fragments.md` | `8f16e15`... (in the c020595 batch, really) |
-| `docs/plans/2026-04-18-behavioral-modes.md` | `82bb30c` (MVP) |
-| `docs/plans/2026-04-18-typed-hook-payloads.md` | `0b311ac` |
-| `docs/plans/2026-04-18-plan-yaml-schema.md` | `8f16e15` + `4143616` + `6e33bd2` |
-
-Earlier plans already archived: `docs/plans/archive/{2026-04-09-layered-skill-taxonomy,2026-04-14-skill-tester}.md`.
-
-**Tier-3-1 follow-up:** move the 4 shipped plans to archive now that they're done. Keeps `docs/plans/` focused on in-flight work.
-
----
-
-## 8. The one thing to remember
+## 7. The one thing to remember
 
 The improvement loop exists and the infrastructure is in place:
 
@@ -203,7 +163,6 @@ session → af log review → research/lessons/ → promote pattern → knowledg
                        ↘ anomalies.md → retrospective skill → skill edits
 ```
 
-Nothing ran the crank automatically this session. The next highest-leverage
-operational change is wiring a weekly cron on `af log review`. Until someone
-does that, compound learning depends on humans remembering to pull the
-handle. See Tier-3-4.
+Before this session, nothing ran the crank. Item 3-4 finally wires it up.
+After that lands, compound learning becomes automatic — no human needed
+to remember to pull the handle.
