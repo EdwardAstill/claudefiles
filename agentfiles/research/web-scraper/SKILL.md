@@ -6,17 +6,27 @@ description: >
   "extract all the articles from Y", "build a dataset from this website", "hit
   their API", "download everything under this URL", "paginate through these
   pages", "parse the JSON-LD", "grab the sitemap and fetch each page". Runs via
-  `af webscraper inspect / scaffold / fetch`: framework fingerprinting, API
-  endpoint discovery, robots.txt, rate-limited fetching, JSONL/CSV/SQLite
-  output. Do NOT use for JS-rendered pages that only populate after client-side
-  execution (use browser-control) or for converting HTML/PDF files already on
-  disk (use file-converter).
+  the standalone `webscraper` CLI (external repo EdwardAstill/webscraper):
+  framework fingerprinting, API endpoint discovery, robots.txt, rate-limited
+  fetching, JSONL/CSV/SQLite output. Do NOT use for JS-rendered pages that
+  only populate after client-side execution (use browser-control) or for
+  converting HTML/PDF files already on disk (use file-converter).
 ---
 
 # web-scraper
 
 Pure-HTTP scraping. Goal: get the minimum viable request that returns the
 data, parse it cheaply, repeat politely.
+
+The CLI used by this skill, `webscraper`, lives in a standalone repo:
+[`EdwardAstill/webscraper`](https://github.com/EdwardAstill/webscraper).
+Install with:
+
+```bash
+uv pip install -e ~/projects/webscraper    # if cloned locally
+# or once published:
+# pipx install webscraper
+```
 
 ## When to use this skill
 
@@ -31,15 +41,15 @@ sitemap, or a discoverable JSON API endpoint.
   `file-converter`.
 - The user wants to drive a full browser session → `browser-control`.
 
-## Fast path — `af webscraper`
+## Fast path — `webscraper`
 
-Built-in CLI. **Always start here.** Three subcommands cover 90% of scraping work.
+Standalone CLI. **Always start here.** Three subcommands cover 90% of scraping work.
 
 ```bash
-af webscraper inspect <url>          # Recon. Cached 1h. Recommends --mode.
-af webscraper scaffold <url>         # Generates scrape_<host>.py.
-                                      # Auto-picks mode from cached inspect.
-af webscraper fetch <url>            # One-off GET with real browser headers.
+webscraper inspect <url>          # Recon. Cached 1h. Recommends --mode.
+webscraper scaffold <url>         # Generates scrape_<host>.py.
+                                   # Auto-picks mode from cached inspect.
+webscraper fetch <url>            # One-off GET with real browser headers.
 ```
 
 ### What `inspect` reports
@@ -76,7 +86,7 @@ Scaffold auto-runs `inspect` if no cache exists. Modes: `html`, `nextdata`,
 ### Worked example
 
 ```bash
-$ af webscraper inspect https://stripe.com
+$ webscraper inspect https://stripe.com
 ...
 ## Sitemaps
 - index   https://stripe.com/sitemap/sitemap.xml
@@ -88,10 +98,10 @@ $ af webscraper inspect https://stripe.com
 ## JSON-LD (schema.org)
 - @types: Organization, WebSite
 ## Suggested approach
-→ `af webscraper scaffold https://stripe.com --mode api`
+→ `webscraper scaffold https://stripe.com --mode api`
   reason: Direct JSON endpoint available — hit it, skip HTML entirely.
 
-$ af webscraper scaffold https://stripe.com            # reuses cache
+$ webscraper scaffold https://stripe.com            # reuses cache
 [webscraper] auto-picked mode: api
 [webscraper] wrote scrape_stripe_com.py  (mode=api)
 
@@ -105,9 +115,9 @@ Agent job: edit the TODOs (selectors, response path, output file), run it.
 
 ### Cache
 
-- Location: `$XDG_CACHE_HOME/af/webscraper/<sha256>.json` (default `~/.cache/af/webscraper/`)
+- Location: `$XDG_CACHE_HOME/webscraper/<sha256>.json` (default `~/.cache/webscraper/`)
 - TTL: 1 hour
-- Management: `af webscraper cache show|clear|path <url>`
+- Management: `webscraper cache show|clear|path <url>`
 - `scaffold --fresh` forces a re-inspect
 - `inspect --no-cache` inspects without writing to cache
 
@@ -166,7 +176,7 @@ Stop as soon as a rung works.
    from curl_cffi import requests
    r = requests.get(url, impersonate="firefox128")
    ```
-   `af webscraper fetch <url> --impersonate firefox128` uses this.
+   `webscraper fetch <url> --impersonate firefox128` uses this.
    Cloudflare, Akamai, DataDome often fall to this alone.
 7. If still blocked, the data almost certainly needs JS → switch to
    `browser-control`.
@@ -188,3 +198,9 @@ the scraping violates ToS).
 - Page needs JS execution before scraping → `browser-control` (foxpilot).
 - Summarise scraped prose → `note-taker` or `knowledge-base`.
 - Answer a question set from scraped corpus → `test-taker`.
+
+## Source
+
+The `webscraper` CLI is maintained in its own repo:
+[`EdwardAstill/webscraper`](https://github.com/EdwardAstill/webscraper).
+Report bugs or request features there.
