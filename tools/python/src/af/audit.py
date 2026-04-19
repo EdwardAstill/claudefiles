@@ -140,6 +140,11 @@ _BASH_BIN_RE = re.compile(
     r"gh|npm|node|bun|cargo|rustc|make|docker|kubectl|ssh|rsync)"
     r"(?=\s|$|[);|&`])"
 )
+# Binaries the script tests before invoking — treat as optional.
+# Covers `command -v foo`, `which foo`, `type foo`, `hash foo 2>/dev/null`.
+_BASH_GUARD_RE = re.compile(
+    r"(?:command\s+-v|which|\btype\b|\bhash\b)\s+([A-Za-z0-9_.-]+)"
+)
 _HOOK_CMD_RE = re.compile(r'"command"\s*:\s*"([^"]+)"')
 # ${CLAUDE_PLUGIN_ROOT} is expanded at hook-invocation time by Claude Code.
 _PLUGIN_ROOT_VAR = "${CLAUDE_PLUGIN_ROOT}"
@@ -270,20 +275,19 @@ def _audit_hooks(repo_root: Path) -> list[str]:
             seen: set[str] = set()
             for m in _BASH_BIN_RE.finditer(source):
                 seen.add(m.group(1))
+            # Binaries the script itself checks before using are optional by
+            # the author's contract. Skip them to suppress false positives.
+            guarded = {m.group(1) for m in _BASH_GUARD_RE.finditer(source)}
             for binary in sorted(seen):
                 # `python` is acceptable if `python3` exists.
                 if binary == "python" and shutil.which("python3") is not None:
                     continue
+                if binary in guarded:
+                    continue
                 if shutil.which(binary) is None:
-                    # Shell scripts often fall back gracefully (e.g. the
-                    # statusline tries jq then python3). Only flag if both
-                    # the binary AND common aliases are missing — here we
-                    # trust the script's own `command -v` guards and flag
-                    # only binaries we're confident are hard requirements.
-                    # To keep noise low, flag once per (hook, binary).
                     issues.append(
-                        f"  ? hook {entry.name} — references '{binary}' but not on PATH\n"
-                        f"    → fix: install {binary} (may be optional if script guards with `command -v`)"
+                        f"  ✗ hook {entry.name} — references '{binary}' but not on PATH\n"
+                        f"    → fix: install {binary} or guard the invocation with `command -v`"
                     )
 
     # hooks.json commands resolve and are executable.
