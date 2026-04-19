@@ -260,13 +260,11 @@ af install --dry-run                     # preview
 
 ## Git
 
-### af worktree
-
-Create a git worktree and open a terminal with Claude Code.
-
-```bash
-af worktree <branch-name> [base-branch]
-```
+Worktree creation lives in the standalone
+[`gwt`](https://github.com/EdwardAstill/gwt) CLI (`pipx install gwt` or
+`uv pip install -e ~/projects/gwt`). It also handles a `--launch`
+command template — see the `git-worktree-workflow` skill for the
+agent-side workflow.
 
 ---
 
