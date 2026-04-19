@@ -60,8 +60,8 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 11 / 12
-- `last_tick`: iter 11 @ ee595f7 — shipped 5-3 (install-scripts parity test)
+- `iteration`: 12 / 12 — STOPPED (iteration cap reached)
+- `last_tick`: iter 12 @ ec39559 — shipped 5-4 (skill-logger canonical schema)
 - `cron_mode`: self-paced (10m cron replaced; ScheduleWakeup 60s on finish)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
@@ -95,6 +95,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `9d5a4e2` | S-6 | `af install` prunes stale skill/agent symlinks on full install; +6 tests (iter 9) |
 | `40f6c19` | 5-1 | `af audit` CHECK 9 skips `command -v`/`which`/`type`/`hash`-guarded binaries; +3 tests (iter 10) |
 | `ee595f7` | 5-3 | Parity test between `install-hooks.sh` and `install-gemini-hooks.sh`; +2 tests, documented divergences (iter 11) |
+| `ec39559` | 5-4 | `skill-logger.py` reads canonical `tool_response` first, with legacy `tool_output`/`output` fallbacks (iter 12) |
 
 ---
 
@@ -110,7 +111,6 @@ at the current pick. Move it down as items finish.
 
 ### Tier 5 (small fixes)
 
-- **⭐ NEXT  5-4** `[trivial]` `skill-logger.py` reads `tool_output`/`output` but canonical hook schema is `tool_response` (per N3 typed-payloads work). One-line fix.
 - **5-2** `[needs-human]` python-expert vs typescript-expert cosine similarity 0.42 per `af check distinct`. Benign template pairing; revisit only if routing confusion is observed.
 
 ### Tier 4 (design candidates — mostly `[speculative]`)
@@ -131,7 +131,10 @@ at the current pick. Move it down as items finish.
 
 One entry per loop run that terminates. Appended by the stop protocol.
 
-<!-- entries go here -->
+- **2026-04-19 run (iter 12/12)** — stopped on iteration cap. Shipped
+  12 backlog items across 12 iterations: 3-4, 3-3, 3-5, S-1..S-6, 5-1,
+  5-3, 5-4. Remaining §3 entries are all `[needs-human]` or tier-4
+  `[speculative]`. Start commit `23589ba` → end commit `ec39559`.
 
 ---
 
