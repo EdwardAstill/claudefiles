@@ -14,6 +14,8 @@ from af.audit import (
     _audit_hooks,
     _audit_plan_pairs,
     _dep_package_name,
+    _modes_on_disk,
+    _parse_manifest,
     _parse_shebang,
     _parse_uv_script_deps,
 )
@@ -207,7 +209,7 @@ def test_audit_cli_reports_check_10(tmp_path, monkeypatch):
     monkeypatch.chdir(repo)
     result = runner.invoke(audit_app, [])
     assert "CHECK 10" in result.stdout
-    assert "10/10" in result.stdout or "10 checks" in result.stdout
+    assert "/11 checks passed" in result.stdout
 
 
 def test_audit_cli_fails_on_plan_drift(tmp_path, monkeypatch):
@@ -224,3 +226,76 @@ def test_audit_cli_fails_on_plan_drift(tmp_path, monkeypatch):
     result = runner.invoke(audit_app, [])
     assert result.exit_code == 1
     assert "bogus-anchor-not-in-prose" in result.stdout
+
+
+# ── CHECK 11: modes on disk ↔ manifest ──────────────────────────────────────
+
+
+def _modes_repo(root: Path) -> Path:
+    (root / "manifest.toml").write_text("")
+    (root / "agentfiles" / "modes").mkdir(parents=True)
+    return root
+
+
+def _write_mode(agentfiles_dir: Path, name: str) -> None:
+    mode_dir = agentfiles_dir / "modes" / name
+    mode_dir.mkdir(parents=True)
+    (mode_dir / "MODE.md").write_text(
+        f"---\nname: {name}\ncategory: test\n---\n\nbody\n"
+    )
+
+
+def test_modes_on_disk_reads_frontmatter_name(tmp_path):
+    repo = _modes_repo(tmp_path)
+    _write_mode(repo / "agentfiles", "alpha-mode")
+    _write_mode(repo / "agentfiles", "beta-mode")
+    assert _modes_on_disk(repo / "agentfiles") == {"alpha-mode", "beta-mode"}
+
+
+def test_parse_manifest_reads_modes_section(tmp_path):
+    manifest = tmp_path / "manifest.toml"
+    manifest.write_text(
+        "[modes.alpha-mode]\ncategory = \"test\"\n\n"
+        "[modes.beta-mode]\ncategory = \"test\"\n"
+    )
+    parsed = _parse_manifest(manifest)
+    assert parsed["modes"] == {"alpha-mode", "beta-mode"}
+
+
+def test_audit_cli_reports_check_11(tmp_path, monkeypatch):
+    repo = _modes_repo(tmp_path)
+    _write_mode(repo / "agentfiles", "alpha-mode")
+    repo.joinpath("manifest.toml").write_text("[modes.alpha-mode]\ncategory = \"test\"\n")
+    (repo / "skills").mkdir()
+
+    monkeypatch.chdir(repo)
+    result = runner.invoke(audit_app, [])
+    assert "CHECK 11" in result.stdout
+    assert "11/11" in result.stdout or "11 checks" in result.stdout
+
+
+def test_audit_cli_flags_orphan_mode_in_manifest(tmp_path, monkeypatch):
+    repo = _modes_repo(tmp_path)
+    # manifest references a mode that doesn't exist on disk
+    repo.joinpath("manifest.toml").write_text(
+        "[modes.ghost-mode]\ncategory = \"test\"\n"
+    )
+    (repo / "skills").mkdir()
+
+    monkeypatch.chdir(repo)
+    result = runner.invoke(audit_app, [])
+    assert result.exit_code == 1
+    assert "ghost-mode" in result.stdout
+
+
+def test_audit_cli_flags_unregistered_mode_on_disk(tmp_path, monkeypatch):
+    repo = _modes_repo(tmp_path)
+    _write_mode(repo / "agentfiles", "ungregistered-mode")
+    # manifest is empty of [modes.*] entries
+    repo.joinpath("manifest.toml").write_text("")
+    (repo / "skills").mkdir()
+
+    monkeypatch.chdir(repo)
+    result = runner.invoke(audit_app, [])
+    assert result.exit_code == 1
+    assert "ungregistered-mode" in result.stdout

@@ -31,7 +31,7 @@ import typer
 app = typer.Typer(help="Audit the agentfiles manifest for consistency.")
 
 
-_TOML_SECTION_RE = re.compile(r'^\[(skills|agents|cli)\.(?:"([^"]+)"|([^\]"]+))\]')
+_TOML_SECTION_RE = re.compile(r'^\[(skills|agents|cli|modes)\.(?:"([^"]+)"|([^\]"]+))\]')
 _CLI_LIST_RE = re.compile(r'cli\s*=\s*\[([^\]]+)\]')
 
 
@@ -44,7 +44,12 @@ def _find_repo_root() -> Path:
 
 
 def _parse_manifest(path: Path) -> dict[str, set[str]]:
-    sections: dict[str, set[str]] = {"skills": set(), "agents": set(), "cli": set()}
+    sections: dict[str, set[str]] = {
+        "skills": set(),
+        "agents": set(),
+        "cli": set(),
+        "modes": set(),
+    }
     declared_cli: set[str] = set()
     for line in path.read_text().splitlines():
         m = _TOML_SECTION_RE.match(line.strip())
@@ -67,6 +72,19 @@ def _skills_on_disk(agentfiles_dir: Path) -> set[str]:
         if "agents" in skill_md.parent.parts:
             continue
         for line in skill_md.read_text().splitlines():
+            if line.startswith("name:"):
+                names.add(line.split(":", 1)[1].strip())
+                break
+    return names
+
+
+def _modes_on_disk(agentfiles_dir: Path) -> set[str]:
+    modes_dir = agentfiles_dir / "modes"
+    if not modes_dir.is_dir():
+        return set()
+    names: set[str] = set()
+    for mode_md in modes_dir.glob("*/MODE.md"):
+        for line in mode_md.read_text().splitlines():
             if line.startswith("name:"):
                 names.add(line.split(":", 1)[1].strip())
                 break
@@ -352,6 +370,7 @@ def audit(
     manifest = _parse_manifest(manifest_path)
     disk_skills = _skills_on_disk(agentfiles_dir)
     disk_agents = _agents_on_disk(agentfiles_dir)
+    disk_modes = _modes_on_disk(agentfiles_dir)
     registry_skills, registry_problems = _registry_symlinks(repo_root)
 
     issues: list[str] = []
@@ -440,6 +459,22 @@ def audit(
                 f"CHECK 10 (plan pair drift): ✓ all {plan_pair_count} pair(s) in sync"
             )
 
+    # Check 11: modes on disk ↔ manifest
+    missing_mode_entries = disk_modes - manifest["modes"]
+    orphan_mode_entries = manifest["modes"] - disk_modes
+    if missing_mode_entries:
+        for n in sorted(missing_mode_entries):
+            issues.append(
+                f"  ✗ mode '{n}' on disk — add [modes.{n}] entry to manifest.toml"
+            )
+    if orphan_mode_entries:
+        for n in sorted(orphan_mode_entries):
+            issues.append(
+                f"  ✗ manifest [modes.{n}] has no MODE.md — create or remove the entry"
+            )
+    if not missing_mode_entries and not orphan_mode_entries:
+        passed.append(f"CHECK 11 (mode dirs ↔ manifest): ✓ all {len(disk_modes)} registered")
+
     # ── --fix mode: repair safely-repairable drift ──────────────────────────
     if fix:
         fixed: list[str] = []
@@ -488,7 +523,7 @@ def audit(
         for line in issues:
             typer.echo(line)
 
-    total_checks = 10
+    total_checks = 11
     failed_checks = sum([
         bool(missing_in_manifest),
         bool(orphan_skill_entries),
@@ -500,6 +535,7 @@ def audit(
         bool(registry_problems or missing_registry),
         bool(hook_issues),
         bool(plan_issues),
+        bool(missing_mode_entries or orphan_mode_entries),
     ])
     typer.echo("")
     typer.echo(f"SUMMARY: {total_checks - failed_checks}/{total_checks} checks passed, {len(issues)} issue(s)")
