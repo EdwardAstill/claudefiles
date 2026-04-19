@@ -32,7 +32,6 @@ from af.terminal import app as terminal_app
 from af.tree import app as tree_app
 from af.versions import app as versions_app
 from af.webscraper import app as webscraper_app
-from af.youtube import app as youtube_app
 
 # tests/test_cli_smoke.py → tools/python/tests → tools/python → tools → agentfiles
 REPO = Path(__file__).parent.parent.parent.parent
@@ -171,17 +170,4 @@ def test_webscraper_help():
     assert result.exit_code == 0, result.output
 
 
-def test_youtube_help():
-    result = runner.invoke(get_command(youtube_app), ["--help"])
-    assert result.exit_code == 0, result.output
-
-
 # ── network-gated ────────────────────────────────────────────────────────────
-
-@_NETWORK
-def test_youtube_search_network():
-    result = runner.invoke(
-        get_command(youtube_app),
-        ["search", "test query", "--limit", "1"],
-    )
-    assert result.exit_code == 0, result.output

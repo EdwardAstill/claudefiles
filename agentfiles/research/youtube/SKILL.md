@@ -2,36 +2,38 @@
 name: youtube
 description: >
   Use for anything YouTube. Trigger phrases: "get the transcript of this video",
-  "download this playlist", "rip audio from this YouTube link", "summarise this
-  YouTube video", "find videos by artist X", "download as MP3", "transcribe the
-  talk", "list videos on this channel", "clip from 1:30 to 2:45", "I only have
-  the channel name, find the video". Covers search, transcripts (video /
-  playlist / channel bulk), audio extraction (WAV / MP3 / any ffmpeg format),
-  clip trimming, channel + playlist listings, and LLM summarisation via `af
-  youtube <subcommand>`. Do NOT use for arbitrary web video (use web-scraper or
-  browser-control) or for converting a local media file you already have (use
-  file-converter).
+  "download this playlist", "rip audio from this YouTube link", "download the
+  video", "grab the mp4", "save as mkv", "summarise this YouTube video", "find
+  videos by artist X", "download as MP3", "transcribe the talk", "list videos
+  on this channel", "clip from 1:30 to 2:45", "I only have the channel name,
+  find the video". Covers search, transcripts (video / playlist / channel
+  bulk), audio extraction (WAV / MP3 / any ffmpeg format), video download
+  (MP4 / MKV / WebM), clip trimming, channel + playlist listings, and LLM
+  summarisation via `yt-tool <subcommand>`. Do NOT use for arbitrary web
+  video (use web-scraper or browser-control) or for converting a local media
+  file you already have (use file-converter).
 ---
 
 # YouTube
 
-All YouTube operations are built in as `af youtube`. Source lives in
-`tools/python/src/af/youtube.py`. Runtime deps (`yt-dlp`,
-`youtube-transcript-api`) lazy-install on first use; `ffmpeg` is required for
-audio. No API key needed for transcripts or audio. `summary` uses Anthropic
-if `ANTHROPIC_API_KEY` is set; otherwise falls through to an in-context
-prompt the calling agent can answer.
+All YouTube operations run through the external [yt-tool](https://github.com/EdwardAstill/yt-tool)
+CLI — `uv pip install -e ~/projects/yt-tool` or `pipx install yt-tool` once published.
+Runtime deps (`yt-dlp`, `youtube-transcript-api`) lazy-install on first use;
+`ffmpeg` is required for audio. No API key needed for transcripts or audio.
+`summary` uses Anthropic if `ANTHROPIC_API_KEY` is set; otherwise falls
+through to an in-context prompt the calling agent can answer.
 
 ## Subcommand map
 
 | Command | Purpose |
 |---------|---------|
-| `af youtube transcript <url> [--out DIR] [--limit N]` | Video → `.txt`, playlist → folder of `.txt`, channel → bulk fetch recent videos |
-| `af youtube audio <url> [--format mp3\|wav\|flac\|...] [--quality 0-9] [--start HH:MM:SS --end HH:MM:SS] [--embed-thumbnail] [--out DIR]` | Audio extraction + optional clip trim |
-| `af youtube summary <url> [--out FILE] [--model ID] [--keep-transcript]` | Transcript → structured summary (Anthropic, or prompt-fallback) |
-| `af youtube channel <@handle\|url> [--limit N]` | TSV list: `id   date   duration   title` |
-| `af youtube playlists <@handle\|url> [--limit N]` | TSV list: `id   count   title` |
-| `af youtube search <query> [--limit N]` | YouTube search → TSV: `id   duration   uploader   title`. No API key needed. |
+| `yt-tool transcript <url> [--out DIR] [--limit N]` | Video → `.txt`, playlist → folder of `.txt`, channel → bulk fetch recent videos |
+| `yt-tool audio <url> [--format mp3\|wav\|flac\|...] [--quality 0-9] [--start HH:MM:SS --end HH:MM:SS] [--embed-thumbnail] [--out DIR]` | Audio extraction + optional clip trim |
+| `yt-tool video <url> [--format mp4\|mkv\|webm] [--quality 720\|1080\|'bestvideo[h<=720]+bestaudio'] [--start --end] [--subs] [--embed-thumbnail]` | Video download (MP4 default) + optional clip / subs |
+| `yt-tool summary <url> [--out FILE] [--model ID] [--keep-transcript]` | Transcript → structured summary (Anthropic, or prompt-fallback) |
+| `yt-tool channel <@handle\|url> [--limit N]` | TSV list: `id   date   duration   title` |
+| `yt-tool playlists <@handle\|url> [--limit N]` | TSV list: `id   count   title` |
+| `yt-tool search <query> [--limit N]` | YouTube search → TSV: `id   duration   uploader   title`. No API key needed. |
 
 All commands accept any YouTube URL shape: `watch?v=`, `youtu.be/`,
 `/shorts/`, `/embed/`, `/live/`, `/playlist?list=`, `/@handle`,
@@ -53,7 +55,7 @@ All commands accept any YouTube URL shape: `watch?v=`, `youtu.be/`,
 | Playlist URL (`list=` only) | `transcript` (folder per playlist), `audio` (loop per entry) |
 | Channel (`@handle`, `/channel/…`, etc.) | `transcript --limit N`, or `channel` for metadata only |
 | Just want metadata | `channel` or `playlists` (no downloads) |
-| Need timestamps in the summary | Use raw yt-dlp VTT path — `af youtube` strips timestamps |
+| Need timestamps in the summary | Use raw yt-dlp VTT path — `yt-tool` strips timestamps |
 | Only have a name / phrase, not a URL | `search` first → pick the id(s) → feed into another subcommand |
 
 ### Target directory
@@ -73,57 +75,57 @@ Ask if the user hasn't said.
 **Transcript of one video:**
 
 ```bash
-af youtube transcript "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --out /tmp/yt
+yt-tool transcript "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --out /tmp/yt
 ```
 
 **Whole playlist:**
 
 ```bash
-af youtube transcript "https://www.youtube.com/playlist?list=PLxxxx" --out ~/notes/talks
+yt-tool transcript "https://www.youtube.com/playlist?list=PLxxxx" --out ~/notes/talks
 # Creates ~/notes/talks/<Playlist Title>/<video>.txt per entry
 ```
 
 **Recent 20 videos from a channel:**
 
 ```bash
-af youtube transcript "@veritasium" --limit 20 --out /tmp/veritasium
+yt-tool transcript "@veritasium" --limit 20 --out /tmp/veritasium
 ```
 
 **MP3 audio (best VBR):**
 
 ```bash
-af youtube audio "https://youtu.be/dQw4w9WgXcQ" --format mp3 --quality 0
+yt-tool audio "https://youtu.be/dQw4w9WgXcQ" --format mp3 --quality 0
 ```
 
 **WAV for ASR:**
 
 ```bash
-af youtube audio "<url>" --format wav --out /tmp/asr
+yt-tool audio "<url>" --format wav --out /tmp/asr
 ```
 
 **Trimmed clip:**
 
 ```bash
-af youtube audio "<url>" --start 00:01:30 --end 00:02:45 --format mp3
+yt-tool audio "<url>" --start 00:01:30 --end 00:02:45 --format mp3
 ```
 
 **Music library style (metadata + thumbnail):**
 
 ```bash
-af youtube audio "<url>" --format mp3 --embed-thumbnail
+yt-tool audio "<url>" --format mp3 --embed-thumbnail
 ```
 
 **Summary (Anthropic):**
 
 ```bash
 export ANTHROPIC_API_KEY=...
-af youtube summary "<url>" --out /tmp/summary.md
+yt-tool summary "<url>" --out /tmp/summary.md
 ```
 
 **Summary fallback (no key — print prompt for calling agent to answer):**
 
 ```bash
-af youtube summary "<url>" --keep-transcript --out /tmp/ready-to-summarise.md
+yt-tool summary "<url>" --keep-transcript --out /tmp/ready-to-summarise.md
 ```
 
 Then Read `/tmp/ready-to-summarise.md` and produce the summary inline.
@@ -131,14 +133,14 @@ Then Read `/tmp/ready-to-summarise.md` and produce the summary inline.
 **Channel inventory (metadata only, no downloads):**
 
 ```bash
-af youtube channel "@veritasium" --limit 10
-af youtube playlists "@veritasium"
+yt-tool channel "@veritasium" --limit 10
+yt-tool playlists "@veritasium"
 ```
 
 **Search for a term (no downloads):**
 
 ```bash
-af youtube search "Radiohead Creep" --limit 5
+yt-tool search "Radiohead Creep" --limit 5
 # id            duration  uploader       title
 # XFkzRNyygfk   237s      Radiohead      Radiohead - Creep
 # ...
@@ -153,10 +155,10 @@ canonical channel (filter `grep` or read the user's pick).
 
 ```bash
 mkdir -p ~/music/radiohead
-af youtube search "Radiohead" --limit 10 \
+yt-tool search "Radiohead" --limit 10 \
   | awk -F'\t' '$3 == "Radiohead" {print $1}' \
   | while read id; do
-      af youtube audio "https://www.youtube.com/watch?v=$id" \
+      yt-tool audio "https://www.youtube.com/watch?v=$id" \
         --format wav \
         --embed-thumbnail \
         --out ~/music/radiohead
@@ -168,10 +170,10 @@ than search hits (more exhaustive but more noise — behind-the-scenes, live
 cuts, shorts), swap `search` for `channel`:
 
 ```bash
-af youtube channel "@radiohead" --limit 50 \
+yt-tool channel "@radiohead" --limit 50 \
   | cut -f1 \
   | while read id; do
-      af youtube audio "https://www.youtube.com/watch?v=$id" --format wav --out ~/music/radiohead
+      yt-tool audio "https://www.youtube.com/watch?v=$id" --format wav --out ~/music/radiohead
     done
 ```
 
@@ -208,7 +210,7 @@ yt-dlp rate-limited — retry with `--quality 5` or add `--retries 5`.
 
 ## Timestamps
 
-`af youtube transcript` joins snippet text with spaces — no timestamps. If the
+`yt-tool transcript` joins snippet text with spaces — no timestamps. If the
 user needs them:
 
 ```bash
@@ -239,7 +241,7 @@ Parse the VTT cues for `HH:MM:SS` anchors, then feed to the summary prompt.
 
 ## Do not
 
-- Do not scrape transcripts via `browser-control` when `af youtube` works — slower and fragile.
+- Do not scrape transcripts via `browser-control` when `yt-tool` works — slower and fragile.
 - Do not call the YouTube Data API v3 — this skill intentionally has no API key dependency.
 - Do not feed raw transcripts into downstream LLM work without at least skimming one file first; auto-captions can be gibberish for music, accents, or heavy jargon.
 - Do not default to WAV when MP3 will do — a 1-hour WAV is ~600 MB and will blow through context if Read into the conversation.
