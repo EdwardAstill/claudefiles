@@ -98,6 +98,7 @@ at the current pick. Move it down as items finish.
 ### Session-surfaced follow-ups
 
 - **⭐ NEXT  S-1** `[small]` Regenerate `docs/skill-tree.md` via `af tree --regenerate` — stale (omits `computer-control`, possibly others after A2 + renames).
+- **S-6** `[small]` `af install` doesn't prune symlinks that no longer correspond to manifest entries. Confirmed on 2026-04-19: after the `skill-manager` → `agentfiles-manager` rename, `af install --global` created the new symlink but left the stale `~/.claude/skills/skill-manager` alias. Add a prune step that removes any `~/.claude/skills/*` symlink whose basename is absent from the manifest's `[skills.*]` keys.
 - **S-2** `[medium]` New `af audit` CHECK 11 — validate `[modes.*]` manifest section the same way CHECK 1 validates `[skills.*]`.
 - **S-3** `[medium]` `af check modes` — MODE.md frontmatter validator. Pending from behavioral-modes design plan.
 - **S-4** `[small]` Upgrade `research` dispatcher description to full trigger-spec (currently brief prose; only dispatcher that hasn't been rewritten).
@@ -139,8 +140,11 @@ systemd state outside the repo.
 
 - `systemctl --user enable --now dotoold` — activate input daemon for `computer-control`. Without it, `dotool` silently fails.
 - `./hooks/install-hooks.sh` — re-sync `~/.claude/settings.json` to the new `modes.py`. The old `caveman-mode.py` is deleted; hook silently no-ops until the user re-installs.
-- `rm ~/.claude/skills/skill-manager` — purge the stale alias symlink left over from the `agentfiles-manager` rename.
 - `bash hooks/install-log-review-timer.sh` — install the weekly `af log review` systemd timer shipped in 3-4. Edit the `WorkingDirectory=` line first if the checkout isn't at `~/projects/agentfiles`.
+
+Cleared 2026-04-19:
+- ~~`af install --global` — re-sync~~ ✓ ran; 73 skills + 14 subagents + hooks + CLAUDE.md all updated
+- ~~`rm ~/.claude/skills/skill-manager`~~ ✓ purged
 
 ---
 
