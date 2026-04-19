@@ -1,0 +1,20 @@
+[Unit]
+Description=Weekly trigger for agentfiles log review (self-improvement crank)
+Documentation=https://github.com/edastill/agentfiles
+
+[Timer]
+# Mon 09:15 — off-the-hour to spread load across any hypothetical fleet, and
+# early in the week so the surfaced patterns are visible during a working
+# stretch rather than over a weekend.
+OnCalendar=Mon 09:15
+# Catch up on missed runs after a reboot or laptop-suspended-over-weekend.
+Persistent=true
+# A small randomised delay so multiple machines on the same NTP-tick don't all
+# fire identical workloads at 09:15:00.
+RandomizedDelaySec=10m
+# If the timer accidentally double-fires while a previous run is still going,
+# don't queue up a second invocation — just skip.
+Unit=af-log-review.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,38 @@
+[Unit]
+Description=agentfiles weekly log review (self-improvement crank)
+Documentation=https://github.com/edastill/agentfiles
+# Only run when the user has network/desktop session-like context available.
+# We don't strictly need network, so no After=network-online.target.
+
+[Service]
+Type=oneshot
+
+# %h expands to the user's $HOME under a --user unit.
+WorkingDirectory=%h/projects/agentfiles
+
+# Full path to the af binary. `af` is installed by `uv tool install` and lives
+# at ~/.local/bin/af (a symlink into ~/.local/share/uv/tools/af/bin/af). It is
+# typically not on PATH for systemd --user services, so we hard-code the path.
+# If the user installed `af` elsewhere, the installer rewrites this line to
+# match `which af` at install time.
+ExecStart=%h/.local/bin/af log review
+
+# Make sure ~/.local/bin is on PATH in case `af` shells out to other tools
+# (e.g. git) that it expects to find there.
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+
+# Tag journal entries so `journalctl --user -t af-log-review` is easy to find.
+SyslogIdentifier=af-log-review
+
+# `af log review` is intentionally idempotent and safe; if it fails we don't
+# want to mask the error in the journal but we also don't want the timer to
+# stop firing.
+SuccessExitStatus=0
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+# Not strictly required — the .timer is what the user enables — but lets a
+# user kick it manually with `systemctl --user start af-log-review.service`.
+WantedBy=default.target

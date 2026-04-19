@@ -138,3 +138,53 @@ it. For context-injecting hooks, assert `r.returncode == 0` and
   fresh install.
 - **Blocking on I/O in Stop.** It delays the UI returning control. Run async
   or keep it trivial.
+
+## Weekly `af log review` systemd timer
+
+The self-improvement loop (`af log review` → `research/lessons/` → promotion
+to `knowledge/K-NNN`) does not run itself. The unit files in
+`hooks/systemd/` add a weekly trigger via systemd `--user` so it runs without
+human intervention.
+
+| File                                       | Purpose                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------ |
+| `hooks/systemd/af-log-review.service`      | `Type=oneshot` unit that runs `af log review` in the repo dir.     |
+| `hooks/systemd/af-log-review.timer`        | Fires the service every Monday at 09:15 (with `Persistent=true`).  |
+| `hooks/install-log-review-timer.sh`        | Installs both into `~/.config/systemd/user/` and enables the timer.|
+
+### Install
+
+```sh
+./hooks/install-log-review-timer.sh           # idempotent; safe to re-run
+./hooks/install-log-review-timer.sh --dry-run # show what would happen
+```
+
+The installer resolves `which af` and rewrites the service's `ExecStart=`
+line to use the real path on your host (because `~/.local/bin` is generally
+not on `PATH` for systemd `--user` services).
+
+### Uninstall
+
+```sh
+./hooks/install-log-review-timer.sh --uninstall
+```
+
+### Inspect
+
+```sh
+systemctl --user list-timers af-log-review        # next/last run
+systemctl --user status  af-log-review.service    # current state
+journalctl   --user -u   af-log-review.service    # output history
+systemctl --user start   af-log-review.service    # trigger manually
+```
+
+### Caveats
+
+- `af log review` does not require `CLAUDE_SESSION_ID`; it operates on
+  accumulated `~/.claude/logs/agentfiles.jsonl` data, so the timer context is
+  fine.
+- The unit assumes the repo lives at `~/projects/agentfiles` (set via
+  `WorkingDirectory=%h/projects/agentfiles`). Edit the unit file before
+  installing if your checkout is elsewhere.
+- If `af` is reinstalled to a new path, re-run the installer to refresh
+  `ExecStart=`.
