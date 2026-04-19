@@ -8,7 +8,7 @@ description: >
   committing", "turn this pattern into a skill". Applies TDD to skill docs:
   pressure-test with subagents, watch baseline fail, write SKILL.md, watch it
   pass, refactor. New skills go in ~/projects/agentfiles/skills/. Do NOT use for
-  raw skill discoverability fixes (use skill-manager) or for cataloguing /
+  raw skill discoverability fixes (use agentfiles-manager) or for cataloguing /
   auditing the existing set (use skill-catalog or audit).
 ---
 
