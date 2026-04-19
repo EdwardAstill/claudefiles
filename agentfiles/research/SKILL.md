@@ -1,12 +1,20 @@
 ---
 name: research
 description: >
-  Category dispatcher for research tasks. Use when you need information before
-  acting. Routes to docs-agent (exact APIs, library usage, versioned docs),
-  research-agent (trade-offs, consensus, risks), codebase-explainer (understand
-  an unfamiliar codebase), readrun (author interactive Markdown docs with
-  runnable code and JSX visualisations), test-taker (answer a question set
-  using reference material with configurable strictness).
+  Category dispatcher for research tasks — use when the user needs information
+  before acting but hasn't narrowed down which research primitive fits.
+  Trigger phrases: "research this", "help me figure out X", "look into Y",
+  "find out about Z", "I need info on W", "what do we know about X",
+  "investigate this topic", "before I decide, check", "can you do some digging",
+  "what's the current state of X". Routes to docs-agent (exact APIs / versioned
+  library docs), research-agent (trade-offs, risks, consensus), codebase-explainer
+  (understand an unfamiliar repo), readrun (author interactive docs with
+  runnable code), test-taker (answer a question set with strictness levels),
+  youtube / terminal-read / web-scraper (the input-specific pulls). Do NOT use
+  when the task is already narrowed to one primitive — invoke it directly
+  (e.g. "exact API signature of X" → docs-agent). Do NOT use for planning or
+  implementation (use planning or executor). Do NOT use to browse the web
+  interactively with a real browser (use browser-control).
 ---
 
 # Research
