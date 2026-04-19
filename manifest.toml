@@ -250,6 +250,10 @@ tools = ["Bash", "Read"]
 cli = ["foxpilot"]
 category = "research"
 
+[skills.computer-control]
+tools = ["Bash", "Read"]
+category = "research"
+
 [skills.sci-hub]
 tools = ["Bash"]
 category = "research"
