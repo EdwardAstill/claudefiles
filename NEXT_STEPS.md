@@ -60,8 +60,8 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 7 / 12
-- `last_tick`: iter 7 @ 35b4ce9 — shipped S-4 (research dispatcher trigger-spec)
+- `iteration`: 8 / 12
+- `last_tick`: iter 8 @ bd8b842 — shipped S-5 (local feature-dev slash command)
 - `cron_mode`: self-paced (10m cron replaced; ScheduleWakeup 60s on finish)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
@@ -91,6 +91,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `d61f3e8` | S-2 | `af audit` CHECK 11 — modes on disk ↔ manifest parity, +5 tests (iter 5) |
 | `e5fdbdd` | S-3 | `af check modes` — MODE.md frontmatter validator, +11 tests, tolerates YAML 1.1 bool-on quirk (iter 6) |
 | `35b4ce9` | S-4 | Research dispatcher description upgraded to full trigger-spec (iter 7) |
+| `bd8b842` | S-5 | `commands/feature-dev.md` — local copy of the Claude Code official slash command (iter 8) |
 
 ---
 
@@ -101,9 +102,9 @@ at the current pick. Move it down as items finish.
 
 ### Session-surfaced follow-ups
 
-- **⭐ NEXT  S-5** `[small]` Copy `feature-dev` slash command locally. NEXT_STEPS's original C2 assumption was wrong — `feature-dev` is a slash command, not a subagent. Would live under `commands/`.
-- **S-6** `[small]` `af install` doesn't prune symlinks that no longer correspond to manifest entries. Confirmed on 2026-04-19: after the `skill-manager` → `agentfiles-manager` rename, `af install --global` created the new symlink but left the stale `~/.claude/skills/skill-manager` alias. Add a prune step that removes any `~/.claude/skills/*` symlink whose basename is absent from the manifest's `[skills.*]` keys.
+- **⭐ NEXT  S-6** `[small]` `af install` doesn't prune symlinks that no longer correspond to manifest entries. Confirmed on 2026-04-19: after the `skill-manager` → `agentfiles-manager` rename, `af install --global` created the new symlink but left the stale `~/.claude/skills/skill-manager` alias. Add a prune step that removes any `~/.claude/skills/*` symlink whose basename is absent from the manifest's `[skills.*]` keys.
 - **S-7** `[trivial]` Quote `on`/`off` levels in MODE.md frontmatter to avoid the YAML-1.1 boolean alias quirk. `af check modes` tolerates the quirk but the canonical form should be explicit strings. Affects planner, verify-first, rubber-duck, deep-research MODE.md files.
+- **S-8** `[small]` Wire `commands/` into `af install` so `commands/feature-dev.md` (and future slash commands) symlink into `~/.claude/commands/`. Mirror the existing `_install_skills`/`_install_agents` flow. Add a `[commands.*]` manifest section + a `CHECK 12` in `af audit` for parity. Related: S-6 (symlink prune) should cover commands too.
 
 ### Tier 5 (small fixes)
 
