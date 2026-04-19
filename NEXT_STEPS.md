@@ -60,8 +60,8 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 9 / 12
-- `last_tick`: iter 9 @ 9d5a4e2 — shipped S-6 (af install symlink pruning)
+- `iteration`: 10 / 12
+- `last_tick`: iter 10 @ 40f6c19 — shipped 5-1 (CHECK 9 skips guarded binaries)
 - `cron_mode`: self-paced (10m cron replaced; ScheduleWakeup 60s on finish)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
@@ -93,6 +93,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `35b4ce9` | S-4 | Research dispatcher description upgraded to full trigger-spec (iter 7) |
 | `bd8b842` | S-5 | `commands/feature-dev.md` — local copy of the Claude Code official slash command (iter 8) |
 | `9d5a4e2` | S-6 | `af install` prunes stale skill/agent symlinks on full install; +6 tests (iter 9) |
+| `40f6c19` | 5-1 | `af audit` CHECK 9 skips `command -v`/`which`/`type`/`hash`-guarded binaries; +3 tests (iter 10) |
 
 ---
 
@@ -108,9 +109,8 @@ at the current pick. Move it down as items finish.
 
 ### Tier 5 (small fixes)
 
-- **⭐ NEXT  5-1** `[small]` `af audit` CHECK 9 false positives on `command -v`-guarded binaries. Add a parse step that skips binaries inside `command -v <bin>` contexts.
-- **5-2** `[trivial]` python-expert vs typescript-expert cosine similarity 0.42 per `af check distinct`. Benign template pairing; revisit only if routing confusion is observed. Tag `[needs-human]` unless routing data shows real confusion.
-- **5-3** `[small]` `hooks/install-gemini-hooks.sh` parity — synced this session but drift will return. Add an audit check or a shared source-of-truth.
+- **⭐ NEXT  5-3** `[small]` `hooks/install-gemini-hooks.sh` parity — synced this session but drift will return. Add an audit check or a shared source-of-truth.
+- **5-2** `[needs-human]` python-expert vs typescript-expert cosine similarity 0.42 per `af check distinct`. Benign template pairing; revisit only if routing confusion is observed.
 - **5-4** `[trivial]` `skill-logger.py` reads `tool_output`/`output` but canonical hook schema is `tool_response` (per N3 typed-payloads work). One-line fix.
 
 ### Tier 4 (design candidates — mostly `[speculative]`)
