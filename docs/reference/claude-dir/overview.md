@@ -43,7 +43,7 @@ Leave these alone unless you know what you're doing.
 | `logs/backlog.md` | Actionable improvement items | manual | [logging](../logging.md) |
 | `logs/.sessions/` | Per-session state for logger (auto-cleaned) | `hooks/skill-logger.py` | — |
 | `data/` | Persistent data store for `af index`/`af search` | `af index` | [cli](../cli.md#af-index) |
-| `secrets` | API keys, chmod 600 | `af secrets` | [secrets](./secrets.md) |
+| `secrets` | API keys, chmod 600 | external [`secrets`](https://github.com/EdwardAstill/secrets) CLI | [secrets](./secrets.md) |
 
 ---
 
@@ -66,12 +66,12 @@ cat ~/.claude/settings.json          # current config
 af agents                            # installed skills
 af log --stats                       # skill usage
 af search --list                     # indexed data sources
-af secrets list                      # stored secret key names (not values)
+secrets list                         # stored secret key names (not values)
 ls ~/.claude/data/                   # data store contents
 ```
 
 ## Safe to edit
 
 - `~/.claude/settings.json` — add hooks, change model, toggle plugins
-- `~/.claude/secrets` — use `af secrets set/remove` rather than editing directly
+- `~/.claude/secrets` — use `secrets set/remove` (external CLI) rather than editing directly
 - `~/.claude/data/` — rebuild with `af index` if stale

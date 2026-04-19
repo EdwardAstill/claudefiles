@@ -159,30 +159,18 @@ af tools --json        # machine-readable for skills
 
 ## Secrets
 
-### af secrets
-
-Manages API keys and tokens stored at `~/.claude/secrets` (`KEY=value` format, chmod 600).
-Never stored in any repo or project directory.
+Secret management was extracted to the standalone external CLI
+[`secrets`](https://github.com/EdwardAstill/secrets) (package name
+`secrets-cli` on PyPI, binary `secrets`). The file format and storage
+location are unchanged:
 
 ```bash
-af secrets set ANNAS_API_KEY <key>     # store or update a key
-af secrets get ANNAS_API_KEY           # print the value (raw, no label)
-af secrets list                        # list key names only (never values)
-af secrets remove ANNAS_API_KEY        # delete a key
-af secrets env                         # print all as `export KEY=value` lines
-af secrets exec -- <cmd> [args]        # run a command with all secrets injected
-```
-
-**Using a secret in a shell command:**
-```bash
-# Inline injection (one-off):
-ANNAS_API_KEY=$(af secrets get ANNAS_API_KEY) anna download <md5>
-
-# Inject all secrets then run:
-af secrets exec -- anna download <md5>
-
-# Export everything for the session:
-eval $(af secrets env)
+secrets set ANNAS_API_KEY <key>     # store or update a key
+secrets get ANNAS_API_KEY           # print the value (raw, no label)
+secrets list                        # list key names only (never values)
+secrets remove ANNAS_API_KEY        # delete a key
+secrets env                         # print all as `export KEY=value` lines
+secrets exec -- <cmd> [args]        # run a command with all secrets injected
 ```
 
 **File format** (`~/.claude/secrets`):
@@ -191,6 +179,8 @@ eval $(af secrets env)
 ANNAS_API_KEY=abc123
 GITHUB_TOKEN=ghp_xxx
 ```
+
+Install: `uv pip install -e ~/projects/secrets` or `pipx install secrets-cli`.
 
 ---
 
@@ -302,25 +292,23 @@ connection doesn't block other requests.
   option-c.html
 ```
 
-### af screenshot
+### shotty *(external — formerly `af screenshot`)*
 
-Capture a browser screenshot that Claude can read visually to verify layout,
-spacing, and colours after implementation.
+Browser screenshots via Playwright (headless Firefox). Extracted to
+[`EdwardAstill/shotty`](https://github.com/EdwardAstill/shotty); same
+flags as before, different binary name.
 
 ```bash
-af screenshot [URL]                         # default: http://localhost:3000
-af screenshot http://localhost:3000 --out /tmp/shot.png
-af screenshot http://localhost:3000 --mobile          # 390×844 (iPhone)
-af screenshot http://localhost:3000 --full-page       # full scrollable height
-af screenshot http://localhost:3000 --wait 500        # extra ms after load
-af screenshot http://localhost:3000 --width 1440 --height 900
+shotty [URL]                         # default: http://localhost:3000
+shotty http://localhost:3000 --out /tmp/shot.png
+shotty http://localhost:3000 --mobile          # 390×844 (iPhone)
+shotty http://localhost:3000 --full-page       # full scrollable height
+shotty http://localhost:3000 --wait 500        # extra ms after load
+shotty http://localhost:3000 --width 1440 --height 900
 ```
 
-Uses Playwright with a headless Firefox backend. Firefox is installed
-automatically on first run (`playwright install firefox`).
-
-After capturing, Claude reads the PNG with the `Read` tool to visually verify
-the rendered output matches the design spec.
+Install: `uv pip install -e ~/projects/shotty` or `pipx install shotty`.
+Firefox installs automatically on first run.
 
 ## Logging & Analysis
 

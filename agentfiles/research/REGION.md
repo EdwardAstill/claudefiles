@@ -55,7 +55,7 @@ Skills for documentation lookup and research.
 - **Purpose:** Capture the user's live terminal scrollback so the agent can see output that happened outside the conversation
 - **Use when:** "Look at what just printed", "check that error", "see the output of setup.fish" — when the user has **not** pasted the output into chat
 - **NOT for:** Output from commands the agent itself ran (Bash tool output is already visible)
-- **Produces:** A plain-text capture file via `af terminal --out <path>`, ready to Read
+- **Produces:** A plain-text capture file via `termread --out <path>` (external CLI — [EdwardAstill/termread](https://github.com/EdwardAstill/termread)), ready to Read
 - **Chains into:** systematic-debugging, codebase-explainer, executor
 
 ### knowledge-base

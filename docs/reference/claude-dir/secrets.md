@@ -3,14 +3,17 @@
 API keys and tokens are stored at `~/.claude/secrets` — a plain `KEY=value` file,
 chmod 600, never committed to any repo.
 
+Managed by the external [`secrets`](https://github.com/EdwardAstill/secrets) CLI
+(install via `uv pip install -e ~/projects/secrets` or `pipx install secrets-cli`).
+
 ---
 
 ## Storing keys
 
 ```bash
-af secrets set ANNAS_API_KEY <key>
-af secrets set GITHUB_TOKEN ghp_xxx
-af secrets set OPENAI_API_KEY sk-xxx
+secrets set ANNAS_API_KEY <key>
+secrets set GITHUB_TOKEN ghp_xxx
+secrets set OPENAI_API_KEY sk-xxx
 ```
 
 Re-running `set` overwrites the existing value.
@@ -21,18 +24,18 @@ Re-running `set` overwrites the existing value.
 
 **Inline — single command:**
 ```bash
-ANNAS_API_KEY=$(af secrets get ANNAS_API_KEY) anna download <md5>
+ANNAS_API_KEY=$(secrets get ANNAS_API_KEY) anna download <md5>
 ```
 
 **Inject all secrets then run:**
 ```bash
-af secrets exec -- anna download <md5>
-af secrets exec -- some-tool --flag value
+secrets exec -- anna download <md5>
+secrets exec -- some-tool --flag value
 ```
 
 **Export everything for the session:**
 ```bash
-eval $(af secrets env)
+eval $(secrets env)
 anna download <md5>     # ANNAS_API_KEY already in env
 ```
 
@@ -41,12 +44,12 @@ anna download <md5>     # ANNAS_API_KEY already in env
 ## All commands
 
 ```bash
-af secrets set KEY value     # store or update
-af secrets get KEY           # print value (raw, exits 1 if not found)
-af secrets list              # list key names only — never prints values
-af secrets remove KEY        # delete
-af secrets env               # print all as `export KEY=value` lines
-af secrets exec -- CMD ARGS  # run CMD with all secrets injected as env vars
+secrets set KEY value     # store or update
+secrets get KEY           # print value (raw, exits 1 if not found)
+secrets list              # list key names only — never prints values
+secrets remove KEY        # delete
+secrets env               # print all as `export KEY=value` lines
+secrets exec -- CMD ARGS  # run CMD with all secrets injected as env vars
 ```
 
 ---
@@ -75,7 +78,7 @@ GITHUB_TOKEN=ghp_xxx
 | `ANNAS_API_KEY` | `anna download`, `anna get`, `anna batch` |
 
 Add more as needed. Skills that need a key should document it in their SKILL.md
-and read it via `af secrets get KEY` or `af secrets exec`.
+and read it via `secrets get KEY` or `secrets exec`.
 
 ---
 

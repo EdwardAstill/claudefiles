@@ -72,21 +72,26 @@ Standalone user-facing tools that are useful outside the agent system. These
 get their own repo; agentfiles keeps a skill that teaches the agent to use
 them.
 
-| CLI | Extracts to | Skill that stays |
+All six extractions shipped 2026-04-19:
+
+| Previously | Now lives at | Skill that stays |
 |---|---|---|
-| `af youtube` | `EdwardAstill/yt-cli` | `youtube` skill |
-| `af webscraper` | `EdwardAstill/webscraper` | `web-scraper` skill |
-| `af terminal` | `EdwardAstill/termread` | `terminal-read` skill |
-| `af screenshot` | `EdwardAstill/shotty` | folded into `computer-control` recipes |
-| `af secrets` | `EdwardAstill/secrets` | — (no skill; ad-hoc use) |
-| `af worktree` | `EdwardAstill/gwt` | `git-worktree-workflow` skill |
+| `af youtube` | [`EdwardAstill/yt-tool`](https://github.com/EdwardAstill/yt-tool) (binary `yt-tool`; adds `video` MP4 subcommand) | `youtube` skill |
+| `af webscraper` | [`EdwardAstill/webscraper`](https://github.com/EdwardAstill/webscraper) (binary `webscraper`) | `web-scraper` skill |
+| `af terminal` | [`EdwardAstill/termread`](https://github.com/EdwardAstill/termread) (binary `termread`) | `terminal-read` skill |
+| `af screenshot` | [`EdwardAstill/shotty`](https://github.com/EdwardAstill/shotty) (binary `shotty`, Playwright-backed) | referenced from `ui-expert` skill recipes |
+| `af secrets` | [`EdwardAstill/secrets`](https://github.com/EdwardAstill/secrets) (package `secrets-cli` on PyPI, binary `secrets`) | — (no skill; ad-hoc use) |
+| `af worktree` | [`EdwardAstill/gwt`](https://github.com/EdwardAstill/gwt) (binary `gwt`, generalized `--launch` flag) | `git-worktree-workflow` skill |
 
 **Pattern:** the skill teaches *how to drive the tool*; the tool is a plain
 CLI with no agent-specific behavior. Tools don't read the manifest, don't
 import from `af.*`, don't care about skills.
 
-Migration is a separate multi-session project — see `docs/plans/` when it
-starts.
+All migrations done in a single session (see commit `a02d333` and the
+preceding extract commits). The `what-belongs-here.md` rule is now
+load-bearing: any new `af <cmd>` that fits Tier 4 (standalone utility
+with no agent-system story) gets a new repo at `EdwardAstill/<name>`
+instead of a new module here.
 
 ### Tier 5 — never belongs here
 

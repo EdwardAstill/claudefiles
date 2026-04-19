@@ -1,8 +1,25 @@
 # Tool extraction — externalize standalone CLIs out of agentfiles
 
-**Status:** designed, not yet started.
+**Status:** shipped 2026-04-19 (all 6 tools extracted in one session).
 **Decided:** 2026-04-19 during scope review.
 **Rules doc:** [`docs/reference/what-belongs-here.md`](../reference/what-belongs-here.md).
+
+## Final state
+
+| Previously | Now lives at | Binary | Highlights |
+|---|---|---|---|
+| `af youtube` | [`EdwardAstill/yt-tool`](https://github.com/EdwardAstill/yt-tool) | `yt-tool` | Renamed mid-flight from `ytscript` — bigger scope. Added `video` (MP4/MKV/WebM) subcommand. |
+| `af webscraper` | [`EdwardAstill/webscraper`](https://github.com/EdwardAstill/webscraper) | `webscraper` | `inspect / fetch / scaffold / cache` subcommands, httpx + selectolax. |
+| `af terminal` | [`EdwardAstill/termread`](https://github.com/EdwardAstill/termread) | `termread` | tmux / screen scrollback capture. |
+| `af screenshot` | [`EdwardAstill/shotty`](https://github.com/EdwardAstill/shotty) | `shotty` | Playwright-backed browser screenshot CLI. |
+| `af secrets` | [`EdwardAstill/secrets`](https://github.com/EdwardAstill/secrets) | `secrets` | PyPI package `secrets-cli` (binary `secrets`) — stdlib-collision forced the rename. |
+| `af worktree` | [`EdwardAstill/gwt`](https://github.com/EdwardAstill/gwt) | `gwt` | Generalized `--launch <tpl>` flag replaces the hardcoded `claude` spawn. |
+
+Agentfiles verification post-extraction: `af audit` 11/11 green; `pytest tools/python/tests/` at 179 passed (down from 235 because the 5 extracted modules' tests also moved out).
+
+Everything below this line is the original plan, kept verbatim for historical reference.
+
+---
 
 ---
 

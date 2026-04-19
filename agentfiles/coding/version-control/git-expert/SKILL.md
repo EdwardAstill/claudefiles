@@ -149,7 +149,7 @@ WORKTREE CONTEXT
 - `Bash` — git commands, env patching
 - `Read` — reading .env files
 - `Glob` — finding config files
-- `af worktree` — create worktrees with port allocation
+- `gwt` — create worktrees with port allocation + optional `--launch` hook (external CLI: [EdwardAstill/gwt](https://github.com/EdwardAstill/gwt))
 - `af status` — full branch/worktree topology map (run on every invocation)
 
 ## Anti-patterns

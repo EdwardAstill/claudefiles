@@ -30,6 +30,6 @@ Routes to the right research skill based on the task.
 | `codebase-explainer` | "How does this codebase work?" — architecture map, execution paths, mental model |
 | `readrun` | Create readrun docs — folders of Markdown with runnable Python (Pyodide) and JSX visualisations, served by `rr` |
 | `test-taker` | Answer a question set using reference material — rough-guide / strong-guide / only-information strictness, calculations get Python scripts |
-| `youtube` | Fetch YouTube transcripts, audio (WAV/MP3), and summaries — `af youtube <cmd>`, native (no external wrapper) |
+| `youtube` | Fetch YouTube transcripts, audio, video (MP4), and summaries — via external `yt-tool` CLI ([EdwardAstill/yt-tool](https://github.com/EdwardAstill/yt-tool)) |
 | `terminal-read` | Capture the user's live terminal scrollback (tmux/screen/stdin) so the agent can Read output that happened outside the chat |
 | `web-scraper` | Pull data from a website via pure HTTP (no browser) — fetch HTML/JSON, parse with selectolax, paginate, store as JSONL/CSV/SQLite |
