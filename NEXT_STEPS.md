@@ -60,8 +60,8 @@ that ticks every 10 min for 2 hours — see §0.
 - `start_commit`: `23589ba`
 - `start_time`: 2026-04-19 (loop-start)
 - `stop_by`: start_time + 2 hours
-- `iteration`: 8 / 12
-- `last_tick`: iter 8 @ bd8b842 — shipped S-5 (local feature-dev slash command)
+- `iteration`: 9 / 12
+- `last_tick`: iter 9 @ 9d5a4e2 — shipped S-6 (af install symlink pruning)
 - `cron_mode`: self-paced (10m cron replaced; ScheduleWakeup 60s on finish)
 - `consecutive_failures`: 0
 - `cron_id`: `20ca1e5e` (every 10 min, recurring, 7-day auto-expire)
@@ -92,6 +92,7 @@ that ticks every 10 min for 2 hours — see §0.
 | `e5fdbdd` | S-3 | `af check modes` — MODE.md frontmatter validator, +11 tests, tolerates YAML 1.1 bool-on quirk (iter 6) |
 | `35b4ce9` | S-4 | Research dispatcher description upgraded to full trigger-spec (iter 7) |
 | `bd8b842` | S-5 | `commands/feature-dev.md` — local copy of the Claude Code official slash command (iter 8) |
+| `9d5a4e2` | S-6 | `af install` prunes stale skill/agent symlinks on full install; +6 tests (iter 9) |
 
 ---
 
