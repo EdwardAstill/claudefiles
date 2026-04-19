@@ -103,13 +103,12 @@ at the current pick. Move it down as items finish.
 
 ### Session-surfaced follow-ups
 
-- **⭐ NEXT  S-6** `[small]` `af install` doesn't prune symlinks that no longer correspond to manifest entries. Confirmed on 2026-04-19: after the `skill-manager` → `agentfiles-manager` rename, `af install --global` created the new symlink but left the stale `~/.claude/skills/skill-manager` alias. Add a prune step that removes any `~/.claude/skills/*` symlink whose basename is absent from the manifest's `[skills.*]` keys.
 - **S-7** `[trivial]` Quote `on`/`off` levels in MODE.md frontmatter to avoid the YAML-1.1 boolean alias quirk. `af check modes` tolerates the quirk but the canonical form should be explicit strings. Affects planner, verify-first, rubber-duck, deep-research MODE.md files.
 - **S-8** `[small]` Wire `commands/` into `af install` so `commands/feature-dev.md` (and future slash commands) symlink into `~/.claude/commands/`. Mirror the existing `_install_skills`/`_install_agents` flow. Add a `[commands.*]` manifest section + a `CHECK 12` in `af audit` for parity. Related: S-6 (symlink prune) should cover commands too.
 
 ### Tier 5 (small fixes)
 
-- **5-1** `[small]` `af audit` CHECK 9 false positives on `command -v`-guarded binaries. Add a parse step that skips binaries inside `command -v <bin>` contexts.
+- **⭐ NEXT  5-1** `[small]` `af audit` CHECK 9 false positives on `command -v`-guarded binaries. Add a parse step that skips binaries inside `command -v <bin>` contexts.
 - **5-2** `[trivial]` python-expert vs typescript-expert cosine similarity 0.42 per `af check distinct`. Benign template pairing; revisit only if routing confusion is observed. Tag `[needs-human]` unless routing data shows real confusion.
 - **5-3** `[small]` `hooks/install-gemini-hooks.sh` parity — synced this session but drift will return. Add an audit check or a shared source-of-truth.
 - **5-4** `[trivial]` `skill-logger.py` reads `tool_output`/`output` but canonical hook schema is `tool_response` (per N3 typed-payloads work). One-line fix.
