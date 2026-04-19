@@ -17,11 +17,11 @@ merge the entries from `hooks.json` into `~/.claude/settings.json` /
 | Script              | Event(s)                                | Matcher  | Purpose                                                                                                                                            |
 | ------------------- | --------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `session-start`     | `SessionStart`                          | —        | Injects the `using-agentfiles` SKILL.md, pre-runs `af context` + `af status`, surfaces unreviewed routing anomalies. Emits `additionalContext`.    |
-| `caveman-mode.py`   | `UserPromptSubmit`                      | —        | Re-injects caveman-mode reminder each turn if `~/.claude/caveman-mode` exists. Emits `additionalContext`.                                          |
+| `modes.py`          | `UserPromptSubmit`                      | —        | Re-injects reminders for every active behavioral mode each turn by scanning `~/.claude/modes/` and matching against `agentfiles/modes/<name>/MODE.md`. Emits `additionalContext`.                                          |
 | `safety-gate.py`    | `PreToolUse`                            | `Bash`   | Exits 2 on `rm -rf` outside a git worktree, force-push, `DROP TABLE`, fork bomb, `dd`, `mkfs`. Recoverable `rm -rf` inside a worktree is allowed.  |
 | `skill-logger.py`   | `PostToolUse`                           | `.*`     | Writes every tool call to `~/.claude/logs/sessions/session-<id>.jsonl`. On SKILL.md reads, logs skill routing to `~/.claude/logs/agentfiles.jsonl`. Rotates logs. |
 | `notify.py`         | `Stop`, `PermissionRequest`, `Notification` | —    | Desktop notifications via `notify-send`, per-session status files in `~/.claude/terminal-status/`, routing-anomaly detection on `Stop`. Async.     |
-| `statusline.sh`     | (statusLine, not an event hook)         | —        | Renders the Claude Code statusline: cwd, git, model, context %, 5h usage, caveman tag.                                                             |
+| `statusline.sh`     | (statusLine, not an event hook)         | —        | Renders the Claude Code statusline: cwd, git, model, context %, 5h usage, active-mode tag.                                                         |
 
 ## Lifecycle events
 
@@ -59,7 +59,7 @@ Exit code 1 is **not** a block anywhere. Use 2.
    `TaskCreated`/`TaskCompleted`.
 2. **Write the script** next to the existing ones. Python goes through
    `uv run --script` so deps are declared inline and no venv management is
-   needed. Follow the style of `caveman-mode.py:1-5` for the shebang +
+   needed. Follow the style of `modes.py:1-5` for the shebang +
    PEP 723 metadata block.
 3. **Register in `hooks.json`** with `"command": "${CLAUDE_PLUGIN_ROOT}/hooks/your-hook.py"`.
    Add a `matcher` if the event supports one (PreToolUse, PostToolUse,
@@ -116,7 +116,7 @@ it. For context-injecting hooks, assert `r.returncode == 0` and
 - **Block with `sys.exit(2)`** and a clear stderr line. The first line of
   stderr is what Claude/the user sees (`safety-gate.py:105-110`).
 - **Inject context** via stdout JSON: `{"hookSpecificOutput": {"hookEventName":
-  "<event>", "additionalContext": "..."}}` (`caveman-mode.py:61-67`,
+  "<event>", "additionalContext": "..."}}` (`modes.py:252-258`,
   `session-start:63`).
 - **`async: true`** for Stop/Notification/PermissionRequest hooks that do I/O
   (`hooks.json:51,63,73`) so the UI is not held up.

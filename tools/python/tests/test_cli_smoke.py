@@ -23,7 +23,7 @@ from typer.main import get_command
 from af.agent_knowledge import app as ak_app
 from af.archetype import app as archetype_app
 from af.audit import app as audit_app
-from af.caveman import app as caveman_app
+from af.mode import app as mode_app
 from af.context import app as context_app
 from af.log import app as log_app
 from af.skill_usage import app as skill_usage_app
@@ -156,8 +156,8 @@ def test_log_help():
     assert result.exit_code == 0, result.output
 
 
-def test_caveman_help():
-    result = runner.invoke(get_command(caveman_app), ["--help"])
+def test_mode_help():
+    result = runner.invoke(get_command(mode_app), ["--help"])
     assert result.exit_code == 0, result.output
 
 

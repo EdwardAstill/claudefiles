@@ -236,10 +236,6 @@ category = "coding/quality"
 tools = ["Bash", "Read", "Grep", "WebFetch"]
 category = "coding/quality"
 
-[skills.caveman]
-tools = []
-category = "communication/caveman"
-
 [skills.repomix]
 tools = ["Bash"]
 category = "coding/quality"
@@ -467,3 +463,57 @@ description = "Focused code review with confidence filtering (local copy)"
 source = "agentfiles/agents/code-simplifier.md"
 category = "builtin-copy"
 description = "Behavior-preserving code simplification (local copy)"
+
+[agents."feature-dev:code-architect"]
+source = "agentfiles/agents/feature-dev-code-architect.md"
+category = "builtin-copy"
+description = "feature-dev:code-architect — richer architect variant used by the feature-dev slash command (local copy)"
+
+[agents."feature-dev:code-explorer"]
+source = "agentfiles/agents/feature-dev-code-explorer.md"
+category = "builtin-copy"
+description = "feature-dev:code-explorer — richer explorer variant used by the feature-dev slash command (local copy)"
+
+[agents."feature-dev:code-reviewer"]
+source = "agentfiles/agents/feature-dev-code-reviewer.md"
+category = "builtin-copy"
+description = "feature-dev:code-reviewer — confidence-scored reviewer variant used by the feature-dev slash command (local copy)"
+
+[agents.statusline-setup]
+source = "agentfiles/agents/statusline-setup.md"
+category = "builtin-copy"
+description = "Configures ~/.claude/settings.json statusLine command (local copy of Claude Code built-in)"
+
+# ── Behavioral modes ─────────────────────────────────────────────────────────
+# Cross-cutting operating postures activated with `af mode on/off`, re-injected
+# each turn by `hooks/modes.py`. See agentfiles/modes/README.md for authoring.
+
+[modes.caveman]
+source = "agentfiles/modes/caveman/MODE.md"
+category = "communication"
+description = "Terse communication with three levels (lite / full / actual-caveman)"
+
+[modes.token-efficient]
+source = "agentfiles/modes/token-efficient/MODE.md"
+category = "communication"
+description = "Cap replies short, code-and-command preferred, keep grammar intact"
+
+[modes.deep-research]
+source = "agentfiles/modes/deep-research/MODE.md"
+category = "research"
+description = "Multi-source fanout, 3+ citations, no memory-only answers on fresh topics"
+
+[modes.verify-first]
+source = "agentfiles/modes/verify-first/MODE.md"
+category = "rigor"
+description = "Run test/typecheck/smoke check and quote output before claiming success"
+
+[modes.rubber-duck]
+source = "agentfiles/modes/rubber-duck/MODE.md"
+category = "rigor"
+description = "Ask one clarifying question before editing; wait for reply"
+
+[modes.planner]
+source = "agentfiles/modes/planner/MODE.md"
+category = "planning"
+description = "Numbered plan before tool calls; approval required on >5 steps"

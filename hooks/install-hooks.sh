@@ -41,7 +41,7 @@ HOOKS_CONFIG=$(cat <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/skills/hooks/caveman-mode.py"
+            "command": "~/.claude/skills/hooks/modes.py"
           }
         ]
       }

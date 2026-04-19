@@ -48,8 +48,6 @@ agentfiles/
 │   │   ├── git-expert     ← Version control context manager.
 │   │   ├── git-worktree-workflow     ← Use when starting isolated feature work (creates a git worktree with safety verification and a cl...
 │   │   ├── github-expert     ← GitHub and gh CLI specialist.
-├── communication/
-│   ├── caveman     ← Terse communication mode with three levels: off (normal), lite (drop filler, keep grammar), full ...
 ├── management/
 │   ├── meta     ← Sub-category dispatcher for skill system tooling.
 │   ├── consultants/

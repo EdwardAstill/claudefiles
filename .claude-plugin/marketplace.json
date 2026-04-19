@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "agentfiles",
-      "description": "54 curated skills (executor, manager, specialists for coding/research/planning), 10 subagents, and session hooks (caveman mode, safety gate, skill logger, notify). Requires the 'af' CLI on PATH for full functionality (install via 'uv tool install -e tools/python/').",
+      "description": "54 curated skills (executor, manager, specialists for coding/research/planning), 10 subagents, behavioral modes (token-efficient, caveman, ...), and session hooks (modes re-injector, safety gate, skill logger, notify). Requires the 'af' CLI on PATH for full functionality (install via 'uv tool install -e tools/python/').",
       "source": "./",
       "strict": false
     }

@@ -62,9 +62,14 @@ if git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   git_display="${git_branch} ${git_indicator}"
 fi
 
-# Caveman mode indicator — read state file if hook is enabled
+# Caveman mode indicator — read state file if hook is enabled.
+# New canonical location is ~/.claude/modes/caveman; fall back to legacy path
+# for one release in case a stale state file is still around.
 caveman_display=""
-CAVEMAN_STATE="$HOME/.claude/caveman-mode"
+CAVEMAN_STATE="$HOME/.claude/modes/caveman"
+if [ ! -f "$CAVEMAN_STATE" ] && [ -f "$HOME/.claude/caveman-mode" ]; then
+  CAVEMAN_STATE="$HOME/.claude/caveman-mode"
+fi
 if [ -f "$CAVEMAN_STATE" ]; then
   caveman_level=$(tr -d '[:space:]' < "$CAVEMAN_STATE")
   [ -z "$caveman_level" ] && caveman_level="full"

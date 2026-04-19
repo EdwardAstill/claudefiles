@@ -30,7 +30,7 @@ import typer
 app = typer.Typer(help="Audit the agentfiles manifest for consistency.")
 
 
-_TOML_SECTION_RE = re.compile(r"^\[(skills|agents|cli)\.([^\]]+)\]")
+_TOML_SECTION_RE = re.compile(r'^\[(skills|agents|cli)\.(?:"([^"]+)"|([^\]"]+))\]')
 _CLI_LIST_RE = re.compile(r'cli\s*=\s*\[([^\]]+)\]')
 
 
@@ -48,7 +48,8 @@ def _parse_manifest(path: Path) -> dict[str, set[str]]:
     for line in path.read_text().splitlines():
         m = _TOML_SECTION_RE.match(line.strip())
         if m:
-            sections[m.group(1)].add(m.group(2))
+            # Group 2 = quoted key body; group 3 = bare key. Exactly one fires.
+            sections[m.group(1)].add(m.group(2) or m.group(3))
             continue
         cli_m = _CLI_LIST_RE.search(line)
         if cli_m:

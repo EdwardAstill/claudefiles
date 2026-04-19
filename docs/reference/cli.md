@@ -372,7 +372,7 @@ af caveman on actual-caveman  # grunt-style cave talk (novelty)
 af caveman                # show current mode
 ```
 
-State file: `~/.claude/caveman-mode`. UserPromptSubmit hook re-injects level reminder every turn (no drift over long conversations).
+State file: `~/.claude/modes/caveman` (written via the unified `af mode` state dir; `af caveman` is a backwards-compat alias for `af mode on/off caveman`). UserPromptSubmit hook (`hooks/modes.py`) re-injects level reminder every turn (no drift over long conversations).
 
 Modes:
 - **off** — normal prose

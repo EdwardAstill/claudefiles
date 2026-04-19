@@ -44,9 +44,9 @@ HOOKS_CONFIG=$(cat <<EOF
       {
         "hooks": [
           {
-            "name": "caveman-mode",
+            "name": "modes",
             "type": "command",
-            "command": "$HOOK_BASE/caveman-mode.py"
+            "command": "$HOOK_BASE/modes.py"
           }
         ]
       }

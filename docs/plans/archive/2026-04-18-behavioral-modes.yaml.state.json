@@ -1,0 +1,12 @@
+{
+  "caveman_alias": "done",
+  "cli_mode": "done",
+  "generic_hook": "done",
+  "hooks_json_swap": "done",
+  "mode_caveman": "done",
+  "mode_token_efficient": "done",
+  "primitive_dir": "done",
+  "quality_review": "done",
+  "tests": "done",
+  "verify_all_green": "done"
+}
