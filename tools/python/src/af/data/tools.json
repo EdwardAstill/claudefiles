@@ -7,7 +7,6 @@
     {"name": "note",     "type": "internal", "package": "af", "description": "Shared scratchpad for cross-agent communication", "usage": "af note <message> [--agent <name>] [--read] [--clear]"},
     {"name": "read",     "type": "internal", "package": "af", "description": "Dump .agentfiles/ bus state", "usage": "af read [context|versions|routes|repo-map|notes]"},
     {"name": "init",     "type": "internal", "package": "af", "description": "Bootstrap .agentfiles/ in current project", "usage": "af init [--dry-run]"},
-    {"name": "worktree", "type": "internal", "package": "af", "description": "Create git worktree and open Claude Code in new terminal", "usage": "af worktree <branch> [base]"},
     {"name": "agents",   "type": "internal", "package": "af", "description": "Inventory of skills grouped by category, plugins, MCP servers, and CLI tool status", "usage": "af agents [--tree] [--global] [--project] [--available] [--mcp]"},
     {"name": "check",    "type": "internal", "package": "af", "description": "Verify all leaf skills have entries in their category REGION.md", "usage": "af check [--verbose]"},
     {"name": "log",      "type": "internal", "package": "af", "description": "View skill invocation history logged by the PostToolUse hook", "usage": "af log [--skill <name>] [--stats] [--tail N]"},

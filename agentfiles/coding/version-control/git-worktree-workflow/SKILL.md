@@ -83,6 +83,36 @@ Why this matters: prevents accidentally committing worktree contents to the repo
 
 ### Creation Steps
 
+#### Fast path — `gwt`
+
+For the common case of "create the worktree, allocate a free dev port,
+maybe launch something in it", use the
+[`gwt`](https://github.com/EdwardAstill/gwt) CLI (install:
+`pipx install gwt` or `uv pip install -e ~/projects/gwt`):
+
+```bash
+# Create only — prints WORKTREE CONTEXT block with path/branch/port.
+gwt <branch> [base]
+
+# Create + launch Claude Code in a new terminal window.
+gwt <branch> [base] --launch 'claude {path}'
+
+# Or any other command template — {path} expands to the worktree dir.
+gwt <branch> [base] --launch 'code {path}'
+```
+
+`gwt` places the worktree at `<parent>/<repo>-<branch>`, which is the
+sibling-directory convention. If the user wants it under `.worktrees/`
+or another location, drop to the manual steps below instead — `gwt`
+doesn't take a destination override.
+
+The `--launch` template accepts `{path}` as the worktree-path
+placeholder; the spawn goes via `$TERMINAL -e <cmd>` when `$TERMINAL`
+is set, otherwise the resolved command is just printed. Env-var
+fallback: `GWT_LAUNCH_CMD`.
+
+#### Manual path
+
 **1. Detect project name**
 
 ```bash

@@ -202,8 +202,13 @@ af install --dry-run                     # preview
 
 ### Git
 
+Worktree creation moved to the standalone
+[`gwt`](https://github.com/EdwardAstill/gwt) CLI. Install with
+`pipx install gwt` or `uv pip install -e ~/projects/gwt`, then:
+
 ```bash
-af worktree <branch> [base]   # create worktree + open Claude Code
+gwt <branch> [base]                          # create + allocate port
+gwt <branch> [base] --launch 'claude {path}' # create + launch Claude
 ```
 
 ---

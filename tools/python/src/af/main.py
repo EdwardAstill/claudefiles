@@ -11,7 +11,6 @@ _SUBCOMMANDS = [
     ("note", "note"),
     ("read", "read"),
     ("init", "init"),
-    ("worktree", "worktree"),
     ("agents", "agents"),
     ("check", "check"),
     ("log", "log"),

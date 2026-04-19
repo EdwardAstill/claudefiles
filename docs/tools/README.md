@@ -32,10 +32,6 @@ Documentation for every `af` subcommand and the external tools they depend on.
 - [index](index.md) — Index directories for search
 - [search](search.md) — Full-text and semantic search via mks
 
-### Git
-
-- [worktree](worktree.md) — Create git worktree and open terminal
-
 ### UI Preview & Browser
 
 - [preview](preview.md) — Serve HTML mockups with auto-refresh
