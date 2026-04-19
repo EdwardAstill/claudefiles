@@ -167,6 +167,69 @@ def _do_remove(dst: Path, dry_run: bool) -> None:
         click.echo(f"  [removed] {dst}")
 
 
+def _prune_stale_symlinks(
+    target_dir: Path,
+    known_basenames: set[str],
+    repo_root: Path,
+    dry_run: bool,
+    suffix: str = "",
+) -> int:
+    """Remove symlinks in target_dir that point into the agentfiles repo
+    but whose basename is no longer in known_basenames.
+
+    Only removes entries that both (a) are symlinks and (b) resolve to a path
+    under repo_root — manual user symlinks from elsewhere are left alone.
+
+    Returns the number of pruned entries.
+
+    Args:
+        suffix: file suffix to strip before comparing to known_basenames
+                (e.g. ".md" for agents dir).
+    """
+    if not target_dir.is_dir():
+        return 0
+
+    pruned = 0
+    repo_root = repo_root.resolve()
+    for entry in sorted(target_dir.iterdir()):
+        if not entry.is_symlink():
+            continue
+
+        basename = entry.name
+        if suffix and basename.endswith(suffix):
+            basename = basename[: -len(suffix)]
+        if basename in known_basenames:
+            continue
+
+        # Broken symlink: prune (we know the name isn't registered and the
+        # target is gone — can't do anything else useful with it).
+        if not entry.exists():
+            if dry_run:
+                click.echo(f"  [dry-run] prune (broken): {entry}")
+            else:
+                entry.unlink()
+                click.echo(f"  [pruned] {entry} (broken symlink)")
+            pruned += 1
+            continue
+
+        # Live symlink: only prune if it points INTO the agentfiles repo.
+        # Symlinks the user created by hand to external sources are left alone.
+        resolved = entry.resolve()
+        try:
+            resolved.relative_to(repo_root)
+        except ValueError:
+            continue
+
+        if dry_run:
+            click.echo(f"  [dry-run] prune: {entry} (no longer in manifest)")
+        else:
+            entry.unlink()
+            click.echo(f"  [pruned] {entry} (no longer in manifest)")
+        pruned += 1
+
+    return pruned
+
+
 # ── CLI tool installation ────────────────────────────────────────────────────
 
 
@@ -440,6 +503,20 @@ def install_cmd(
             skill_dir = selected[name]
             _do_symlink(skill_dir, target / name, dry_run)
 
+    # Prune stale skill symlinks — only on full install (no --skill / --category).
+    # Preserve non-skill entries that install.py itself creates (hooks, etc.).
+    if not skill_name and not category:
+        preserved = {"hooks", "commands"}
+        keep = set(all_skills) | preserved
+        for target in targets:
+            pruned = _prune_stale_symlinks(
+                target, keep, repo_root, dry_run
+            )
+            if pruned:
+                click.echo(
+                    f"  {pruned} stale skill symlink(s) pruned from {target}"
+                )
+
     # Agents (only on full install — skill_name and category scopes skip agents)
     if all_agents and not skill_name and not category:
         click.echo(f"\nInstalling {len(all_agents)} subagent(s) {scope}...")
@@ -449,6 +526,16 @@ def install_cmd(
             agent_target.mkdir(parents=True, exist_ok=True)
             for name in sorted(all_agents):
                 _do_symlink(all_agents[name], agent_target / f"{name}.md", dry_run)
+
+        # Prune stale agent symlinks.
+        for agent_target in agent_targets:
+            pruned = _prune_stale_symlinks(
+                agent_target, set(all_agents), repo_root, dry_run, suffix=".md"
+            )
+            if pruned:
+                click.echo(
+                    f"  {pruned} stale agent symlink(s) pruned from {agent_target}"
+                )
 
     # Hooks (global only, unless explicitly installing per-project)
     if global_mode:
